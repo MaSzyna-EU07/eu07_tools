@@ -3,7 +3,7 @@ This module contains utilities sharing by various IO components.
 """
 
 from typing import Sequence
-
+from .tokenize import TokenStream
 
 DEFAULT_NEWLINE = '\r\n'
 

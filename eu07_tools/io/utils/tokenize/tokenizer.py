@@ -3,6 +3,7 @@ from io import TextIOWrapper, BufferedReader, BytesIO
 import re
 import math
 
+# TODO: Clean up
 
 def _get_stream_size(stream: TextIOWrapper) -> int:
     stream.seek(0, 2)
