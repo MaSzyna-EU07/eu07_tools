@@ -115,4 +115,26 @@ class SCNLoader:
         start_time, sunset_time, sunrise_time = self._token_stream.get_tokens(3)
 
 
+class NodeLoader:
+    def __init__(self):
+        self._subnode_loaders {
+            "dynamic": self._load_dynamic,
+            "eventlauncher": self._load_eventlauncher,
+            "lines": self._load_lines,
+            "line_strip": self._load_linestrip,
+            "line_loop": self._load_lineloop,
+            "memcell": self._load_memcell,
+            "model": self._load_model,
+            "sound": self._load_sound,
+            "track": self._load_track,
+            "traction": self._load_traction,
+            "tractionpowersource": self._load_tractionpowersource,
+            "triangles": self._load_triangles,
+            "traingle_strip": self._load_trianglestrip,
+            "triangle_fan": self._load_trianglefan
+        }
+
+    def load_node(self, token_stream):
+        pass
+
     
