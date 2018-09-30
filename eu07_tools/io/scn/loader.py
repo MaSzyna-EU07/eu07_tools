@@ -30,8 +30,12 @@ class SCNLoader:
         keyword = self._token_stream.get_token().lower()
         load_entry_func = self._entry_loaders[keyword]
 
-        entry = load_entry_func()
-        yield keyword, entry
+        if load_entry_func:
+            entry_object = load_entry_func()
+        else:
+            entry_object = None
+
+        yield keyword, entry_object
 
 
     @property
@@ -49,6 +53,9 @@ class SCNLoader:
 
         return SCNAtmo(sky_color, fog_start, fog_end, fog_color, overcast)
 
+    def _load_area(self):
+        isolated_names = self._token_stream.get_tokens_before("endarea")
+
     def _load_camera(self):
         tokens = self._token_stream.get_tokens_before("endcamera")
         values = [float(token) for token in tokens]
@@ -60,14 +67,13 @@ class SCNLoader:
         return SCNCamera(position, rotation, index)
 
     def _load_config(self):
-        pass
+        self._token_stream.get_tokens_before("endconfig")
 
     def _load_description(self):
-        pass
-        #return self._token_stream.get_tokens_before("enddescription")
+        self._token_stream.get_tokens_before("enddescription")
 
     def _load_event(self):
-        pass
+        self._token_stream.get_tokens_before("endevent")
 
     def _load_firstinit(self):
         return None
@@ -92,16 +98,18 @@ class SCNLoader:
         return SCNLua(file_path)
 
     def _load_node(self):
-        pass
-
+        max_distance, min_distance, name, typename = self._token_stream.get_tokens(4)
+        
     def _load_origin(self):
-        pass
+        tokens = self._token_stream.get_tokens(3)
+        offset_vector = [float(token) for token in tokens]
+        return Vector3(offset_vector)
 
     def _load_rotate(self):
-        tokens = self._token_stream.get_tokens_before("endlight")
-        values = [float(token) for token in tokens]
+        tokens = self._token_stream.get_tokens(3)
+        rotation_vector = [float(token) for token in tokens]
 
-        return Vector3(values)
+        return Vector3(rotation_vector)
 
     def _load_sky(self):
         model_path = self._token_stream.get_token()
@@ -116,8 +124,9 @@ class SCNLoader:
 
 
 class NodeLoader:
-    def __init__(self):
-        self._subnode_loaders {
+    def __init__(self, token_stream: TokenStream):
+        self._token_stream = token_stream
+        self._node_loaders {
             "dynamic": self._load_dynamic,
             "eventlauncher": self._load_eventlauncher,
             "lines": self._load_lines,
@@ -134,7 +143,29 @@ class NodeLoader:
             "triangle_fan": self._load_trianglefan
         }
 
-    def load_node(self, token_stream):
-        pass
+    def load_node(self, name: str, typename: str):
+        load_node_func = self._node_loaders[typename]
+
+        if load_node_func:
+            node_object = load_node_func(name)
+        else:
+            node_object = None
+
+        return node_object
+
+    def _load_model(self, name: str):
+        model = SCNNodeModel(name)
+
+        tokens = self._token_stream.get_tokens_before("endmodel")
+        *model.location, model.rotation_y = (float(token) for token in tokens[:4])
+        model.file_path, model.replacableskin = tokens[4:5]
+
+        try:
+            model.light_states = (int(token) for token in tokens[6:])
+        except IndexError:
+            pass
+
+        return model
+
 
     

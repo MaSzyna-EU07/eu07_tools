@@ -114,6 +114,10 @@ class Vector2(collections.abc.Iterable):
         )
 
 
+class Bezier3D:
+    pass
+
+
 class Vertex3D(collections.abc.Iterable):
     def __init__(self, values: Sequence[float]):
         num_values = len(values)
