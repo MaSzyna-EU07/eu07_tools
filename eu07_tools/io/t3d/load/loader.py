@@ -1,5 +1,5 @@
 from io import TextIOWrapper
-from typing import Iterator, Union
+from typing import Iterator, Tuple, Any
 
 from eu07_tools.structs.t3d.submodel import T3DSubmodel
 from .parser import T3DPropertiesParser
@@ -9,6 +9,9 @@ from eu07_tools.structs.utils import IncludedFile
 
 
 class T3DLoader:
+    """
+    Class for loading T3D text model files.
+    """
     def __init__(self):
         self._NUMS_MAX_PROPERTIES = {
             "mesh": 17,
@@ -21,7 +24,8 @@ class T3DLoader:
         self._properties_iter = None
 
     # TODO: Validation
-    def load_from_file(self, file: TextIOWrapper, validate: bool=False) -> Iterator[Union[IncludedFile, T3DSubmodel]]:
+    def load_from_file(self, file: TextIOWrapper) -> Iterator[Tuple(str, Any)]:
+        """ Read given file and yield tuple with entry identifier and entry datablock. """
         self._properties_iter = self._parser.parse_properties(file)
 
         while True:
@@ -33,16 +37,17 @@ class T3DLoader:
             if key == "include":
                 path, *parameters = value
                 yield "include", IncludedFile(path, *parameters)
+
             elif key == "parent":
                 type_id, submodel = self._load_submodel(parent_name=value)
                 yield type_id, submodel
+
             else:
-                if validate:
-                    raise SyntaxError(
-                        f"Unexpected token \"{key}\"" 
-                        f"in file {file.name}" 
-                        f"at line {self._parser.current_line_number}"
-                    )
+                raise SyntaxError(
+                    f"Unexpected token \"{key}\"" 
+                    f"in file {file.name}" 
+                    f"at line {self._parser.current_line_number}"
+                )
 
     @property
     def progress(self) -> float:
