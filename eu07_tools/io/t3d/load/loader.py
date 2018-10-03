@@ -32,10 +32,10 @@ class T3DLoader:
 
             if key == "include":
                 path, *parameters = value
-                yield IncludedFile(path, *parameters)
+                yield "include", IncludedFile(path, *parameters)
             elif key == "parent":
-                submodel = self._load_submodel(parent_name=value)
-                yield submodel
+                type_id, submodel = self._load_submodel(parent_name=value)
+                yield type_id, submodel
             else:
                 if validate:
                     raise SyntaxError(

@@ -40,6 +40,14 @@ class SCNNodeLines(SCNNode):
     def get_vertex_position(self, index: int) -> Vector3:
         return self._vertices_positions[index]
 
+    @property
+    def color(self) -> ColorRGB:
+        return self._color
+
+    @color.setter
+    def color(self, color: Iterable[float]):
+        self._color = ColorRGB(color)
+
 
 class SCNNodeLineStrip(SCNNodeLines): pass
 

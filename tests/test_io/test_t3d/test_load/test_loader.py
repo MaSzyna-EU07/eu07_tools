@@ -6,13 +6,13 @@ TESTDATA_FILENAME = os.path.join(os.path.dirname(__file__), 'loader_testfile.t3d
 def test_load_file():
     entries = T3DLoader().load_from_file(open(TESTDATA_FILENAME))
 
-    expected = [
-        "<T3DMeshSubmodel: sub0>",
-        "<IncludedFile(path=example.t3d, params=('param', 'pam', 'pam'))>",
-        "<T3DFreeSpotLightSubmodel: sub1>",
-        "<T3DStarsSubmodel: sub2>",
-    ]
+    report = [type_id for type_id, _ in entries]
 
-    report = [repr(entry) for entry in entries]
+    expected = [
+        "submodel::mesh", 
+        "include", 
+        "submodel::freespotlight", 
+        "submodel::stars"
+    ]
 
     assert report == expected 

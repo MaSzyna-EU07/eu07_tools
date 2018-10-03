@@ -9,7 +9,7 @@ class T3DSubmodel(abc.ABC):
     def __init__(self, name: str):
         self.parent_name = "none"
         self.name: str = name
-        self.type_name = ""
+        self.type = ""
         self.anim: str = "false" # Enum here?
         self._diffuse: ColorRGB = ColorRGB((255, 255, 255))
         self.self_illum: float = ColorRGB

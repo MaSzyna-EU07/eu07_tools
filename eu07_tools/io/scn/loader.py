@@ -10,7 +10,7 @@ class SCNLoader:
             "config": self._load_config,
             "description": self._load_description,
             "event": self._load_event,
-            "firstinit": self._load_first_init,
+            "firstinit": self._load_firstinit,
             "include": self._load_include,
             "light": self._load_light,
             "lua": self._load_lua,
@@ -24,19 +24,18 @@ class SCNLoader:
             "trainset": self._load_trainset
         }
 
-    def load_scenery(self, file):
+    def load_scenery_elements(self, file):
         self._token_stream = TokenStream.from_file(file)
 
         keyword = self._token_stream.get_token().lower()
-        load_entry_func = self._entry_loaders[keyword]
+        load_entry_func = self._entry_loaders.get(keyword)
 
         if load_entry_func:
-            entry_object = load_entry_func()
+            entry_type, entry_object = load_entry_func()
         else:
-            entry_object = None
+            raise
 
-        yield keyword, entry_object
-
+        yield entry_type, entry_object
 
     @property
     def progress(self):
@@ -51,10 +50,11 @@ class SCNLoader:
         fog_color = values[5:8] if fog_end > 0 else None
         overcast = values[-1]
 
-        return SCNAtmo(sky_color, fog_start, fog_end, fog_color, overcast)
+        return "atmo", SCNAtmo(sky_color, fog_start, fog_end, fog_color, overcast)
 
     def _load_area(self):
         isolated_names = self._token_stream.get_tokens_before("endarea")
+        return "area", isolated_names
 
     def _load_camera(self):
         tokens = self._token_stream.get_tokens_before("endcamera")
@@ -64,7 +64,7 @@ class SCNLoader:
         rotation = values[3:6]
         index = int(values[-1]) if len(values) == 7 else None
 
-        return SCNCamera(position, rotation, index)
+        return "camera", SCNCamera(position, rotation, index)
 
     def _load_config(self):
         self._token_stream.get_tokens_before("endconfig")
@@ -73,14 +73,14 @@ class SCNLoader:
         self._token_stream.get_tokens_before("enddescription")
 
     def _load_event(self):
-        self._token_stream.get_tokens_before("endevent")
+        self._token_stream.get_tokens_before("endevent") 
 
     def _load_firstinit(self):
-        return None
+        return "firstinit", None
 
     def _load_include(self):
         file_path, params = self._token_stream.get_tokens_before("end")
-        return IncludedFile(file_path, params)
+        return "include", IncludedFile(file_path, params)
 
     def _load_light(self):
         tokens = self._token_stream.get_tokens_before("endlight")
@@ -91,29 +91,39 @@ class SCNLoader:
         diffuse = values[6:9]
         specular = values[9:12]
 
-        return SCNLight(location, ambient, diffuse, specular)
+        return "light", SCNLight(location, ambient, diffuse, specular)
 
     def _load_lua(self):
         file_path = self._token_stream.get_token()
-        return SCNLua(file_path)
+        return "lua", file_path
 
     def _load_node(self):
         max_distance, min_distance, name, typename = self._token_stream.get_tokens(4)
+
+        node = None
+        node.max_distance = max_distance
+        node.min_distance = min_distance
+
+        return f"node::{typename}", node
         
     def _load_origin(self):
         tokens = self._token_stream.get_tokens(3)
         offset_vector = [float(token) for token in tokens]
-        return Vector3(offset_vector)
+        return "origin", Vector3(offset_vector)
+
+    def _load_endorigin(self):
+        self._token_stream.get_token()
+        return "endorigin", None
 
     def _load_rotate(self):
         tokens = self._token_stream.get_tokens(3)
         rotation_vector = [float(token) for token in tokens]
 
-        return Vector3(rotation_vector)
+        return "rotate", Vector3(rotation_vector)
 
     def _load_sky(self):
         model_path = self._token_stream.get_token()
-        return SCNSky(model_path)
+        return "sky", model_path
 
     def _load_test(self):
         self._token_stream.get_tokens_before("endtest")
@@ -122,11 +132,13 @@ class SCNLoader:
         tokens = self._token_stream.get_tokens_before("endtime")
         start_time, sunset_time, sunrise_time = self._token_stream.get_tokens(3)
 
+        return SCNTime(start_time, sunset_time, sunrise_time)
+
 
 class NodeLoader:
     def __init__(self, token_stream: TokenStream):
         self._token_stream = token_stream
-        self._node_loaders {
+        self._node_loaders = {
             "dynamic": self._load_dynamic,
             "eventlauncher": self._load_eventlauncher,
             "lines": self._load_lines,
@@ -153,6 +165,34 @@ class NodeLoader:
 
         return node_object
 
+    def _load_lines(self):
+        color, thickness, vertices = self._load_lines()
+        
+
+    def _load_lines(self, name: str):
+        lines = SCNNodeLines(name)
+
+        tokens = self._token_stream.get_tokens(4)
+        *lines.color, lines.thickness = (float(token) for token in tokens)
+
+        tokens = self._token_stream.get_tokens_before("endlines")
+        numbers = [float(token) for token in tokens]
+
+        num_vertices = len(numbers) / 3
+        vertices = []
+        for vertex_id in range(num_vertices):
+            vertex = numbers[vertex_id * 3:(vertex_id + 1) * 3]
+            lines.add_vertex_position(vertex)
+
+        return "lines", lines
+
+    def _load_linestrip(self, name: str):
+        return "line_strip", self._load_lines(name)
+
+    def _load_lineloop(self, name: str):
+        return "line_loop", self._load_lines(name)
+
+
     def _load_model(self, name: str):
         model = SCNNodeModel(name)
 
@@ -165,7 +205,7 @@ class NodeLoader:
         except IndexError:
             pass
 
-        return model
+        return "model", model
 
 
     

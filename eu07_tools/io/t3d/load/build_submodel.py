@@ -50,4 +50,5 @@ def build_submodel(d):
     submodel.min_distance = d["mindistance"]
     submodel.transform = d["transform"]
 
-    return submodel
+    type_id = f"submodel::{type_}"
+    return type_id, submodel
