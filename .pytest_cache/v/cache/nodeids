@@ -1,3 +1,26 @@
 [
-  "tests/test_io/test_t3d/test_load/test_loader.py::test_load_file"
+  "tests/test_io/test_scn/test_loader.py::Test_Loader::()::test_load_atmo",
+  "tests/test_io/test_t3d/test_load/test_loader.py::test_load_file",
+  "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_include",
+  "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_single_value",
+  "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_rgb",
+  "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_matrix",
+  "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_geometry_with_numverts_divisible_by_3",
+  "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_geometry_with_numverts_non_divisible_by_3",
+  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_rgb",
+  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_transform",
+  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_bool",
+  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_self_illum",
+  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_geometry",
+  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_token::()::test_when_stream_has_tokens",
+  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_token::()::test_when_stream_is_exhausted",
+  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_tokens::()::test_when_stream_has_tokens",
+  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_tokens::()::test_when_stream_is_exhausted",
+  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_tokens::()::test_when_stream_gets_exhausted_during_call",
+  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_tokens_before::()::test_when_stream_has_tokens",
+  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_tokens_before::()::test_when_stream_is_exhausted",
+  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_tokens_before::()::test_when_stream_gets_exhausted_during_call",
+  "tests/test_io/test_tokenize/test_tokenizer.py::Test_tokenize::()::test_various_separators",
+  "tests/test_io/test_tokenize/test_tokenizer.py::Test_tokenize::()::test_comments",
+  "tests/test_io/test_tokenize/test_tokenizer.py::Test_tokenize::()::test_quoted_tokens"
 ]

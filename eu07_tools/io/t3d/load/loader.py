@@ -24,7 +24,7 @@ class T3DLoader:
         self._properties_iter = None
 
     # TODO: Validation
-    def load_from_file(self, file: TextIOWrapper) -> Iterator[Tuple(str, Any)]:
+    def load_from_file(self, file: TextIOWrapper) -> Iterator[Tuple[str, Any]]:
         """ Read given file and yield tuple with entry identifier and entry datablock. """
         self._properties_iter = self._parser.parse_properties(file)
 
