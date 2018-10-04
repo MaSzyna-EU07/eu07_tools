@@ -3,32 +3,6 @@ import collections
 from typing import Any, Iterable, Sequence
 
 
-class IncludedFile:
-    def __init__(self, file_path: str, *params: Sequence[Any]):
-        self.file_path = file_path
-        self._params = params
-
-    def get_parameter(self, index: int) -> str:
-        try:
-            if index < 1:
-                raise IndexError()
-            return self._params[index-1]
-        except IndexError:
-            return None
-
-    def __str__(self):
-        params_str = " ".join(str(param) for param in self._params)
-        return (f"include {params_str} end")
-
-    def __repr__(self):
-        return (
-            f"<{self.__class__.__name__}("
-            f"path={self.file_path}, "
-            f"params={self._params}"
-            f")>"
-        )
-
-
 class ColorRGB(collections.abc.Iterable):
     def __init__(self, values: Sequence[float]):
         self.r, self.g, self.b = values

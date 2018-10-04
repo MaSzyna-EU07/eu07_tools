@@ -1,6 +1,4 @@
 [
-  "tests/test_io/test_scn/test_loader.py::Test_Loader::()::test_load_atmo",
-  "tests/test_io/test_t3d/test_load/test_loader.py::test_load_file",
   "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_include",
   "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_single_value",
   "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_rgb",

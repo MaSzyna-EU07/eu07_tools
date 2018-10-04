@@ -1,4 +1,4 @@
 {
-  "tests/test_io/test_scn/test_loader.py::Test_Loader": true,
-  "tests/test_io/test_scn/test_loader.py::Test_Loader::()::test_load_atmo": true
+  "tests/test_io/test_scn/test_loader.py": true,
+  "tests/test_io/test_t3d/test_load/test_loader.py": true
 }

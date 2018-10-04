@@ -35,8 +35,7 @@ class T3DLoader:
                 return None
 
             if key == "include":
-                path, *parameters = value
-                yield "include", IncludedFile(path, *parameters)
+                yield "include", list(value)
 
             elif key == "parent":
                 type_id, submodel = self._load_submodel(parent_name=value)
@@ -67,7 +66,8 @@ class T3DLoader:
             casted_value = self._type_caster.cast_property_value(key, value)
             submodel_dict[key] = casted_value
 
-        return build_submodel(submodel_dict)
+        type_id, submodel = build_submodel(submodel_dict)
+        return type_id, submodel
     
 
         
