@@ -4,7 +4,7 @@ from .freespotlight import T3DFreeSpotLightSubmodel
 from .submodel import T3DSubmodel
 
 
-def create_submodel(type_: str, name: str) -> T3DSubmodel:
+def create_submodel(name: str, type_: str) -> T3DSubmodel:
     """ Create named T3DSubmodel instance """
     type_lowered = type_.lower()
     if type_lowered == "mesh":

@@ -21,9 +21,14 @@ class T3DStarsSubmodel(T3DSubmodel):
         """ Remove specified star from submodel """
         self._stars.remove(star)
 
+    @property
     def stars(self) -> Sequence[T3DStar]:
         """ Return list of stars """
         return tuple(self._stars)
+
+    @property
+    def num_verts(self) -> int:
+        return len(self._stars)
 
 
 class T3DStar:

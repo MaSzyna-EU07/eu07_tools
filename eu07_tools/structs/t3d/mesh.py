@@ -12,7 +12,7 @@ class T3DMeshSubmodel(T3DSubmodel):
         self._specular: ColorRGB = ColorRGB((255, 255, 255))
         self.wire: bool = False
         self.wire_size: float = 1.0
-        self.opacity: float = 1.0
+        self.opacity: float = 100.0
         self.map = "none"
         self._triangles: Sequence[T3DTriangle] = []
 
@@ -53,6 +53,7 @@ class T3DMeshSubmodel(T3DSubmodel):
 
 class T3DTriangle:
     def __init__(self, vertices: Iterable[Iterable[float]], smooth: int=0):
+        # TODO: Automatic -1 mask when vertices has normals
         self.smooth: int = smooth
         self.vertices = tuple(
             Vertex3D(vertex) for vertex in vertices

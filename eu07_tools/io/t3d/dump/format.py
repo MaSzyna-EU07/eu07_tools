@@ -8,7 +8,7 @@ def format_sequence(seq: Iterable[object]) -> str:
 
 
 def format_number(num: Union[float, int]) -> str:
-    return str(round(num, _FLOAT_PRECISION))
+    return str(round(num, _FLOAT_PRECISION)).rstrip("0").rstrip(".")
 
 
 def format_matrix(matrix: Iterable[float]) -> str:
@@ -27,7 +27,7 @@ def format_geometry_unit(unit: Sequence[Union[int, Iterable[float]]]) -> str:
         "\n".join(
             format_sequence(vertex)
             for vertex in unit[1:]
-        ) + "\n"
+        ) + "\n\n"
     )
 
 

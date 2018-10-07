@@ -17,6 +17,9 @@ class ColorRGB(collections.abc.Iterable):
             self.b == other.b
         )
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __str__(self):
         return f"{self.r} {self.g} {self.b}"
 
@@ -43,6 +46,9 @@ class Vector4(collections.abc.Iterable):
             self.v == other.v
         )
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return (
             f"<{self.__class__.__name__}("
@@ -65,26 +71,35 @@ class Vector3(collections.abc.Iterable):
             f")>"
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return (
             self.x == other.x and
             self.y == other.y and
             self.z == other.z
         )
 
+    def __ne__(self, other) -> bool:
+        return not self.__eq__(other)
+
 
 class Vector2(collections.abc.Iterable):
     def __init__(self, values: Sequence[float]):
         self.x, self.y = values
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[float]:
         return iter((self.x, self.y))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"<{self.__class__.__name__}("
             f"x={self.x}, y={self.y}"
             f")>"
+        )
+    
+    def __eq__(self, other) -> bool:
+        return (
+            self.x == other.x and
+            self.y == other.y
         )
 
 

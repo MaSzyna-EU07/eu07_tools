@@ -85,9 +85,9 @@ class MeshSubmodelWriter(SubmodelWriter):
         self._write_property("WireSize", submodel.wire_size)
         self._write_property("Opacity", submodel.opacity)
         self._write_property("Map", submodel.map)
-        self._write_property("NumVerts", submodel.num_verts)
 
     def _write_geometry(self, submodel: T3DSubmodel):
+        self._write_property("NumVerts", submodel.num_verts)
         for triangle in submodel.triangles:
             unit = [triangle.smooth, *triangle.vertices]
 
@@ -117,24 +117,26 @@ class StarsSubmodelWriter(SubmodelWriter):
     def _write_specific_properties(self, submodel: T3DSubmodel):
         self._write_property("Diffuse", submodel.diffuse)
         self._write_property("SelfIllum", submodel.self_illum)
-        self._write_property("NumVerts", submodel.num_verts)
 
     def _write_geometry(self, submodel: T3DSubmodel):
+        self._write_property("NumVerts", submodel.num_verts)
         MAX_GROUP_SIZE = 3
         num_groups = len(submodel.stars) // MAX_GROUP_SIZE
+
+        stars = submodel.stars
 
         for group_idx in range(num_groups):
             slice_start = group_idx * MAX_GROUP_SIZE
             slice_end = slice_start + MAX_GROUP_SIZE
-            group = [slice_start, slice_end]
+            group = stars[slice_start:slice_end]
 
             star_lists = []
             for star in group:
     
                 color = (
-                    (int(star.color[2] * 255) << 16) | 
-                    (int(star.color[1] * 255) << 8) | 
-                    (int(star.color[0] * 255))
+                    (int(star.color.b * 255) << 16) | 
+                    (int(star.color.g * 255) << 8) | 
+                    (int(star.color.r * 255))
                 )
 
                 star_lists.append(
