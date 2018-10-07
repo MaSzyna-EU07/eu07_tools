@@ -85,6 +85,7 @@ class MeshSubmodelWriter(SubmodelWriter):
         self._write_property("WireSize", submodel.wire_size)
         self._write_property("Opacity", submodel.opacity)
         self._write_property("Map", submodel.map)
+        self._write_property("NumVerts", submodel.num_verts)
 
     def _write_geometry(self, submodel: T3DSubmodel):
         for triangle in submodel.triangles:
@@ -116,6 +117,7 @@ class StarsSubmodelWriter(SubmodelWriter):
     def _write_specific_properties(self, submodel: T3DSubmodel):
         self._write_property("Diffuse", submodel.diffuse)
         self._write_property("SelfIllum", submodel.self_illum)
+        self._write_property("NumVerts", submodel.num_verts)
 
     def _write_geometry(self, submodel: T3DSubmodel):
         MAX_GROUP_SIZE = 3
@@ -140,7 +142,6 @@ class StarsSubmodelWriter(SubmodelWriter):
                 )
 
             unit = [1, *star_lists]
-            
 
             self._file.write(
                 format_geometry_unit(unit)

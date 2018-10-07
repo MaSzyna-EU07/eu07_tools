@@ -1,4 +1,7 @@
 from eu07_tools.io.t3d.dump.dumper import T3DDumper
+from eu07_tools.structs.t3d import T3DMeshSubmodel
+
+from unittest import mock
 
 from io import StringIO
 
@@ -15,4 +18,6 @@ def test_dump_include():
 
 
 def test_dump_submodel():
-    pass
+    submodel = T3DMeshSubmodel("lol")
+
+    assert submodel.name == "lol"

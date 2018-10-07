@@ -54,11 +54,7 @@ class T3DMeshSubmodel(T3DSubmodel):
 class T3DTriangle:
     def __init__(self, vertices: Iterable[Iterable[float]], smooth: int=0):
         self.smooth: int = smooth
-        
-        final_vertices = []
-
-        for vertex in vertices:
-            final_vertices.append(Vertex3D(vertex))
-
-        self.vertices = tuple(final_vertices)
+        self.vertices = tuple(
+            Vertex3D(vertex) for vertex in vertices
+        )
 

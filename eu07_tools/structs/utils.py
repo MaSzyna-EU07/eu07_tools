@@ -132,7 +132,8 @@ class Vertex3D(collections.abc.Iterable):
         self._mapping = Vector2(*mapping)
 
     def __iter__(self):
-        return (*self._position, *self._normal, *self._mapping)
+        normal = [] if self._normal == Vector3((0, 0, 0)) else self._normal
+        return iter((*self._position, *normal, *self._mapping))
 
     def __repr__(self):
         return (
