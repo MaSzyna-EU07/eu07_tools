@@ -7,7 +7,7 @@ from eu07_tools.structs.utils import ColorRGB, Vertex3D
 class T3DMeshSubmodel(T3DSubmodel):
     def __init__(self, name: str):
         super().__init__(name)   
-        self.type_name = "Mesh"
+        self.type = "Mesh"
         self._ambient: ColorRGB = ColorRGB((255, 255, 255)) 
         self._specular: ColorRGB = ColorRGB((255, 255, 255))
         self.wire: bool = False

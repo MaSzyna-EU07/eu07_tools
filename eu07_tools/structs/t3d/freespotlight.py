@@ -5,7 +5,7 @@ from .submodel import T3DSubmodel
 class T3DFreeSpotLightSubmodel(T3DSubmodel):
     def __init__(self, name: str):
         super().__init__(name)
-        self.type_name = "FreeSpotLight"
+        self.type = "FreeSpotLight"
         self.near_atten_start: float = 40.0
         self.near_atten_end: float = 0.0
         self.use_near_atten: bool = False

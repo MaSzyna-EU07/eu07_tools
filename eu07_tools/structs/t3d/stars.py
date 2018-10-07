@@ -8,7 +8,7 @@ from eu07_tools.structs.utils import ColorRGB, Vector3
 class T3DStarsSubmodel(T3DSubmodel):
     def __init__(self, name: str):
         super().__init__(name)
-        self.type_name = "Stars"
+        self.type = "Stars"
         self._stars: Sequence[T3DStar] = []
 
     def add_star(self, position: Iterable[float], color: Iterable[float]):
