@@ -23,6 +23,12 @@ class ColorRGB(collections.abc.Iterable):
     def __str__(self):
         return f"{self.r} {self.g} {self.b}"
 
+    def __getitem__(self, index: int) -> float:
+        return tuple(self)[index]
+
+    def __setitem__(self, index: int, value: float):
+        raise NotImplementedError()
+
     def __repr__(self):
         return (
             f"<{self.__class__.__name__}("
@@ -48,6 +54,12 @@ class Vector4(collections.abc.Iterable):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __getitem__(self, index: int) -> float:
+        return tuple(self)[index]
+
+    def __setitem__(self, index: int, value: float):
+        raise NotImplementedError()
 
     def __repr__(self):
         return (
@@ -78,6 +90,12 @@ class Vector3(collections.abc.Iterable):
             self.z == other.z
         )
 
+    def __getitem__(self, index: int) -> float:
+        return tuple(self)[index]
+
+    def __setitem__(self, index: int, value: float):
+        raise NotImplementedError()
+
     def __ne__(self, other) -> bool:
         return not self.__eq__(other)
 
@@ -95,6 +113,12 @@ class Vector2(collections.abc.Iterable):
             f"x={self.x}, y={self.y}"
             f")>"
         )
+
+    def __getitem__(self, index: int) -> float:
+        return tuple(self)[index]
+
+    def __setitem__(self, index: int, value: float):
+        raise NotImplementedError()
     
     def __eq__(self, other) -> bool:
         return (
@@ -149,6 +173,12 @@ class Vertex3D(collections.abc.Iterable):
     def __iter__(self):
         normal = [] if self._normal == Vector3((0, 0, 0)) else self._normal
         return iter((*self._position, *normal, *self._mapping))
+
+    def __getitem__(self, index: int) -> float:
+        return tuple(self)[index]
+
+    def __setitem__(self, index: int, value: float):
+        raise NotImplementedError()
 
     def __repr__(self):
         return (
