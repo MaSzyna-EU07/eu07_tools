@@ -5,7 +5,6 @@ from eu07_tools.structs.t3d.submodel import T3DSubmodel
 from .parser import T3DPropertiesParser
 from .type_caster import T3DTypeCaster
 from .build_submodel import build_submodel
-from eu07_tools.structs.utils import IncludedFile
 
 
 class T3DLoader:

@@ -1,17 +1,19 @@
+from typing import Any
 import abc
+
+from eu07_tools.structs.t3d import T3DSubmodel
 from .format import (
     format_bool, format_geometry_unit, format_matrix, format_number, 
     format_sequence
 )
 
-
-def get_writer(type_: str) -> SubmodelWriter:
+def get_writer(type_: str):
     type_lowered = type_.lower()
     if type_lowered == "mesh":
         return MeshSubmodelWriter()
-    elif type_lowered = "freespotlight":
+    elif type_lowered == "freespotlight":
         return FreeSpotLightSubmodelWriter()
-    elif type_lowered = "stars":
+    elif type_lowered == "stars":
         return StarsSubmodelWriter()
 
     raise ValueError(f"Illegal T3D submodel type: {type_}")
@@ -21,6 +23,7 @@ class SubmodelWriter(abc.ABC):
     # public:
     def write_submodel(self, submodel: T3DSubmodel, file):
         """ Write submodel object to given file """
+        self._file = file
 
         self._write_separator()
         self._write_property("Parent", submodel.parent_name)
@@ -34,7 +37,7 @@ class SubmodelWriter(abc.ABC):
         self._write_property("MinDistance", submodel.min_distance)
         self._write_property("Transform", submodel.transform)
 
-        self._write_geometry()
+        self._write_geometry(submodel)
 
 
     # internal:
@@ -62,19 +65,16 @@ class SubmodelWriter(abc.ABC):
             value = format_number(value)
 
         self._file.write(
-            f"{key}: {value}{self._newline}"
+            f"{key}: {value}\n"
         )
 
     def _write_separator(self, length: int=81):
         self._file.write(
-            f"//{"-" * length}{self._newline}"
+            f"//{'-' * length}\n"
         )
         
 
 class MeshSubmodelWriter(SubmodelWriter):
-    def __init__(self, file, newline: str):
-        super().__init__(file, newline)
-
     # internal, overriden:
     def _write_specific_properties(self, submodel: T3DSubmodel):
         self._write_property("Ambient", submodel.ambient)
@@ -108,7 +108,7 @@ class FreeSpotLightSubmodelWriter(SubmodelWriter):
         self._write_property("HotspotAngle", submodel.hotspot_angle)
 
     def _write_geometry(self, submodel: T3DSubmodel):
-        self._file.write(self._newline)
+        self._file.write("\n")
 
 
 class StarsSubmodelWriter(SubmodelWriter):
@@ -132,11 +132,11 @@ class StarsSubmodelWriter(SubmodelWriter):
                 color = (
                     (int(star.color[2] * 255) << 16) | 
                     (int(star.color[1] * 255) << 8) | 
-                    (int(star.color[0] * 255)
+                    (int(star.color[0] * 255))
                 )
 
                 star_lists.append(
-                    [star.position, color, 0]
+                    [*star.position, color, 0]
                 )
 
             unit = [1, *star_lists]

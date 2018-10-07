@@ -1,4 +1,7 @@
 [
+  "tests/test_io/test_t3d/test_dump/test_dumper.py::test_dump_include",
+  "tests/test_io/test_t3d/test_dump/test_dumper.py::test_dump_submodel",
+  "tests/test_io/test_t3d/test_load/test_loader.py::test_load_file",
   "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_include",
   "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_single_value",
   "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser::()::test_parsing_rgb",
