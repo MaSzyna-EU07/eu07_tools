@@ -8,7 +8,11 @@ def format_sequence(seq: Iterable[object]) -> str:
 
 
 def format_number(num: Union[float, int]) -> str:
-    return str(round(num, _FLOAT_PRECISION)).rstrip("0").rstrip(".")
+    formatted = str(round(num, _FLOAT_PRECISION))
+    if formatted != "0":
+        formatted = formatted.rstrip("0").rstrip(".")
+
+    return formatted
 
 
 def format_matrix(matrix: Iterable[float]) -> str:

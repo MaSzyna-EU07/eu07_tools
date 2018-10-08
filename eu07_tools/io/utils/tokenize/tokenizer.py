@@ -97,7 +97,7 @@ class Tokenizer:
             line = string  # Cache line to gain speed while looking for closing delimiter
             while delim_data.closing not in line:
                 line = next(self._stream)
-                self.line_no + 1
+                self.line_no += 1
                 string += line
                 
         except StopIteration:

@@ -1,4 +1,1 @@
-{
-  "tests/test_io/test_t3d/test_dump/test_dumper.py::Test_T3DDumper::()::test_dump_stars": true,
-  "tests/test_io/test_t3d/test_dump/test_dumper.py::test_dump_mesh": true
-}
+{}

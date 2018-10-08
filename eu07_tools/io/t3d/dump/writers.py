@@ -1,5 +1,6 @@
 from typing import Any
 import abc
+import math
 
 from eu07_tools.structs.t3d import T3DSubmodel
 from .format import (
@@ -120,8 +121,9 @@ class StarsSubmodelWriter(SubmodelWriter):
 
     def _write_geometry(self, submodel: T3DSubmodel):
         self._write_property("NumVerts", submodel.num_verts)
+
         MAX_GROUP_SIZE = 3
-        num_groups = len(submodel.stars) // MAX_GROUP_SIZE
+        num_groups = math.ceil(len(submodel.stars) / MAX_GROUP_SIZE)
 
         stars = submodel.stars
 

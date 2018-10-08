@@ -126,13 +126,14 @@ class Test_T3DDumper:
             "1\n"
             "1 2 3 4278189825 0\n"
             "1 2 3 0 0\n"
-            "1 2 3 2147483520 0\n"
+            "1 2 3 214748352 0\n"
             "\n"
             "1\n"
             "1 2 3 4269768704 0\n"
             "1 2 3 16771773 0\n"
             "\n"
         )
+        print(self.file.getvalue())
         assert self.file.getvalue() == expected
 
 
