@@ -12,7 +12,7 @@ class T3DSubmodel(abc.ABC):
         self.type = ""
         self.anim: str = "false" # Enum here?
         self._diffuse: ColorRGB = ColorRGB((255, 255, 255))
-        self.self_illum: float = 1.0
+        self.selfillum: float = 1.0
         self.max_distance: float = 1000.0
         self.min_distance: float = 0.0
         self.transform: Sequence[Sequence[float]]= [

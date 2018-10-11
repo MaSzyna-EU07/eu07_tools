@@ -17,8 +17,10 @@ class MATDumper:
         for key, value in block_dict.items():
             if isinstance(value, dict):
                 value = self._block_to_string(value, indent=indent+1, in_brackets=True)
-            elif isinstance(value, (list, tuple)):
+            elif isinstance(value, (tuple, list)):
                 value = " ".join(str(v) for v in value)
+            elif isinstance(value, set):
+                value = f"[ {' '.join(str(v) for v in value)} ]"
 
             indentation = '\t' * indent
             buffer.write(f"{indentation}{key}: {value}\n")

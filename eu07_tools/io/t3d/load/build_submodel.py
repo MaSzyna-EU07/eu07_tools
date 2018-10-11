@@ -45,7 +45,7 @@ def build_submodel(d):
     submodel.parent_name = d["parent"]
     submodel.anim = d["anim"]
     submodel.diffuse = d["diffuse"]
-    submodel.self_illum = d["selfillum"]
+    submodel.selfillum = d["selfillum"]
     submodel.max_distance = d["maxdistance"]
     submodel.min_distance = d["mindistance"]
     submodel.transform = d["transform"]

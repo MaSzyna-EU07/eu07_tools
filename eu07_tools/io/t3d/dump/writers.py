@@ -81,7 +81,7 @@ class MeshSubmodelWriter(SubmodelWriter):
         self._write_property("Ambient", submodel.ambient)
         self._write_property("Diffuse", submodel.diffuse)
         self._write_property("Specular", submodel.specular)
-        self._write_property("SelfIllum", submodel.self_illum)
+        self._write_property("SelfIllum", submodel.selfillum)
         self._write_property("Wire", submodel.wire)
         self._write_property("WireSize", submodel.wire_size)
         self._write_property("Opacity", submodel.opacity)
@@ -100,7 +100,7 @@ class FreeSpotLightSubmodelWriter(SubmodelWriter):
     # internal, overriden:
     def _write_specific_properties(self, submodel: T3DSubmodel):
         self._write_property("Diffuse", submodel.diffuse)
-        self._write_property("SelfIllum", submodel.self_illum)
+        self._write_property("SelfIllum", submodel.selfillum)
         self._write_property("NearAttenStart", submodel.near_atten_start)
         self._write_property("NearAttenEnd", submodel.near_atten_end)
         self._write_property("UseNearAtten", submodel.use_near_atten)
@@ -117,7 +117,7 @@ class StarsSubmodelWriter(SubmodelWriter):
     # internal, overriden:
     def _write_specific_properties(self, submodel: T3DSubmodel):
         self._write_property("Diffuse", submodel.diffuse)
-        self._write_property("SelfIllum", submodel.self_illum)
+        self._write_property("SelfIllum", submodel.selfillum)
 
     def _write_geometry(self, submodel: T3DSubmodel):
         self._write_property("NumVerts", submodel.num_verts)
