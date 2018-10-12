@@ -3,188 +3,63 @@ import collections
 from typing import Any, Iterable, Sequence
 
 
-class ColorRGB(collections.abc.Iterable):
-    def __init__(self, values: Sequence[float]):
-        self.r, self.g, self.b = values
+class EntitySet(collections.abc.Set):
+    def __init__(self, items: Iterable[Any]):
+        self._items = set(items)
+
+    def __contains__(self, item: Any):
+        return item in self._items
 
     def __iter__(self):
-        return iter((self.r, self.g, self.b))
+        return iter(self._items)
 
-    def __eq__(self, other):
-        return (
-            self.r == other.r and
-            self.g == other.g and
-            self.b == other.b
-        )
+    def __len__(self):
+        return len(self._items)
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    def add(self, item: Any):
+        self._items.add(item)
+
+    def discard(self, item: Any):
+        self._items.discard(item)
 
     def __str__(self):
-        return f"{self.r} {self.g} {self.b}"
+        str_items = " ".join(
+            str(item) for item in self._items
+        )
+        return f"[ {str_items} ]" 
 
-    def __getitem__(self, index: int) -> float:
-        return tuple(self)[index]
 
-    def __setitem__(self, index: int, value: float):
-        raise NotImplementedError()
+class Texture:
+    def __init__(self, path: str, traits: str = ""):
+        self.path: str = path
+        self.use_vertical_wrap: bool = ("s" in traits)
+        self.use_horizontal_wrap: bool = ("t" in traits)
+        self.use_sharpening: bool = ("#" in traits)
+
+    def __str__(self):
+        traits = ":"
+        traits += "t" if self.use_vertical_wrap else ""
+        traits += "s" if self.use_horizontal_wrap else ""
+        traits += "#" if self.use_sharpening else ""
+
+        has_traits = traits != ":"
+
+        return f"{self.path}{traits if has_traits else ''}"
 
     def __repr__(self):
         return (
-            f"<{self.__class__.__name__}("
-            f"r={self.r}, g={self.g}, b={self.b}"
-            f")>"
+            f"{self.__class__.__name__}({str(self)})"
         )
 
 
-class Vector4(collections.abc.Iterable):
-    def __init__(self, values: Sequence[float]):
-        self.x, self.y, self.z, self.v = values
-
-    def __iter__(self):
-        return iter((self.x, self.y, self.z, self.v))
-
-    def __eq__(self, other):
-        return (
-            self.x == other.x and
-            self.y == other.y and
-            self.z == other.z and
-            self.v == other.v
-        )
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __getitem__(self, index: int) -> float:
-        return tuple(self)[index]
-
-    def __setitem__(self, index: int, value: float):
-        raise NotImplementedError()
-
-    def __repr__(self):
-        return (
-            f"<{self.__class__.__name__}("
-            f"x={self.x}, y={self.y}, z={self.z}, v={self.v}"
-            f")>"
-        )
 
 
-class Vector3(collections.abc.Iterable):
-    def __init__(self, values: Sequence[float]):
-        self.x, self.y, self.z = values
-
-    def __iter__(self):
-        return iter((self.x, self.y, self.z))
-
-    def __repr__(self):
-        return (
-            f"<{self.__class__.__name__}("
-            f"x={self.x}, y={self.y}, z={self.z}"
-            f")>"
-        )
-
-    def __eq__(self, other) -> bool:
-        return (
-            self.x == other.x and
-            self.y == other.y and
-            self.z == other.z
-        )
-
-    def __getitem__(self, index: int) -> float:
-        return tuple(self)[index]
-
-    def __setitem__(self, index: int, value: float):
-        raise NotImplementedError()
-
-    def __ne__(self, other) -> bool:
-        return not self.__eq__(other)
 
 
-class Vector2(collections.abc.Iterable):
-    def __init__(self, values: Sequence[float]):
-        self.x, self.y = values
-
-    def __iter__(self) -> Iterable[float]:
-        return iter((self.x, self.y))
-
-    def __repr__(self) -> str:
-        return (
-            f"<{self.__class__.__name__}("
-            f"x={self.x}, y={self.y}"
-            f")>"
-        )
-
-    def __getitem__(self, index: int) -> float:
-        return tuple(self)[index]
-
-    def __setitem__(self, index: int, value: float):
-        raise NotImplementedError()
-    
-    def __eq__(self, other) -> bool:
-        return (
-            self.x == other.x and
-            self.y == other.y
-        )
 
 
 class Bezier3D:
     pass
 
 
-class Vertex3D(collections.abc.Iterable):
-    def __init__(self, values: Sequence[float]):
-        num_values = len(values)
-        if num_values in (5, 8):
-            self._position = Vector3(values[:3])
-            self._normal = (
-                Vector3(values[3:6]) if num_values == 8 
-                else Vector3((0, 0, 0))
-            )
-            self._mapping = Vector2(values[-2:])
-        else:
-            raise ValueError(
-                f"Vertex3D constructor needs 5 or 8 values, {num_values} given"
-            )
 
-    @property
-    def position(self):
-        return self._position
-
-    @position.setter
-    def position(self, position):
-        self._position = Vector3(*position)
-
-    @property
-    def normal(self):
-        return self._normal
-
-    @normal.setter
-    def normal(self, normal):
-        self._normal = Vector3(*normal)
-
-    @property
-    def mapping(self):
-        return self._mapping
-
-    @mapping.setter
-    def mapping(self, mapping):
-        self._mapping = Vector2(*mapping)
-
-    def __iter__(self):
-        normal = [] if self._normal == Vector3((0, 0, 0)) else self._normal
-        return iter((*self._position, *normal, *self._mapping))
-
-    def __getitem__(self, index: int) -> float:
-        return tuple(self)[index]
-
-    def __setitem__(self, index: int, value: float):
-        raise NotImplementedError()
-
-    def __repr__(self):
-        return (
-            f"<{self.__class__.__name__}("
-            f"position={repr(self._position)}, "
-            f"normal={repr(self._normal)}, "
-            f"mapping={repr(self._mapping)},"
-            f")>"   
-        )

@@ -6,20 +6,32 @@ class MATLoader:
     
     def load_from_file(self, file):
         self._token_stream = TokenStream.from_file(file)
-        material = {}
+        material = self._load_block(endmark="")
+        return material
 
+    @property
+    def progress(self) -> float:
+        return self._token_stream.progress
+            
+    def _load_block(self, endmark: str):
+        block = {}
         while True:
-            key, value = self._token_stream.get_tokens(2)
-
-            if key == "":
-                return material
-            if value.startswith("{"):
-                pass
-            elif value.startswith("["):
-                pass
-            else:
-                pass    
-                
+            key = self._token_stream.get_token()
             key = key.rstrip(":")
-            material[key] = value
-        
+
+            if key == endmark:
+                return block
+            elif key == "size":
+                value = list(self._token_stream.get_tokens(2))
+            else:
+                value = self._token_stream.get_token()
+
+            if value.startswith("{"):
+                value = self._load_block(endmark="}")
+            elif value.startswith("["):
+                value = set(
+                    self._token_stream.get_tokens_before("]")
+                )
+                
+            block[key] = value
+

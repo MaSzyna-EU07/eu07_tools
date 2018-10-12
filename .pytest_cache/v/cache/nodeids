@@ -1,5 +1,6 @@
 [
   "tests/test_io/test_mat/test_mat_dumper.py::Test_MATDumper::()::test_dump_material_dict",
+  "tests/test_io/test_mat/test_mat_loader.py::Test_MATLoader::()::test_load_mat",
   "tests/test_io/test_t3d/test_dump/test_t3d_dumper.py::Test_T3DDumper::()::test_dump_include",
   "tests/test_io/test_t3d/test_dump/test_t3d_dumper.py::Test_T3DDumper::()::test_dump_mesh",
   "tests/test_io/test_t3d/test_dump/test_t3d_dumper.py::Test_T3DDumper::()::test_dump_spot",
