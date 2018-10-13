@@ -1,88 +1,119 @@
-class Vector4(collections.abc.Iterable):
-    def __init__(self, values: Sequence[float]):
-        self.x, self.y, self.z, self.v = values
+from typing import Iterable, Callable, Sequence
+import collections
+import operator
+
+class BaseVector(collections.abc.MutableSequence):
+    def __init__(self, values: Iterable[float]):
+        self._values = values
 
     def __iter__(self):
-        return iter((self.x, self.y, self.z, self.v))
+        return iter(self._values)
+
+    def __getitem__(self, index: int) -> float:
+        return self._values[index]
+
+    def __setitem__(self, index: int, item: float):
+        self._values[index] = item
+
+    def __delitem__(self, item: float):
+        pass
+
+    def __add__(self, other):
+        return self._math_helper(operator.add, other)
+
+    def __sub__(self, other):
+       return self._math_helper(operator.sub, other)
+
+    def __mul__(self, other):
+        return self._math_helper(operator.mul, other)
+
+    def __div__(self, other):
+        return self._math_helper(operator.truediv, other)
 
     def __eq__(self, other):
-        return (
-            self.x == other.x and
-            self.y == other.y and
-            self.z == other.z and
-            self.v == other.v
-        )
+        return list(self) == list(other)
+        
+    def _math_helper(self, operator: Callable[float, float], other):
+        if isinstance(other, (int, float)):
+            return (operator(v, other) for v in iter(self))
+        else:
+            return (operator(a, b) for a, b in zip(self, other))
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __getitem__(self, index: int) -> float:
-        return tuple(self)[index]
-
-    def __setitem__(self, index: int, value: float):
-        raise NotImplementedError()
-
-    def __repr__(self):
-        return (
-            f"<{self.__class__.__name__}("
-            f"x={self.x}, y={self.y}, z={self.z}, v={self.v}"
-            f")>"
-        )
+    def __str__(self) -> str:
+        return " ".join(str(v) for v in self._values)
 
 
-class Vector3(collections.abc.Iterable):
+class VectorXYZ(BaseVector):
+    def __init__(self, values):
+        super().__init__(values)
+
+    @property
+    def x(self) -> float:
+        return self._values[0]
+
+    @x.setter
+    def x(self, x: float):
+        self._values[0] = x
+
+    @property
+    def y(self) -> float:
+        return self._values[1]
+
+    @y.setter
+    def y(self, y: float):
+        self._values[1] = y
+
+    @property
+    def z(self) -> float:
+        return self._values[2]
+
+    @z.setter
+    def z(self, z: float):
+        self._values[2] = z
+
+
+class VectorUV(BaseVector):
+    @property
+    def u(self) -> float:
+        return self._values[1]
+
+    @u.setter
+    def u(self, u: float):
+        self._values[1] = u
+
+    @property
+    def v(self) -> float:
+        return self._values[2]
+
+    @v.setter
+    def v(self, v: float):
+        self._values[2] = v
+
+
+class ColorRGB(BaseVector):
     def __init__(self, values: Sequence[float]):
-        self.x, self.y, self.z = values
+        self._values = values
 
-    def __iter__(self):
-        return iter((self.x, self.y, self.z))
+    @property
+    def r(self) -> float:
+        return self._values[0]
 
-    def __repr__(self):
-        return (
-            f"<{self.__class__.__name__}("
-            f"x={self.x}, y={self.y}, z={self.z}"
-            f")>"
-        )
+    @r.setter
+    def r(self, r: float):
+        self._values[0] = r
 
-    def __eq__(self, other) -> bool:
-        return (
-            self.x == other.x and
-            self.y == other.y and
-            self.z == other.z
-        )
+    @property
+    def g(self) -> float:
+        return self._values[1]
 
-    def __getitem__(self, index: int) -> float:
-        return tuple(self)[index]
+    @g.setter
+    def g(self, g: float):
+        self._values[1] = g
 
-    def __setitem__(self, index: int, value: float):
-        raise NotImplementedError()
+    @property
+    def b(self) -> float:
+        return self._values[2]
 
-    def __ne__(self, other) -> bool:
-        return not self.__eq__(other)
-
-
-class Vector2(collections.abc.Iterable):
-    def __init__(self, values: Sequence[float]):
-        self.x, self.y = values
-
-    def __iter__(self) -> Iterable[float]:
-        return iter((self.x, self.y))
-
-    def __repr__(self) -> str:
-        return (
-            f"<{self.__class__.__name__}("
-            f"x={self.x}, y={self.y}"
-            f")>"
-        )
-
-    def __getitem__(self, index: int) -> float:
-        return tuple(self)[index]
-
-    def __setitem__(self, index: int, value: float):
-        raise NotImplementedError()
-    
-    def __eq__(self, other) -> bool:
-        return (
-            self.x == other.x and
-            self.y == other.y
-        )
+    @b.setter
+    def b(self, b: float):
+        self._values[2] = b

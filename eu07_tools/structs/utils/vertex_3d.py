@@ -47,6 +47,9 @@ class Vertex3D(collections.abc.Iterable):
     def __setitem__(self, index: int, value: float):
         raise NotImplementedError()
 
+    def __str__(self):
+        return " ".join(str(v) for v in iter(self))
+
     def __repr__(self):
         return (
             f"<{self.__class__.__name__}("
