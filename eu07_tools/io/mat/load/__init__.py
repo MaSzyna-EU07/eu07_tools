@@ -1,5 +1,7 @@
 from eu07_tools.io.utils import TokenStream
 
+# TODO: Write it more pretty
+
 class MATLoader:
     def __init__(self):
         self._token_stream: TokenStream = None
@@ -26,12 +28,24 @@ class MATLoader:
             else:
                 value = self._token_stream.get_token()
 
-            if value.startswith("{"):
-                value = self._load_block(endmark="}")
-            elif value.startswith("["):
-                value = set(
-                    self._token_stream.get_tokens_before("]")
-                )
-                
+                if value.startswith("{"):
+                    value = self._load_block(endmark="}")
+                elif value.startswith("["):
+                    value = set(
+                        self._token_stream.get_tokens_before("]")
+                    )
+
+            value = self._cast_type(key, value)
+                    
             block[key] = value
+
+
+    def _cast_type(self, key, value):
+        if key in "opacity selfillum":
+            return float(value)
+        if key in ("size"):
+            return [float(v) for v in value]
+        else:
+            return value
+
 

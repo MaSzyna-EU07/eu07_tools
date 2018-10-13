@@ -1,10 +1,10 @@
-from typing import Dict, Union, Set
+from typing import Dict, Union, Set, Sequence
 
-from eu07_tools.structs.utils import Vector2, Texture, EntitySet
+from eu07_tools.structs.utils import Texture
 
 class Material:
     def __init__(self):
-        self.textures: Dict[str, Union[Texture, EntitySet]] = {}
+        self.textures: Dict[str, Union[Texture, Set[Texture]]] = {}
         self.variants: Dict[str, Material] = {
             "spring": None,
             "summer": None,
@@ -18,7 +18,7 @@ class Material:
         self.shader_path: str = None
         self.opacity: float = None
         self.selfillum: float = None
-        self.size: Vector2 = None
+        self.size: Sequence[float] = None
 
     @classmethod
     def from_file(self, file):

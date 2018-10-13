@@ -1,16 +1,3 @@
 {
-  "tests/test_io/test_mat/test_mat_dumper.py::Test_MATDumper": true,
-  "tests/test_io/test_mat/test_mat_loader.py::Test_MATLoader": true,
-  "tests/test_io/test_t3d/test_dump/test_t3d_dumper.py::Test_T3DDumper": true,
-  "tests/test_io/test_t3d/test_load/test_loader.py::test_load_file": true,
-  "tests/test_io/test_t3d/test_load/test_parser.py::Test_T3DPropertiesParser": true,
-  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_bool": true,
-  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_geometry": true,
-  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_rgb": true,
-  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_self_illum": true,
-  "tests/test_io/test_t3d/test_load/test_type_caster.py::test_cast_transform": true,
-  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_token": true,
-  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_tokens": true,
-  "tests/test_io/test_tokenize/test_token_accessor.py::Test_get_tokens_before": true,
-  "tests/test_io/test_tokenize/test_tokenizer.py::Test_tokenize": true
+  "tests/test_io/test_t3d/test_dump/test_t3d_dumper.py::Test_T3DDumper::()::test_dump_mesh": true
 }
