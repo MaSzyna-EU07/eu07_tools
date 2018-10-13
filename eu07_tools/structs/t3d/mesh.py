@@ -53,9 +53,11 @@ class T3DMeshSubmodel(T3DSubmodel):
 
 class T3DTriangle:
     def __init__(self, vertices: Iterable[Iterable[float]], smooth: int=0):
-        # TODO: Automatic -1 mask when vertices has normals
-        self.smooth: int = smooth
         self.vertices = tuple(
             Vertex3D(vertex) for vertex in vertices
         )
+
+        self.smooth: int = -1 if any(
+            vertex.has_normal for vertex in self.vertices
+        ) else smooth
 
