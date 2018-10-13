@@ -50,7 +50,7 @@ class Vertex3D(collections.abc.Iterable):
         return self._normal != VectorXYZ((0, 0, 0))
 
     def __iter__(self):
-        normal = [] if self.has_normal else self._normal
+        normal = self._normal if self.has_normal else []
         return iter((*self._position, *normal, *self._mapping))
 
     def __str__(self):
