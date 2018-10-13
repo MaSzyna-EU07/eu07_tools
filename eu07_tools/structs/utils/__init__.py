@@ -1,4 +1,5 @@
-
+from .vectors import VectorXYZ, VectorUV, ColorRGB
+from .vertex_3d import Vertex3D
 
 # class EntitySet(collections.abc.Set):
 #     def __init__(self, items: Iterable[Any]):

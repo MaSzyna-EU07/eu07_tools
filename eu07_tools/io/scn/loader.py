@@ -109,7 +109,7 @@ class SCNLoader:
     def _load_origin(self):
         tokens = self._token_stream.get_tokens(3)
         offset_vector = [float(token) for token in tokens]
-        return "origin", Vector3(offset_vector)
+        return "origin", VectorXYZ(offset_vector)
 
     def _load_endorigin(self):
         self._token_stream.get_token()
@@ -119,7 +119,7 @@ class SCNLoader:
         tokens = self._token_stream.get_tokens(3)
         rotation_vector = [float(token) for token in tokens]
 
-        return "rotate", Vector3(rotation_vector)
+        return "rotate", VectorXYZ(rotation_vector)
 
     def _load_sky(self):
         model_path = self._token_stream.get_token()

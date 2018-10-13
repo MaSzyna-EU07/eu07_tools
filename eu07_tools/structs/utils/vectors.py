@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Iterable, Callable, Iterator
 import collections
 import operator
+import math
 
 class BaseVector(collections.abc.MutableSequence):
     def __init__(self, values: Iterable[float]):
@@ -41,7 +42,7 @@ class BaseVector(collections.abc.MutableSequence):
         return self._math_helper(operator.truediv, other)
 
     def __iadd__(self, other) -> BaseVector:
-        self._values = list(self.__add__(other))
+        self._values = list(self + other)
         return self
 
     def __eq__(self, other) -> bool:
@@ -92,19 +93,19 @@ class VectorXYZ(BaseVector):
 class VectorUV(BaseVector):
     @property
     def u(self) -> float:
-        return self._values[1]
+        return self._values[0]
 
     @u.setter
     def u(self, u: float):
-        self._values[1] = u
+        self._values[0] = u
 
     @property
     def v(self) -> float:
-        return self._values[2]
+        return self._values[1]
 
     @v.setter
     def v(self, v: float):
-        self._values[2] = v
+        self._values[1] = v
 
 
 class ColorRGB(BaseVector):

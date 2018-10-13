@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Iterable, Sequence
 
 from .submodel import T3DSubmodel
-from eu07_tools.structs.utils import ColorRGB, Vector3
+from eu07_tools.structs.utils import ColorRGB, VectorXYZ
 
 
 class T3DStarsSubmodel(T3DSubmodel):
@@ -33,16 +33,16 @@ class T3DStarsSubmodel(T3DSubmodel):
 
 class T3DStar:
     def __init__(self, position: Iterable[float], color: Iterable[float]):
-        self._position = Vector3(position)
+        self._position = VectorXYZ(position)
         self._color = ColorRGB(color)
 
     @property
-    def position(self) -> Vector3:
+    def position(self) -> VectorXYZ:
         return self._position
 
     @position.setter
     def position(self, position: Iterable[float]):
-        self._position = Vector3(position)
+        self._position = VectorXYZ(position)
 
     @property
     def color(self) -> ColorRGB:

@@ -41,20 +41,20 @@ class SCNCamera:
         self._rotation = rotation
 
     @property
-    def position(self) -> Vector3:
+    def position(self) -> VectorXYZ:
         return self._position
 
     @position.setter
     def position(self, position: Iterable[float]):
-        self._position = Vector3(position)
+        self._position = VectorXYZ(position)
 
     @property
-    def rotation(self) -> Vector3:
+    def rotation(self) -> VectorXYZ:
         return self._rotation
 
     @rotation.setter
     def rotation(self, rotation: Iterable[float]):
-        self._rotation = Vector3(rotation)
+        self._rotation = VectorXYZ(rotation)
 
 
 # TODO: More generic case?
@@ -71,7 +71,7 @@ class SCNConfig:
 
 class SCNLight:
     def __init__(self, location, ambient, diffuse, specular):
-        self._location = Vector3(location)
+        self._location = VectorXYZ(location)
         self._ambient = ColorRGB(ambient)
         self._diffuse = ColorRGB(diffuse)
         self._specular = ColorRGB(specular)
@@ -82,7 +82,7 @@ class SCNLight:
 
     @location.setter
     def location(self, location):
-        self._location = Vector3(location)
+        self._location = VectorXYZ(location)
 
     @property
     def ambient(self):

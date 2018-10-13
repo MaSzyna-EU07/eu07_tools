@@ -1,6 +1,6 @@
 from typing import Iterable, List
 
-from eu07_tools.structs.utils import Vector3, ColorRGB, Vertex3D
+from eu07_tools.structs.utils import VectorXYZ, ColorRGB, Vertex3D
 
 class SCNNode:
     """ Base class for nodes """
@@ -13,13 +13,13 @@ class SCNNode:
 class SCNNodeEventLauncher(SCNNode):
     def __init__(self, name: str):
         super().__init__(name)
-        self._position: Vector3 = Vector3((0, 0, 0))
+        self._position: VectorXYZ = VectorXYZ((0, 0, 0))
         self.radius: float = -1.0
         self.key = "none?"
         self.delta_time: float = 0
 
     @property
-    def position(self) -> Vector3:
+    def position(self) -> VectorXYZ:
         return self._position
 
     @position.setter
@@ -35,9 +35,9 @@ class SCNNodeLines(SCNNode):
         self._vertices_positions = []
 
     def add_vertex_position(self, position: Iterable[float]):
-        self._vertices_positions.append(Vector3(position))
+        self._vertices_positions.append(VectorXYZ(position))
 
-    def get_vertex_position(self, index: int) -> Vector3:
+    def get_vertex_position(self, index: int) -> VectorXYZ:
         return self._vertices_positions[index]
 
     @property
@@ -58,12 +58,12 @@ class SCNNodeLineLoop(SCNNodeLines): pass
 class SCNNodeMemcell(SCNNode):
     def __init__(self, name: str):
         super().__init__(name)
-        self._position: Vector3 = Vector3((0, 0, 0))
+        self._position: VectorXYZ = VectorXYZ((0, 0, 0))
         self.values: List[str, float, float] = []
         self.linked_node_name: str = "none"
 
     @property
-    def position(self) -> Vector3:
+    def position(self) -> VectorXYZ:
         return self._position
 
     @position.setter
@@ -74,14 +74,14 @@ class SCNNodeMemcell(SCNNode):
 class SCNNodeModel(SCNNode):
     def __init__(self, name: str):
         super().__init__(name)
-        self._position: Vector3 = Vector3((0, 0, 0))
+        self._position: VectorXYZ = VectorXYZ((0, 0, 0))
         self.rotation_y: float = 0
         self.file_path: str = ""
         self.replacableskin: str = ""
         self.light_states = []
 
     @property
-    def position(self) -> Vector3:
+    def position(self) -> VectorXYZ:
         return self._position
 
     @position.setter
@@ -92,11 +92,11 @@ class SCNNodeModel(SCNNode):
 class SCNNodeSound(SCNNode):
     def __init__(self, name: str):
         super().__init__(name)
-        self._position: Vector3 = Vector3((0, 0, 0))
+        self._position: VectorXYZ = VectorXYZ((0, 0, 0))
         self.file_path: str = ""
 
     @property
-    def position(self) -> Vector3:
+    def position(self) -> VectorXYZ:
         return self._position
 
     @position.setter
@@ -107,7 +107,7 @@ class SCNNodeSound(SCNNode):
 class SCNNodeTractionPowerSource(SCNNode):
     def __init__(self, name: str):
         super().__init__(name)
-        self._position: Vector3 = Vector3((0, 0, 0))
+        self._position: VectorXYZ = VectorXYZ((0, 0, 0))
         self.nominal_voltage: float = 0.0
         self.voltage_frequency: float = 0.0
         self.internal_resistance: float = 0.2
@@ -119,7 +119,7 @@ class SCNNodeTractionPowerSource(SCNNode):
         self.section: bool = True
 
     @property
-    def position(self) -> Vector3:
+    def position(self) -> VectorXYZ:
         return self._position
 
     @position.setter
@@ -142,42 +142,42 @@ class SCNNodeTraction(SCNNode):
         self.wire_offset: float = 0.0
         self.visible: bool = True
         self.parallel_name = "none"
-        self._p1: Vector3 = Vector3((0, 0, 0))
-        self._p2: Vector3 = Vector3((0, 0, 0))
-        self._p3: Vector3 = Vector3((0, 0, 0))
-        self._p4: Vector3 = Vector3((0, 0, 0))
+        self._p1: VectorXYZ = VectorXYZ((0, 0, 0))
+        self._p2: VectorXYZ = VectorXYZ((0, 0, 0))
+        self._p3: VectorXYZ = VectorXYZ((0, 0, 0))
+        self._p4: VectorXYZ = VectorXYZ((0, 0, 0))
     
     @property
-    def p1(self) -> Vector3:
+    def p1(self) -> VectorXYZ:
         return self._p1
 
     @p1.setter
     def p1(self, p1: Iterable[float]):
-        self._p1 = Vector3(p1)
+        self._p1 = VectorXYZ(p1)
 
     @property
-    def p2(self) -> Vector3:
+    def p2(self) -> VectorXYZ:
         return self._p2
 
     @p2.setter
     def p2(self, p2: Iterable[float]):
-        self._p2 = Vector3(p2)
+        self._p2 = VectorXYZ(p2)
 
     @property
-    def p3(self) -> Vector3:
+    def p3(self) -> VectorXYZ:
         return self._p3
 
     @p3.setter
     def p3(self, p3: Iterable[float]):
-        self._p3 = Vector3(p3)
+        self._p3 = VectorXYZ(p3)
 
     @property
-    def p4(self) -> Vector3:
+    def p4(self) -> VectorXYZ:
         return self._p4
 
     @p4.setter
     def p4(self, p4: Iterable[float]):
-        self._p4 = Vector3(p4)
+        self._p4 = VectorXYZ(p4)
 
 
 class SCNNodeTriangles(SCNNode):
