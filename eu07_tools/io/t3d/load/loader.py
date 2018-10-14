@@ -4,7 +4,6 @@ from typing import Iterator, Tuple, Any
 from eu07_tools.structs.t3d.submodel import T3DSubmodel
 from .parser import T3DPropertiesParser
 from .type_caster import T3DTypeCaster
-from .build_submodel import build_submodel
 
 
 class T3DLoader:
@@ -13,9 +12,9 @@ class T3DLoader:
     """
     def __init__(self):
         self._NUMS_MAX_PROPERTIES = {
-            "mesh": 17,
-            "freespotlight": 16,
-            "stars": 11
+            "Mesh": 17,
+            "FreeSpotLight": 16,
+            "Stars": 11
         }
 
         self._parser = T3DPropertiesParser()
@@ -36,9 +35,9 @@ class T3DLoader:
             if key == "include":
                 yield "include", list(value)
 
-            elif key == "parent":
-                type_id, submodel = self._load_submodel(parent_name=value)
-                yield type_id, submodel
+            elif key == "Parent":
+                submodel_dict = self._load_submodel(parent_name=value)
+                yield "submodel", submodel_dict
 
             else:
                 raise SyntaxError(
@@ -53,20 +52,19 @@ class T3DLoader:
 
     def _load_submodel(self, parent_name: str):
         submodel_dict = {}
-        submodel_dict["parent"] = parent_name
+        submodel_dict["Parent"] = parent_name
         __, type_ = next(self._properties_iter)
-        submodel_dict["type"] = type_
+        submodel_dict["Type"] = type_
 
         # TODO: Type validation
-        num_max_properties = self._NUMS_MAX_PROPERTIES[type_.lower()]
+        num_max_properties = self._NUMS_MAX_PROPERTIES[type_]
 
         while len(submodel_dict) < num_max_properties:
             key, value = next(self._properties_iter)
             casted_value = self._type_caster.cast_property_value(key, value)
             submodel_dict[key] = casted_value
 
-        type_id, submodel = build_submodel(submodel_dict)
-        return type_id, submodel
+        return submodel_dict
     
 
         

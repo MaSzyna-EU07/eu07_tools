@@ -7,35 +7,35 @@ class T3DTypeCaster:
     def __init__(self):
         self._cast_funcs = {
             int: [
-                "farattendecaytype",
-                "numverts"
+                "FarAttenDecayType",
+                "NumVerts"
             ],
             float: [
-                "maxdistance",
-                "mindistance",
-                "wiresize",
-                "opacity",
-                "nearattenstart",
-                "nearattenend",
-                "fardecayradius",
-                "falloffangle",
-                "hotspotangle",
+                "MaxDistance",
+                "MinDistance",
+                "WireSize",
+                "Opacity",
+                "NearAttenStart",
+                "NearAttenEnd",
+                "FarDecayRadius",
+                "FalloffAngle",
+                "HotspotAngle",
             ],
             bool_from_string: [
-                "wire",
-                "usenearatten"
+                "Wire",
+                "UseNearAtten"
             ],
             self._self_illum_from_string: [
-                "selfillum"
+                "SelfIllum"
             ],
             self._floats_from_strings: [
-                "ambient",
-                "diffuse",
-                "specular",
-                "transform"
+                "Ambient",
+                "Diffuse",
+                "Specular",
+                "Transform"
             ],
             self._geometry_from_strings: [
-                "geometry"
+                "GEOMETRY"
             ],
         }
 
@@ -66,18 +66,11 @@ class T3DTypeCaster:
     def _floats_from_strings(self, values: Sequence[str]) -> Sequence[float]:
         return [float(value) for value in values]
 
-    def _geometry_from_strings(self, string_geometry):
-        geometry = []
-        for string_geometry_unit in string_geometry:
+    def _geometry_from_strings(self, geometry):
+        casted_geometry = []
+        for unit in geometry:
+            casted_unit = self._floats_from_strings(unit)
+            casted_unit[0] = int(casted_unit[0])
+            casted_geometry.append(casted_unit)
 
-            geometry_unit = []
-
-            geometry_unit.append(int(string_geometry_unit[0]))
-            for vertex in string_geometry_unit[1:]:
-                geometry_unit.append(
-                    self._floats_from_strings(vertex)
-                )
-
-            geometry.append(geometry_unit)
-
-        return geometry
+        return casted_geometry

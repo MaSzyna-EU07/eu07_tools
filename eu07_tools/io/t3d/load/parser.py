@@ -19,29 +19,29 @@ class T3DPropertiesParser:
             if token == "":
                 return
 
-            key = token.rstrip(":").lower()
+            key = token.rstrip(":")
 
             if key == "include":
                 parameters = list(self._token_stream.get_tokens_before("end"))
                 value = parameters
 
-            elif key in "ambient diffuse specular":
+            elif key in "Ambient Diffuse Specular":
                 value = list(self._token_stream.get_tokens(3))
 
-            elif key == "transform":
+            elif key == "Transform":
                 value = list(self._token_stream.get_tokens(16))
 
-            elif key == "numverts":
+            elif key == "NumVerts":
                 # If submodel has NumVerts property, that means we have
                 # geometry definition below.
                 value = self._token_stream.get_token()
                 yield key, value
 
                 num_verts = int(value)
-                yield "geometry", self._parse_geometry(num_verts)
+                yield "GEOMETRY", self._parse_geometry(num_verts)
                 continue
 
-            elif key in "selfillum":
+            elif key in "SelfIllum":
                 value = self._token_stream.get_token().lower()
                 if value == "true":
                     value = "1"
@@ -64,29 +64,27 @@ class T3DPropertiesParser:
     # internal:
     def _parse_geometry(self, num_total_verts: int):
         geometry = []
-
         num_loaded_verts = 0
         MAX_UNIT_SIZE = 3
+
         if num_total_verts % MAX_UNIT_SIZE == 0:
             LAST_UNIT_SIZE = MAX_UNIT_SIZE
         else:
             LAST_UNIT_SIZE = num_total_verts % MAX_UNIT_SIZE
 
         while num_loaded_verts < num_total_verts:
-            is_last_unit = num_loaded_verts + MAX_UNIT_SIZE >= num_total_verts
+            is_last_unit = (num_loaded_verts + MAX_UNIT_SIZE >= num_total_verts)
             unit_size = LAST_UNIT_SIZE if is_last_unit else MAX_UNIT_SIZE
 
             unit_flag = self._token_stream.get_token()
-            geometry_unit = [unit_flag]
-            
-            # -1 mask means that we have explicitly defined vertex normals
             vertex_size = 8 if unit_flag == "-1" else 5
 
-            for _ in range(unit_size):
-                vertex = [self._token_stream.get_token() for j in range(vertex_size)]
-                geometry_unit.append(vertex)
-                
+            geometry_unit = [
+                unit_flag,
+                *self._token_stream.get_tokens(vertex_size * unit_size)
+            ]
             geometry.append(geometry_unit)
+
             num_loaded_verts += unit_size
 
         return geometry

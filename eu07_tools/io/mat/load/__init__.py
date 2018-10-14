@@ -31,7 +31,7 @@ class MATLoader:
                 if value.startswith("{"):
                     value = self._load_block(endmark="}")
                 elif value.startswith("["):
-                    value = set(
+                    value = list(
                         self._token_stream.get_tokens_before("]")
                     )
 

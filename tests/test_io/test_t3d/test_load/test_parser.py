@@ -29,10 +29,10 @@ class Test_T3DPropertiesParser:
         parsed = list(self._parser.parse_properties(file))
 
         expected = [
-            ("parent", "dupa"),
-            ("name", "kupa"),
-            ("type", "Mesh"),
-            ("anim", "false")
+            ("Parent", "dupa"),
+            ("Name", "kupa"),
+            ("Type", "Mesh"),
+            ("Anim", "false")
         ]
 
         assert parsed == expected
@@ -47,9 +47,9 @@ class Test_T3DPropertiesParser:
         parsed = list(self._parser.parse_properties(file))
 
         expected = [
-            ("ambient", ["255", "255", "255"]),
-            ("diffuse", ["0", "0", "0"]),
-            ("specular", ["128", "128", "128"])
+            ("Ambient", ["255", "255", "255"]),
+            ("Diffuse", ["0", "0", "0"]),
+            ("Specular", ["128", "128", "128"])
         ]
 
         assert parsed == expected
@@ -66,7 +66,7 @@ class Test_T3DPropertiesParser:
         parsed = list(self._parser.parse_properties(file))
 
         expected = [
-            ("transform", [
+            ("Transform", [
             "1", "2", "3", "4", 
             "5", "6", "7", "8", 
             "9", "10", "11", "12", 
@@ -93,19 +93,19 @@ class Test_T3DPropertiesParser:
         parsed = list(self._parser.parse_properties(file))
 
         expected = [
-            ("numverts", "6"),
-            ("geometry", [
+            ("NumVerts", "6"),
+            ("GEOMETRY", [
                 [
                     "0", 
-                    ["1", "2", "3", "4", "5"],
-                    ["1", "2", "3", "4", "5"],
-                    ["1", "2", "3", "4", "5"]
+                    "1", "2", "3", "4", "5",
+                    "1", "2", "3", "4", "5",
+                    "1", "2", "3", "4", "5"
                 ],
                 [
                     "-1", 
-                    ["1", "2", "3", "4", "5", "6", "7", "8"],
-                    ["1", "2", "3", "4", "5", "6", "7", "8"],
-                    ["1", "2", "3", "4", "5", "6", "7", "8"]
+                    "1", "2", "3", "4", "5", "6", "7", "8",
+                    "1", "2", "3", "4", "5", "6", "7", "8",
+                    "1", "2", "3", "4", "5", "6", "7", "8"
                 ],
             ])
         ]
@@ -123,12 +123,12 @@ class Test_T3DPropertiesParser:
             parsed = list(self._parser.parse_properties(file))
 
             expected = [
-                ("numverts", "2"),
-                ("geometry", [
+                ("NumVerts", "2"),
+                ("GEOMETRY", [
                     [
                         "0", 
-                        ["1", "2", "3", "4", "5"],
-                        ["1", "2", "3", "4", "5"],
+                        "1", "2", "3", "4", "5",
+                        "1", "2", "3", "4", "5",
                     ],
                 ])
             ]

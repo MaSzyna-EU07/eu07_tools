@@ -22,7 +22,7 @@ class Test_MATLoader:
 
         expected = {
             "texture1": "example/tex",
-            "texture2": set(("tex1", "tex2", "tex3")),
+            "texture2": ["tex1", "tex2", "tex3"],
             "winter": {
                 "texture1": "example/winter/tex",
                 "texture2": "example/winter/tex_normal"
