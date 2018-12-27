@@ -1,3 +1,12 @@
 {
-  "tests/test_io/test_t3d/test_load/test_loader.py::test_load_file": true
+  "tests/test_io/test_mat/test_mat_dumper.py": true,
+  "tests/test_io/test_mat/test_mat_loader.py": true,
+  "tests/test_io/test_scn/test_loader.py": true,
+  "tests/test_io/test_t3d/test_dump/test_t3d_dumper.py": true,
+  "tests/test_io/test_t3d/test_load/test_loader.py": true,
+  "tests/test_io/test_t3d/test_load/test_parser.py": true,
+  "tests/test_io/test_t3d/test_load/test_type_caster.py": true,
+  "tests/test_io/test_tokenize/test_token_accessor.py": true,
+  "tests/test_io/test_tokenize/test_tokenizer.py": true,
+  "tests/test_structs/test_t3d_tree.py": true
 }

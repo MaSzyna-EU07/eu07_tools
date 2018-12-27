@@ -1,1 +1,0 @@
-from .loader import T3DLoader
