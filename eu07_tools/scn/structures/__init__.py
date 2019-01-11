@@ -20,6 +20,10 @@ class SCNCamera:
         self._rotation = VectorXYZ((0, 0, 0))
         self.index = -1
 
+class SCNFirstInit:
+    def __init__(self):
+        self.typename = "firstinit"
+
 
 class SCNInclude:
     def __init__(self):
@@ -48,6 +52,10 @@ class SCNOrigin(VectorXYZ):
         super().__init__(values)
         self.typename = "origin"
 
+class SCNEndOrigin:
+    def __init__(self):
+        self.typename = "origin"
+
 
 class SCNRotate(VectorXYZ):
     def __init__(self, values):
@@ -57,11 +65,13 @@ class SCNRotate(VectorXYZ):
 
 class SCNSky:
     def __init__(self):
+        self.typename = "sky"
         self.model_path = ""
 
 
 class SCNTime:
     def __init__(self):
+        self.typename = "time"
         self.initial_time = ""
         self.sunset_time = ""
         self.sunrise_time = ""
@@ -69,7 +79,12 @@ class SCNTime:
 
 class SCNTrainset:
     def __init__(self):
+        self.typename = "trainset"
         self.timetable_path = "rozklad"
         self.track_name = "none"
         self.offset = 0
         self.velocity = 0
+
+class SCNEndTrainset:
+    def __init__(self):
+        self.typename = "endtrainset"

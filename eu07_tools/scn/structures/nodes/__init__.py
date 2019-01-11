@@ -11,6 +11,7 @@ class SCNNode:
 class SCNNodeDynamic(SCNNode):
     def __init__(self, name):
         super().__init__(name)
+        self.typename = "node:dynamic"
         self.base_path = ""
         self.map = ""
         self.mmd_path = ""
@@ -27,6 +28,7 @@ class SCNNodeDynamic(SCNNode):
 class SCNNodeEventlauncher(SCNNode):
     def __init__(self, name):
         super().__init__(name)
+        self.typename = "node:eventlauncher"
         self._location = VectorXYZ((0, 0, 0))
         self.radius = -1
         self.key = "none"
@@ -93,6 +95,7 @@ class SCNNodeMemcell(SCNNode):
 class SCNNodeModel(SCNNode):
     def __init__(self, name):
         super().__init__(name)
+        self.typename = "node:model"
         self._location = VectorXYZ((0, 0, 0))
         self.rotation_y = 0
         self.path = ""
@@ -110,6 +113,7 @@ class SCNNodeModel(SCNNode):
 class SCNNodeSound(SCNNode):
     def __init__(self, name):
         super().__init__(name)
+        self.typename = "node:sound"
         self._location = VectorXYZ((0, 0, 0))
         self.path = ""
 
@@ -124,6 +128,7 @@ class SCNNodeSound(SCNNode):
 class SCNNodeTraction(SCNNode):
     def __init__(self, name):
         super().__init__(name)
+        self.typename = "node:tractionpowersource"
         self.powersource_name = "none"
         self.nominal_voltage = 0
         self.max_current = 0
@@ -138,6 +143,32 @@ class SCNNodeTraction(SCNNode):
         self.wire_offset = 0
         self.visible = True
         self.parallel_name = "none"
+
+
+class SCNNodeTrack(SCNNode):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track"
+        self.length = 0
+        self.width = 1.435
+        self.friction = 0.2
+        self.sound_distance = 0
+        self.damage_flag = 0
+        self.environment = "flat"
+        self.visible = True
+        self.radius = 0
+        self.optional_parameters = {}
+
+class SCNNodeTrackNormal(SCNNodeTrack):
+    pass
+
+
+class SCNNodeTrackSwitch(SCNNodeTrack):
+    pass
+
+
+class SCNNodeTrackCross(SCNNodeTrack):
+    pass
 
 
 class SCNNodeTriangles(SCNNode):

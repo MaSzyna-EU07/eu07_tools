@@ -26,7 +26,8 @@ class SCNIterativeLoader(Iterator):
             "sky": self._load_sky,
             "test": self._load_test,
             "time": self._load_time,
-            "trainset": self._load_trainset
+            "trainset": self._load_trainset,
+            "endtrainset": self._load_endtrainset,
         }
 
         self._event_loaders = {
@@ -34,9 +35,12 @@ class SCNIterativeLoader(Iterator):
         }
 
         self._node_loaders = {
+            "dynamic": self._load_node_dynamic,
+            "model": self._load_node_model,
+            "track": self._load_node_track,
             "triangles": self._load_node_triangles,
             "triangle_strip": self._load_node_triangle_strip,
-            "triangle_fan": self._load_node_triangle_fan
+            "triangle_fan": self._load_node_triangle_fan,
         }
 
         self._get_token = self._token_stream.get_token
@@ -62,7 +66,7 @@ class SCNIterativeLoader(Iterator):
             if load_element:
                 element = load_element()
                 if element:
-                    yield token, element
+                    yield element.typename, element
 
     def _load_atmo(self):
         atmo = scnstruct.SCNAtmo()
@@ -110,7 +114,7 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_firstinit(self):
-        return True
+        return scnstruct.SCNFirstInit()
 
     def _load_include(self):
         include = scnstruct.SCNInclude()
@@ -139,10 +143,10 @@ class SCNIterativeLoader(Iterator):
         if load_node:
             node = load_node(name)
 
-        node.max_distance = max_distance
-        node.min_distance = min_distance
+            node.max_distance = max_distance
+            node.min_distance = min_distance
 
-        return node
+            return node
 
     def _load_node_dynamic(self, name):
         dynamic = scnstruct.SCNNodeDynamic(name)
@@ -150,8 +154,8 @@ class SCNIterativeLoader(Iterator):
 
         if not self._is_trainset_opened:
             dynamic.track_name = self._get_token()
-            dynamic.offset = float(self._get_token())
 
+        dynamic.offset = float(self._get_token())
         dynamic.driver_type = self._get_token()
 
         if self._is_trainset_opened:
@@ -248,7 +252,7 @@ class SCNIterativeLoader(Iterator):
     def _load_node_track(self, name):
         # TODO: Track loading
         self._get_tokens_before("endtrack")
-        return None
+        return scnstruct.SCNNodeTrack(name)
 
     def _load_node_traction(self, name):
         traction = scnstruct.SCNNodeTraction(name)
@@ -276,7 +280,9 @@ class SCNIterativeLoader(Iterator):
         if token == "parallel":
             traction.parallel_name = self._get_token()
 
-
+    def _load_node_tractionpowersource(self, name):
+        self._get_tokens_before("end")
+        return None
 
     def _load_node_triangles(self, name):
         return self._generic_load_triangles(
@@ -329,7 +335,7 @@ class SCNIterativeLoader(Iterator):
         return scnstruct.SCNOrigin(vector)
 
     def _load_endorigin(self):
-        return True
+        return scnstruct.SCNEndOrigin()
 
     def _load_rotate(self):
         vector = list(self._get_typed_tokens(3, float))
@@ -360,7 +366,7 @@ class SCNIterativeLoader(Iterator):
 
     def _load_endtrainset(self):
         self._is_trainset_opened = False
-        return True
+        return scnstruct.SCNEndTrainset()
 
     def _get_typed_tokens(self, count, type_):
         return (type_(self._get_token()) for _ in range(count))
