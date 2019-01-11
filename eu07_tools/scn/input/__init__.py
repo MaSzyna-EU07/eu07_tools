@@ -2,10 +2,7 @@ from collections.abc import Iterator
 import functools
 
 from eu07_tools.utils.input import TokenStream
-from eu07_tools.scn.structures import (
-    SCNNodeTriangles, SCNNodeTriangleFan, SCNNodeTriangleStrip,
-    SCNTrianglesMaterial
-)
+import eu07_tools.scn.structures as scnstruct
 
 class SCNIterativeLoader(Iterator):
     def __init__(self, file):
@@ -68,7 +65,7 @@ class SCNIterativeLoader(Iterator):
                     yield token, element
 
     def _load_atmo(self):
-        atmo = SCNAtmo()
+        atmo = scnstruct.SCNAtmo()
         atmo.sky_color = list(self._get_typed_tokens(3, float))
         atmo.fog_start = float(self._get_token())
         atmo.fog_end = float(self._get_token())
@@ -82,8 +79,11 @@ class SCNIterativeLoader(Iterator):
             atmo.overcast = float(token)
             self._get_token()
 
+        return atmo
+
+
     def _load_camera(self):
-        camera = SCNCamera()
+        camera = scnstruct.SCNCamera()
         camera.position = list(self._get_typed_tokens(3, float))
         camera.rotation = list(self._get_typed_tokens(3, float))
 
@@ -93,6 +93,8 @@ class SCNIterativeLoader(Iterator):
             camera.index = int(token)
         else:
             pass # TODO: Automatic camera indexing
+
+        return camera
 
     def _load_config(self):
         # TODO: Config loading
@@ -104,33 +106,28 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_event(self):
-        name, subtype = self._get_tokens(2)
-        delay = float(self._get_token())
-        target = self._get_token()
-
-        load_event = self._event_loaders.get(subtype)
-
-        if load_event:
-            event = load_event(name)
-            # Temporary mock
-            self._get_tokens_before("endevent")
-            return None
-
-        event.delay = delay
-        event.target = target
-
-        return event
+        self._get_tokens_before("endevent")
+        return None
 
     def _load_firstinit(self):
-        return SCNFirstInit()
+        return True
+
+    def _load_include(self):
+        include = scnstruct.SCNInclude()
+        include.path, *parameters = self._get_tokens_before("end")
+        for p_value in parameters:
+            include.append_parameter_value(p_value)
+
+        return include
 
     def _load_light(self):
         self._get_tokens_before("endlight")
         return None
 
     def _load_lua(self):
-        path = self._get_token()
-        return SCNLua(path)
+        lua = scnstruct.SCNLua()
+        lua.path = self._get_token()
+        return lua
 
     def _load_node(self):
         max_distance = float(self._get_token())
@@ -223,7 +220,7 @@ class SCNIterativeLoader(Iterator):
 
         token = self._get_token()
 
-        if token = "lights":
+        if token == "lights":
             light_states = [float(ls) for ls in self._get_tokens_before("endmodel")]
 
         return SCNNodeModel()
@@ -248,10 +245,10 @@ class SCNIterativeLoader(Iterator):
         wire_material_type = self._get_token()
         wire_thickness = float(self._get_token())
         damage_flag = int(self._get_token())
-        p1 = list(self._get_typed_tokens(3))
-        p2 = list(self._get_typed_tokens(3))
-        p3 = list(self._get_typed_tokens(3))
-        p4 = list(self._get_typed_tokens(3))
+        p1 = list(self._get_typed_tokens(3, float))
+        p2 = list(self._get_typed_tokens(3, float))
+        p3 = list(self._get_typed_tokens(3, float))
+        p4 = list(self._get_typed_tokens(3, float))
         min_height, segment_length = self._get_typed_tokens(2, float)
         num_wires = int(self._get_token())
         wire_offset = float(self._get_token())
@@ -265,13 +262,19 @@ class SCNIterativeLoader(Iterator):
 
 
     def _load_node_triangles(self, name):
-        return self._generic_load_triangles(SCNNodeTriangles(name))
+        return self._generic_load_triangles(
+            scnstruct.SCNNodeTriangles(name)
+        )
 
     def _load_node_triangle_strip(self, name):
-        return self._generic_load_triangles(SCNNodeTriangleStrip(name))
+        return self._generic_load_triangles(
+            scnstruct.SCNNodeTriangleStrip(name)
+        )
 
     def _load_node_triangle_fan(self, name):
-        return self._generic_load_triangles(SCNNodeTriangleFan(name))
+        return self._generic_load_triangles(
+            scnstruct.SCNNodeTriangleFan(name)
+        )
 
 
     def _generic_load_triangles(self, node):
@@ -287,7 +290,7 @@ class SCNIterativeLoader(Iterator):
             specular = list(self._get_typed_tokens(3, float))
             self._get_token()
 
-            node.material = SCNTrianglesMaterial(ambient, diffuse, specular)
+            node.material = scnstruct.SCNTrianglesMaterial(ambient, diffuse, specular)
             map_ = self._get_token()
             
         node.map = map_
@@ -306,39 +309,41 @@ class SCNIterativeLoader(Iterator):
 
     def _load_origin(self):
         vector = list(self._get_typed_tokens(3, float))
-        return SCNOrigin(vector)
+        return scnstruct.SCNOrigin(vector)
 
     def _load_endorigin(self):
         return True
 
     def _load_rotate(self):
         vector = list(self._get_typed_tokens(3, float))
-        return SCNRotate(vector)
+        return scnstruct.SCNRotate(vector)
 
     def _load_sky(self):
-        sky_model_path, __ = self._get_tokens(2)
-        return SCNSky(sky_model_path)
+        sky = scnstruct.SCNSky()
+        sky.model_path, __ = self._get_tokens(2)
+        return sky
 
     def _load_test(self):
         self._get_tokens_before("endtest")
         return None
 
     def _load_time(self):
-        inital_time, sunset_time, sunrise_time = self._get_tokens(3)
-        return T3DTime(inital_time, sunset_time, sunrise_time)
+        time = scnstruct.T3DTime()
+        time.inital_time, time.sunset_time, time.sunrise_time = self._get_tokens(3)
+        return time
 
     def _load_trainset(self):
         self._is_trainset_opened = True
 
-        timetable_path, track_name = self._get_tokens(2)
-        offset, velocity = self._get_typed_tokens(2, float)
-        return SCNTrainset(timetable_path, track_name, offset, velocity)
+        trainset = scnstruct.SCNTrainset()
+
+        trainset.timetable_path, trainset.track_name = self._get_tokens(2)
+        trainset.offset, trainset.velocity = self._get_typed_tokens(2, float)
+        return trainset
 
     def _load_endtrainset(self):
         self._is_trainset_opened = False
         return True
-
-
 
     def _get_typed_tokens(self, count, type_):
         return (type_(self._get_token()) for _ in range(count))
