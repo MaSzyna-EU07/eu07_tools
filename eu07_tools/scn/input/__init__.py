@@ -145,52 +145,61 @@ class SCNIterativeLoader(Iterator):
         return node
 
     def _load_node_dynamic(self, name):
-        directory, replacableskin, mmd_file = self._get_tokens(3)
+        dynamic = scnstruct.SCNNodeDynamic(name)
+        dynamic.base_path, dynamic.map, dynamic.mmd_path = self._get_tokens(3)
 
         if not self._is_trainset_opened:
-            track_name = self._get_token()
-            offset = float(self._get_token())
+            dynamic.track_name = self._get_token()
+            dynamic.offset = float(self._get_token())
 
-        driver_type = self._get_token()
+        dynamic.driver_type = self._get_token()
 
         if self._is_trainset_opened:
-            coupling = self._get_token()
+            dynamic.coupling = self._get_token()
         else:
-            initial_velocity = float(self._get_token())
+            dynamic.initial_velocity = float(self._get_token())
         
-        load_count = float(self._get_token())
+        dynamic.load_count = float(self._get_token())
 
-        if load_count > 0:
-            load_type = self._get_token()
+        if dynamic.load_count > 0:
+            dynamic.load_type = self._get_token()
 
         token = self._get_token()
 
         if token != "enddynamic":
-            __, destination, __ = self._get_tokens(3)
+            __, dynamic.destination, __ = self._get_tokens(3)
 
-        return SCNNodeDynamic()
+        return dynamic
 
     def _load_node_eventlauncher(self, name):
-        *location, radius = self._get_typed_tokens(4, float)
-        key = self._get_token()
-        delta_time = float(self._get_token())
-        first_event_name, second_event_name = self._get_tokens(2)
+        launcher = scnstruct.SCNNodeEventlauncher(name)
+        *launcher.location, launcher.radius = self._get_typed_tokens(4, float)
+        launcher.key = self._get_token()
+        launcher.delta_time = float(self._get_token())
+        launcher.first_event_name, launcher.second_event_name = self._get_tokens(2)
 
-        if second_event_name != "condition":
-            memcell_name = self._get_tokens(2)
-            check_mask = int(self._get_token)
-
+        if launcher.second_event_name != "condition":
+            launcher.memcell_name = self._get_tokens(2)
+            launcher.check_mask = int(self._get_token)
         
         self._get_token() # endtag
 
+        return launcher
+
     def _load_node_lines(self, name):
-        return self._generic_load_lines(SCNNodeLines(name))
+        return self._generic_load_lines(
+            scnstruct.SCNNodeLines(name)
+        )
 
     def _load_node_line_loop(self, name):
-        return self._generic_load_lines(SCNNodeLineLoop(name))
+        return self._generic_load_lines(
+            scnstruct.SCNNodeLineLoop(name)
+        )
 
     def _load_node_line_strip(self, name):
-        return self._generic_load_lines(SCNNodeLineStrip(name))
+        return self._generic_load_lines(
+            scnstruct.SCNNodeLineStrip(name)
+        )
 
     def _generic_load_lines(self, node):
         *node.color, node.thickness = self._get_typed_tokens(4, float)
@@ -207,31 +216,33 @@ class SCNIterativeLoader(Iterator):
         return node
 
     def _load_node_memcell(self, name):
-        location = self._get_typed_tokens(3, float)
-        text = self._get_token()
-        value1, value2 = self._get_typed_tokens(3, float)
-        track_name = self._get_token()
+        memcell = scnstruct.SCNNodeMemcell(name)
+        memcell.location = self._get_typed_tokens(3, float)
+        memcell.values[0] = self._get_token()
+        memcell.values[1:] = self._get_typed_tokens(3, float)
+        memcell.track_name = self._get_token()
 
-        return SCNNodeMemcell()
+        return memcell
 
     def _load_node_model(self, name):
-        *location, rotation_y = self._get_typed_tokens(4, float)
-        path, skin_path = self._get_tokens(2)
+        model = scnstruct.SCNNodeModel(name)
+        *model.location, model.rotation_y = self._get_typed_tokens(4, float)
+        model.path, model.map = self._get_tokens(2)
 
         token = self._get_token()
 
         if token == "lights":
-            light_states = [float(ls) for ls in self._get_tokens_before("endmodel")]
+            model.light_states = [float(ls) for ls in self._get_tokens_before("endmodel")]
 
-        return SCNNodeModel()
+        return model
 
     def _load_node_sound(self, name):
-        location = self._get_typed_tokens(3, float)
-        file_path = self._get_token()
-
+        sound = scnstruct.SCNNodeSound(name)
+        sound.location = self._get_typed_tokens(3, float)
+        sound.path = self._get_token()
         self._get_token()
 
-        return SCNNodeSound()
+        return sound
 
 
     def _load_node_track(self, name):
@@ -240,24 +251,30 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_node_traction(self, name):
-        powersource_name = self._get_token()
-        nominal_voltage, max_current, resistivity = self._get_typed_tokens(3, float)
-        wire_material_type = self._get_token()
-        wire_thickness = float(self._get_token())
-        damage_flag = int(self._get_token())
+        traction = scnstruct.SCNNodeTraction(name)
+
+        traction.powersource_name = self._get_token()
+        traction.nominal_voltage = float(self._get_token())
+        traction.max_current = float(self._get_token())
+        traction.resistivity = float(self._get_token())
+        traction.wire_material_type = self._get_token()
+        traction.wire_thickness = float(self._get_token())
+        traction.damage_flag = int(self._get_token())
         p1 = list(self._get_typed_tokens(3, float))
         p2 = list(self._get_typed_tokens(3, float))
         p3 = list(self._get_typed_tokens(3, float))
         p4 = list(self._get_typed_tokens(3, float))
-        min_height, segment_length = self._get_typed_tokens(2, float)
-        num_wires = int(self._get_token())
-        wire_offset = float(self._get_token())
-        visible = (True if self._get_token() == "vis" else False)
+        traction.min_height, traction.segment_length = self._get_typed_tokens(2, float)
+        traction.wires_type = int(self._get_token())
+        
+        if traction.wires_type != 0:
+            traction.wire_offset = float(self._get_token())
+        traction.visible = (True if self._get_token() == "vis" else False)
         
         token = self._get_token()
 
         if token == "parallel":
-            parallel = self._get_token()
+            traction.parallel_name = self._get_token()
 
 
 
@@ -328,7 +345,7 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_time(self):
-        time = scnstruct.T3DTime()
+        time = scnstruct.SCNTime()
         time.inital_time, time.sunset_time, time.sunrise_time = self._get_tokens(3)
         return time
 
