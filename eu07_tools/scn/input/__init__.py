@@ -102,15 +102,15 @@ class SCNIterativeLoader(Iterator):
 
     def _load_config(self):
         # TODO: Config loading
-        self._get_tokens_before("endconfig")
+        list(self._get_tokens_before("endconfig"))
         return None
 
     def _load_description(self):
-        self._get_tokens_before("enddescription")
+        list(self._get_tokens_before("enddescription"))
         return None
 
     def _load_event(self):
-        self._get_tokens_before("endevent")
+        list(self._get_tokens_before("endevent"))
         return None
 
     def _load_firstinit(self):
@@ -280,9 +280,25 @@ class SCNIterativeLoader(Iterator):
         if token == "parallel":
             traction.parallel_name = self._get_token()
 
+        return traction
+
     def _load_node_tractionpowersource(self, name):
-        self._get_tokens_before("end")
-        return None
+        power_source = scnstruct.SCNNodeTractionPowerSource(name)
+        power_source.location = self._get_typed_tokens(3, float)
+        power_source.nominal_voltage = float(self._get_token())
+        power_source.voltage_frequency = float(self._get_token())
+        power_source.internal_resistance = float(self._get_token())
+        power_source.max_output_current = float(self._get_token())
+        power_source.fast_fuse_timeout = float(self._get_token())
+        power_source.fast_fuse_repetition = int(self._get_token())
+        power_source.slow_fuse_timeout = float(self._get_token())
+
+        optional = list(self._get_tokens_before("end"))
+
+        power_source.recuperation = ("recuperation" in optional)
+        power_source.section = ("section" in optional)
+
+        return power_source
 
     def _load_node_triangles(self, name):
         return self._generic_load_triangles(
@@ -347,7 +363,7 @@ class SCNIterativeLoader(Iterator):
         return sky
 
     def _load_test(self):
-        self._get_tokens_before("endtest")
+        list(self._get_tokens_before("endtest"))
         return None
 
     def _load_time(self):
