@@ -4,7 +4,7 @@ import math
 
 from .format import (
     format_bool, format_geometry_unit, format_matrix, format_number, 
-    format_sequence
+    format_sequence, format_submodel_name
 )
 
 def get_writer(type_):
@@ -57,9 +57,11 @@ class SubmodelWriter(abc.ABC):
             value = format_matrix(value)
         elif key_lower in "usenearatten wire":
             value = format_bool(value)
+        elif key_lower in "parent name":
+            value = format_submodel_name(value)
         # HACK: It's easier to type all keys of string properties
         # than typing keys of all numeric properties...
-        elif key_lower in "parent type name anim map":
+        elif key_lower in "type anim map":
             pass
         else:
             value = format_number(value)

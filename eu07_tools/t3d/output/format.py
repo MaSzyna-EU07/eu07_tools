@@ -36,3 +36,9 @@ def format_geometry_unit(unit):
 def format_bool(value):
     return "true" if value else "false"
 
+
+def format_submodel_name(value):
+    if " " in value:
+        value = f"\"{value}\""
+
+    return value

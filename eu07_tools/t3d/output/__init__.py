@@ -1,1 +1,1 @@
-from .dumper import T3DDumper
+from .output import T3DOutput

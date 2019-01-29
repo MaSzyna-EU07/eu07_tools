@@ -4,7 +4,7 @@ from eu07_tools.t3d.structures import create_submodel, create_include
 from . import type_cast
 
 
-class T3DIterativeLoader(Iterator):
+class T3DInput(Iterator):
     @classmethod
     def from_file(cls, file):
         return cls(file)

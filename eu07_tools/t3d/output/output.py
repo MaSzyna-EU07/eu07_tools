@@ -1,7 +1,7 @@
 from . import writers
 
 
-class T3DDumper:
+class T3DOutput:
     @classmethod
     def to_file(cls, file):
         return cls(file)
