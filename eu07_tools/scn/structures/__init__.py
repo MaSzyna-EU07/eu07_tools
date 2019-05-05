@@ -54,7 +54,7 @@ class SCNOrigin(VectorXYZ):
 
 class SCNEndOrigin:
     def __init__(self):
-        self.typename = "origin"
+        self.typename = "endorigin"
 
 
 class SCNRotate(VectorXYZ):

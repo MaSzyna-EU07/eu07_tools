@@ -233,10 +233,7 @@ class SCNIterativeLoader(Iterator):
         *model.location, model.rotation_y = self._get_typed_tokens(4, float)
         model.path, model.map = self._get_tokens(2)
 
-        token = self._get_token()
-
-        if token == "lights":
-            model.light_states = [float(ls) for ls in self._get_tokens_before("endmodel")]
+        model.light_states = [int(s) for s in self._get_tokens_before("endmodel")]
 
         return model
 

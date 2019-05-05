@@ -90,6 +90,24 @@ class VectorXYZ(BaseVector):
         self._values[2] = z
 
 
+class VectorXY(BaseVector):
+    @property
+    def x(self) -> float:
+        return self._values[0]
+
+    @x.setter
+    def x(self, x: float):
+        self._values[0] = x
+
+    @property
+    def y(self) -> float:
+        return self._values[1]
+
+    @y.setter
+    def y(self, y: float):
+        self._values[1] = y
+
+
 class VectorUV(BaseVector):
     @property
     def u(self) -> float:

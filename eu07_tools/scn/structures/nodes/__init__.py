@@ -101,6 +101,7 @@ class SCNNodeModel(SCNNode):
         self.path = ""
         self.map = ""
         self.light_states = []
+        self.light_colors = []
 
     @property
     def location(self):
