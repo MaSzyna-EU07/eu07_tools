@@ -46,11 +46,15 @@ class TexturePath:
             self.type = "GENERATED"
         elif path.startswith("[") and path.endswith("]"):
             self.type = "RANDOM_SET"
+        elif path in "replacableskin -1 -2 -3 -4":
+            self.type = "SKIN"
         else:
             self.type = "IMAGE"
 
     def __str__(self):
         return self._path
+
+    
         
 
         
