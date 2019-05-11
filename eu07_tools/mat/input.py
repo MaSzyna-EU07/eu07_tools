@@ -15,6 +15,7 @@ _NUMERIC_KEYS = {
     "selfillum", "opacity"
 }
 
+# TODO: Texturesets
 def _load_mapping(token_stream):
     map_ = create_mat_mapping()
 
