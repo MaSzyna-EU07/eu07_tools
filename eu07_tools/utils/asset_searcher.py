@@ -25,7 +25,7 @@ class AssetSearcher:
 
 class PathFinder:
     """
-    Class for finding absolute asset paths.
+    Class for finding assets absolute paths.
 
     :param lookups: sequence of lookup paths. The lookup path is a absolute path to directory, used to concatenate with relative path passed to *find_paths()* method.
     :type lookups: `Sequence[str]`

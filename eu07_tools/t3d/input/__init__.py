@@ -4,6 +4,11 @@ from eu07_tools.t3d.structures import create_submodel, create_include
 from . import type_cast
 
 
+def load(self, file):
+    inp = T3DInput.from_file(file)
+    yield from iter(inp)
+
+
 class T3DInput(Iterator):
     @classmethod
     def from_file(cls, file):
