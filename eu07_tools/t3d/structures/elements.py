@@ -74,7 +74,7 @@ class T3DSubmodel(T3DElement):
     :ivar anim: animation type
     :type anim: str
     :ivar diffuse: diffuse color
-    :type diffuse: :class:`ColorRGB`
+    :type diffuse: :class:`ColorRGB`http://eksploratorzy.com.pl/viewtopic.php?f=21&t=6076&start=60
     :ivar selfillum: light emission threshold
     :type selfillum: float, <-1.25; 1.25>
     :ivar max_distance: maximal rendering radius. In case of unlimited range, this value should be equal -1.
@@ -124,7 +124,7 @@ class T3DMeshSubmodel(T3DSubmodel):
     :ivar wire_size: line thickness in wireframe mode
     :type wire_size: float
     :ivar opacity: opacity level 
-    :type opacity: float
+    :type opacity: float <0;100>
     :ivar map: texture path or replaceable skin identifier (*-1*, *-2*, *-3*, *-4*). *none* by default.
     :type map: str
     :ivar num_verts: number of vertices in all triangles, >=0

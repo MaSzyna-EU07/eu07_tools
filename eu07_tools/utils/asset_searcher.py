@@ -1,83 +1,102 @@
 from pathlib import Path
+import functools
 import os
-
-
-class AssetSearcher:
-    def __init__(self, extensions, lookups):
-        self._original_extensions = extensions
-        self.extensions = extensions
-        self.lookups = lookups
-
-    def reset(self):
-        self.extensions = self._original_extensions
-
-    def set_extension_priority(self, extension, priority):
-        self.extensions.pop(self.get_extension_priority(extension))
-        self.extensions.insert(priority, extension)
-
-    def get_extension_priority(self, extension):
-        return self.extensions.index(extension)
-
-    def find_paths(self, rel_path):
-        for lookup in self.lookups:
-            full_path = Path(lookup, rel_path)
-            for extension in self.extensions:
-                yield str(full_path.with_suffix(extension))
-
-
 
 class AssetSearcher:
     def __init__(self, root, basedir):
         self._root = Path(root)
         self._basedir = Path(basedir)
-        self.texture_extensions = [".tga", ".dds", ".png", ".bmp", ".tex"]
-        self.model_extensions = [".e3d", ".t3d"]
 
-    def find_texture_paths(self, rel_path, find_mat=True):
-        rel_path = self._normalize_path(rel_path)
-        lookups = [
-            Path(self._root),
-            Path(self._basedir),
-            Path(self._root, "textures")
-        ]
-
-        extensions = (
-            [".mat"] + self.texture_extensions if find_mat 
-            else self.texture_extensions
+        self.models_finder = PathFinder(
+            [Path(self._root), Path(self._basedir), Path(self._root, "models")],
+            [".e3d", ".t3d"]
         )
 
-        yield from self._find_paths(rel_path, lookups, extensions)
+        self.textures_finder = PathFinder(
+            [Path(self._root), Path(self._basedir), Path(self._root, "textures")],
+            [".mat", ".tga", ".dds", ".png", ".bmp", ".tex"]
+        )
 
-    def find_model_paths(self, rel_path):
-        rel_path = self._normalize_path(rel_path)
-        lookups = [
-            Path(self._root),
-            Path(self._basedir),
-            Path(self._root, "models")
-        ]
+        self.includes_finder = PathFinder(
+            [Path(self._root), Path(self._basedir), Path(self._root, "?")],
+            []
+        )
 
-        yield from self._find_paths(rel_path, lookups, self.model_extensions)
 
-    def find_include_paths(self, rel_path):
-        rel_path = self._normalize_path(rel_path, trim_ext=False)
-        lookups = [
-            Path(self._root),
-            Path(self._basedir),
-            # TODO: Should be more?
-        ]
+class PathFinder:
+    """
+    Class for finding absolute asset paths.
 
-        yield from self._find_paths(rel_path, lookups, [])
+    :param lookups: sequence of lookup paths. The lookup path is a absolute path to directory, used to concatenate with relative path passed to *find_paths()* method.
+    :type lookups: `Sequence[str]`
+    :param extensions: sequence of extensions. Each extension should have a leading dot.
+    :type extensions: `Sequence[str]` 
+    """
+    def __init__(self, lookups, extensions):
+        self._original_extensions = extensions
+        self.extensions = extensions
+        self.lookups = lookups
 
-    def _find_paths(self, rel_path, lookups, extensions):
-        for lookup in lookups:
+    def reset(self):
+        """ Restore default finder state """
+        self.extensions = self._original_extensions
+
+    def add_extension(self, extension):
+        """ 
+        Add new extension to extensions list 
+
+        :param extension: Extension to add, with leading dot
+        :type extension: `str`
+        """
+        self.extensions.append(extension)
+
+    def remove_extension(self, extension):
+        """ 
+        Remove extension from extensions list 
+
+        :param extension: Extension to remove, with leading dot
+        :type extension: `str`
+        """
+        self.extensions.remove(extension)
+
+    def set_extension_priority(self, extension, priority):
+        """ 
+        Set extension priority in extensions list.
+        The highest priority is 0.
+
+        :param extension: extension, with leading dot
+        :type extension: `str`
+        :param priority: priority 
+        """
+        self.extensions.pop(self.get_extension_priority(extension))
+        self.extensions.insert(priority, extension)
+
+    def get_extension_priority(self, extension):
+        """
+        Get extension priority
+
+        :param extension: extension, with leading dot
+        :type extension: `str`
+
+        :returns: priority of given extension
+        :rtype: `int`
+        """
+        return self.extensions.index(extension)
+
+    def find_paths(self, rel_path):
+        """
+        Find all possible asset paths.
+
+        :param rel_path: relative path to asset
+        :type rel_path: `str`
+
+        :returns: iterator of all possible absolute asset paths.
+        :rtype: `Iterator[str]`
+        """
+        if not self.extensions:
+            rel_path = Path(rel_path).with_suffix("")
+
+        for lookup in self.lookups:
             full_path = Path(lookup, rel_path)
-            for ext in extensions:
-                yield str(full_path.with_suffix(ext))
-
-        return
-
-    # TODO: Refactor
-    def _normalize_path(self, path, trim_ext=True):
-        path = os.path.splitext(path)[0] if trim_ext else path
-        path = os.path.normpath(path.replace('\\', '/')).lstrip('/').lower()
-        return path
+            for extension in self.extensions:
+                yield str(full_path.with_suffix(extension))
