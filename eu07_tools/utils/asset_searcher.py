@@ -93,10 +93,12 @@ class PathFinder:
         :returns: iterator of all possible absolute asset paths.
         :rtype: `Iterator[str]`
         """
-        if not self.extensions:
-            rel_path = Path(rel_path).with_suffix("")
-
+        
         for lookup in self.lookups:
             full_path = Path(lookup, rel_path)
-            for extension in self.extensions:
-                yield str(full_path.with_suffix(extension))
+
+            if self.extensions:
+                for extension in self.extensions:
+                    yield str(full_path.with_suffix(extension))
+            else:
+                yield str(full_path)
