@@ -10,15 +10,15 @@ class T3DOutput:
         self._file = file
 
     def dump_from_iterable(self, iterable):
-        for datablock in iterable:
-            if datablock.datablock_type == "submodel":
-                self.dump_submodel(datablock)
-            elif datablock.datablock_type == "include":
-                self.dump_include(datablock)
+        for element in iterable:
+            if element.element_type == "submodel":
+                self.dump_submodel(element)
+            elif element.element_type == "include":
+                self.dump_include(element)
 
     # public:
     def dump_submodel(self, submodel):
-        writer = writers.get_writer(submodel.type)
+        writer = writers.get_writer(submodel.submodel_type)
         writer.write_submodel(submodel, self._file)
 
     def dump_include(self, include):

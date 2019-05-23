@@ -26,9 +26,17 @@ def _load_mapping(token_stream):
 
         if not token:
             break
+        elif "texture" in key:
+            token = token_stream.get_token()
+
+            if token == "[":
+                value = list(token_stream.get_tokens_before("]"))
+            else:
+                value = token
+
         elif key in "}{":
             continue
-        if key in _NESTED_MAPPING_KEYS:
+        elif key in _NESTED_MAPPING_KEYS:
             value = _load_mapping(token_stream)
         elif key in _NUMERIC_KEYS:
             value = float(token_stream.get_token())

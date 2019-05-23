@@ -4,7 +4,7 @@ from eu07_tools.t3d.structures import create_submodel, create_include
 from . import type_cast
 
 
-def load(self, file):
+def load(file):
     inp = T3DInput.from_file(file)
     yield from iter(inp)
 

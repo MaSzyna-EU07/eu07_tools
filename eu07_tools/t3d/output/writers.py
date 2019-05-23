@@ -27,7 +27,7 @@ class SubmodelWriter(abc.ABC):
 
         self._write_separator()
         self._write_property("Parent", submodel.parent_name)
-        self._write_property("Type", submodel.type)
+        self._write_property("Type", submodel.submodel_type)
         self._write_property("Name", submodel.name)
         self._write_property("Anim", submodel.anim)
         

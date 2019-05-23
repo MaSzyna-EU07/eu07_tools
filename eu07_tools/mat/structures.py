@@ -15,6 +15,8 @@ class MATMapping:
     def __setitem__(self, key, value):
         if key == "size":
             self._items["size"] = VectorXY(value)
+        elif "texture" in key:
+            self._items[key] = TextureValue(value)
         else:
             self._items[key] = value
 
@@ -47,4 +49,36 @@ class MATMapping:
 
     def setdefault(self, key, default_value=None):
         self._items.setdefault(key, default_value)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {repr(self._items)}>"
+
+class TextureValue:
+    def __init__(self, value):
+        self.value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self.value_type = (
+            "TEXTURE_SET" if isinstance(value, list)
+            else "TEXTURE_PATH"
+        )
+        self._value = value
+
+    def __repr__(self):
+        return (
+            f"<{self.__class__.__name__} "
+            f"type={self.value_type} "
+            f"value={self.value}>"
+        )
+
+    def __str__(self):
+        if self.value_type == "TEXTURE_SET":
+            return "[ " + " ".join(self._value) + " ]"
+        else:
+            return self.value
 

@@ -1,6 +1,5 @@
 from pathlib import Path
-import functools
-import os
+
 
 class AssetSearcher:
     def __init__(self, root, basedir):
@@ -13,7 +12,10 @@ class AssetSearcher:
         )
 
         self.textures_finder = PathFinder(
-            [Path(self._root), Path(self._basedir), Path(self._root, "textures")],
+            [
+                Path(self._root), Path(self._basedir), Path(self._root, "textures"),
+                Path(str(self._basedir).replace("models", "textures"))
+            ],
             [".mat", ".tga", ".dds", ".png", ".bmp", ".tex"]
         )
 
@@ -83,22 +85,33 @@ class PathFinder:
         """
         return self.extensions.index(extension)
 
-    def find_paths(self, rel_path):
+    def find(self, rel_path):
+        try:
+            return next(self.find_all(rel_path))
+        except StopIteration:
+            return ""
+        
+    def find_all(self, rel_path):
         """
-        Find all possible asset paths.
+        Find all existing assets paths.
 
         :param rel_path: relative path to asset
         :type rel_path: `str`
 
-        :returns: iterator of all possible absolute asset paths.
+        :returns: iterator of paths
         :rtype: `Iterator[str]`
         """
         
+        rel_path = rel_path.lstrip("\\").lstrip("/").lower()
         for lookup in self.lookups:
             full_path = Path(lookup, rel_path)
 
             if self.extensions:
                 for extension in self.extensions:
-                    yield str(full_path.with_suffix(extension))
+                    if full_path.with_suffix(extension).exists():
+                        yield str(full_path.with_suffix(extension))
             else:
-                yield str(full_path)
+                if full_path.exists():
+                    yield str(full_path)
+
+        return
