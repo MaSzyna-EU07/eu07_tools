@@ -6,15 +6,6 @@ def load(file):
     token_stream = TokenStream.from_file(file)
     return _load_mapping(token_stream)
 
-_NESTED_MAPPING_KEYS = {
-    "spring", "summer", "autumn", "winter", 
-    "rain", "snow", "cloudy", "clear"
-}
-
-_NUMERIC_KEYS = {
-    "selfillum", "opacity"
-}
-
 # TODO: Texturesets
 def _load_mapping(token_stream):
     map_ = create_mat_mapping()

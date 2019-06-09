@@ -1,5 +1,7 @@
 from eu07_tools.utils import VectorXY
 
+from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS
+
 
 def create_mat_mapping():
     return MATMapping()
