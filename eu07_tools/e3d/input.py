@@ -18,7 +18,7 @@ class E3DInput:
         self._chunk_readers = {
             "SUB0": self._read_SUB0,
             "VNT0": self._read_VNT0,
-            "TEX0": self._read_zero_separated_chunk,
+            "TEX0": self._read_TEX0,
             "NAM0": self._read_zero_separated_chunk,
             "TRA0": self._read_TRA0,
             "TRA1": self._read_TRA1
@@ -95,6 +95,9 @@ class E3DInput:
             self._scanner.read_floats(_TRA1_MATRIX_SIZE) for _ in num_matrices
         ] 
 
+    def _read_TEX0(self, chunk_size):
+        return self._read_zero_separated_chunk(chunk_size - 8)
+
     def _read_zero_separated_chunk(self, chunk_size):
         data = self._scanner.read_str(chunk_size)
         values = data.strip("\x00").split("\x00")
@@ -107,7 +110,8 @@ class E3DScanner:
 
     @property
     def is_empty(self):
-        return self._file_size == self._file.tell()
+        print("file size", self._file_size, "pos", self._file.tell())
+        return self._file_size <= self._file.tell()
 
     def read(self, n):
         self._file.read(n)
