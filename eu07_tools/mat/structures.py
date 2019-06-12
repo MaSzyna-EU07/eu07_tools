@@ -52,6 +52,10 @@ class MATMapping:
     def setdefault(self, key, default_value=None):
         self._items.setdefault(key, default_value)
 
+    def items(self):
+        return self._items.items()
+
+
     def __repr__(self):
         return f"<{self.__class__.__name__} {repr(self._items)}>"
 

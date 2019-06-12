@@ -15,7 +15,7 @@ def _load_mapping(token_stream):
         token = token_stream.get_token()
         key = token.rstrip(":")
         value = None
-
+        
         if not token:
             break
         elif "texture" in key:
@@ -30,8 +30,10 @@ def _load_mapping(token_stream):
             else:
                 value = token
 
-        elif key in "}{":
+        elif key == "{":
             continue
+        elif key == "}":
+            break 
         elif key in NESTED_MAPPING_KEYS:
             value = _load_mapping(token_stream)
         elif key in NUMERIC_KEYS:
