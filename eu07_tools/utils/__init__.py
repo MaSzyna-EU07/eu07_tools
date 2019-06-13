@@ -1,6 +1,7 @@
 from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB
 from .asset_searcher import AssetSearcher
 from .input import TokenStream
+from .input import BinaryScanner
 
 from pathlib import Path
 
@@ -19,3 +20,8 @@ def find_root(filepath):
         return root
     else:
         raise ValueError(f"Can't find EU07 root for {filepath}")
+
+
+def make_relative_path(filepath):
+    root = find_root(filepath)
+    return NotImplemented

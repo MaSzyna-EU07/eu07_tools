@@ -3,6 +3,7 @@ This module contains utilities sharing by various IO components.
 """
 
 from .tokenize import TokenStream
+from .binary_scanner import BinaryScanner
 
 DEFAULT_NEWLINE = '\r\n'
 

@@ -11,6 +11,15 @@ class MATMapping:
     def __init__(self):
         self._items = {}
 
+    @classmethod
+    def from_dict(cls, d):
+        map_ = create_mat_mapping()
+        for k, v in d.items():
+            map_[k] = v
+
+        return map_
+
+
     def __getitem__(self, key):
         return self._items[key]
 
@@ -18,7 +27,7 @@ class MATMapping:
         if key == "size":
             self._items["size"] = VectorXY(value)
         elif "texture" in key:
-            self._items[key] = TextureValue(value)
+            self._items[key] = Texture(value)
         else:
             self._items[key] = value
 
@@ -59,7 +68,7 @@ class MATMapping:
     def __repr__(self):
         return f"<{self.__class__.__name__} {repr(self._items)}>"
 
-class TextureValue:
+class Texture:
     def __init__(self, value):
         self.value = value
 
