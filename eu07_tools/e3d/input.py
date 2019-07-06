@@ -1,37 +1,43 @@
 import struct
 
 from eu07_tools.utils import BinaryScanner
+from .structures import E3DStruct
 
 #TODO: Refactor magic numbers
 def load(file):
     inp = E3DInput(file)
-    return inp
+    return inp.load()
     
 _VERTEX_SIZE = 8 * 4
 _TRA0_MATRIX_SIZE = 16 * 4
 _HEADER_SIZE = 8
+_SUBMODEL_SIZE = 256
 
 class E3DInput:
     def __init__(self, file):
         self._chunk_readers = {
             "SUB0": self._read_SUB0,
             "VNT0": self._read_VNT0,
-            "TEX0": self._read_zero_separated_chunk,
-            "NAM0": self._read_zero_separated_chunk,
+            "TEX0": self._read_TEX0,
+            "NAM0": self._read_NAM0,
             "TRA0": self._read_TRA0,
         }
 
         self._scanner = BinaryScanner(file)
 
-    def __iter__(self):
+    def load(self):
         self._scanner.read_bytes(_HEADER_SIZE)
+
+        self.data = E3DStruct()
 
         while not self._scanner.is_empty:
             chunk_id, chunk_size = self._read_header()
 
             chunk_read = self._chunk_readers.get(chunk_id)
 
-            yield from chunk_read(chunk_size)
+            chunk_read(chunk_size)
+    
+        return self.data
 
     def _read_header(self):
         chunk_id = self._scanner.read_str(4)
@@ -41,60 +47,71 @@ class E3DInput:
 
 
     def _read_SUB0(self, chunk_size):
-        NUM_SUBMODELS = chunk_size // 256
+        NUM_SUBMODELS = chunk_size // _SUBMODEL_SIZE
 
         for _ in range(NUM_SUBMODELS):
-            chunk = {}
-            #TODO: Dedicated structure
-            chunk["next_id"] = self._scanner.read_int()
-            chunk["first_child_id"] = self._scanner.read_int()
-            chunk["submodel_type_id"] = self._scanner.read_int()
-            chunk["name_id"] = self._scanner.read_int()
-            chunk["anim_id"] = self._scanner.read_int()
-            chunk["flags"] = self._scanner.read_int()
-            chunk["transform_id"] = self._scanner.read_int()
-            chunk["num_verts"] = self._scanner.read_int()
-            chunk["first_vertex_id"] = self._scanner.read_int()
-            chunk["material_id"] = self._scanner.read_int()
-            chunk["light_level_visibility_treshold"] = self._scanner.read_float()
-            chunk["light_emission_treshold"] = self._scanner.read_float()
-            chunk["ambient_color"] = [self._scanner.read_float() for _ in range(4)]
-            chunk["diffuse_color"] = [self._scanner.read_float() for _ in range(4)]
-            chunk["specular_color"] = [self._scanner.read_float() for _ in range(4)]
-            chunk["emission_color"] = [self._scanner.read_float() for _ in range(4)]
-            chunk["wire_size"] = self._scanner.read_float()
-            chunk["max_distance"] = self._scanner.read_float()
-            chunk["min_distance"] = self._scanner.read_float()
-            chunk["near_atten_start"] = self._scanner.read_float()
-            chunk["near_atten_end"] = self._scanner.read_float()
-            chunk["use_near_atten"] = self._scanner.read_float()
-            chunk["far_atten_decay_type"] = self._scanner.read_float()
-            chunk["far_decay_radius"] = self._scanner.read_float()
-            chunk["cos_falloff_angle"] = self._scanner.read_float()
-            chunk["cos_hotspot_angle"] = self._scanner.read_float()
-            chunk["cos_view_angle"] = self._scanner.read_float()
+            submodel = self.data.create_submodel()
+
+            submodel.next_id = self._scanner.read_int()
+            submodel.first_child_id = self._scanner.read_int()
+            submodel.submodel_type_id = self._scanner.read_int()
+            submodel.name_id = self._scanner.read_int()
+            submodel.anim_id = self._scanner.read_int()
+            submodel.flags = self._scanner.read_int()
+            submodel.transform_id = self._scanner.read_int()
+            submodel.num_verts = self._scanner.read_int()
+            submodel.first_vertex_id = self._scanner.read_int()
+            submodel.material_id = self._scanner.read_int()
+            submodel.light_level_treshold = self._scanner.read_float()
+            submodel.light_emission_treshold = self._scanner.read_float()
+            submodel.ambient_color = [self._scanner.read_float() for _ in range(4)]
+            submodel.diffuse_color = [self._scanner.read_float() for _ in range(4)]
+            submodel.specular_color = [self._scanner.read_float() for _ in range(4)]
+            submodel.emission_color = [self._scanner.read_float() for _ in range(4)]
+            submodel.wire_size = self._scanner.read_float()
+            submodel.max_distance = self._scanner.read_float()
+            submodel.min_distance = self._scanner.read_float()
+            submodel.near_atten_start = self._scanner.read_float()
+            submodel.near_atten_end = self._scanner.read_float()
+            submodel.use_near_atten = self._scanner.read_float()
+            submodel.far_atten_decay_type = self._scanner.read_float()
+            submodel.far_decay_radius = self._scanner.read_float()
+            submodel.cos_falloff_angle = self._scanner.read_float()
+            submodel.cos_hotspot_angle = self._scanner.read_float()
+            submodel.cos_view_angle = self._scanner.read_float()
 
             # skip pad bytes
             self._scanner.read_bytes(100)
             
-            yield chunk
+            self.data.submodels.append(submodel)
 
     def _read_VNT0(self, chunk_size):
         num_verts = chunk_size // _VERTEX_SIZE
-        yield [
-            [self._scanner.read_float() for _ in range(8)]
-            for _1 in range(num_verts)
-        ]
+
+        for _ in range(num_verts):
+            vertex = [self._scanner.read_float() for _ in range(8)]
+            self.data.vertices.append(vertex)
+                
 
     def _read_TRA0(self, chunk_size):
         num_matrices = chunk_size // _TRA0_MATRIX_SIZE
-        yield [
-            [self._scanner.read_float() for _ in range(16)]
-            for _1 in range(num_matrices)
-        ]
 
-    def _read_zero_separated_chunk(self, chunk_size):
+        for _ in range(num_matrices):
+            matrix = [self._scanner.read_float() for _ in range(16)]
+            self.data.matrices.append(matrix)
+
+    def _read_TEX0(self, chunk_size):
+        self._read_zero_separated_values(chunk_size, self.data.materials)
+
+    def _read_NAM0(self, chunk_size):
+        self._read_zero_separated_values(chunk_size, self.data.names)
+
+    def _read_zero_separated_values(self, chunk_size, collection):
         data = self._scanner.read_str(chunk_size - 8)
         values = data.strip("\x00").split("\x00")
-        yield values
+
+        for value in values:
+            collection.append(value)
+
+
 

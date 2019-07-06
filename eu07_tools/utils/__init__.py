@@ -22,6 +22,10 @@ def find_root(filepath):
         raise ValueError(f"Can't find EU07 root for {filepath}")
 
 
-def make_relative_path(filepath):
+def make_relative_path(filepath, basedir):
     root = find_root(filepath)
-    return NotImplemented
+
+    # moze byc relatywnie do basedir
+    # do roota
+    # 
+    

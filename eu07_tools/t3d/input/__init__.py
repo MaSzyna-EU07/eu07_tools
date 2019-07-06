@@ -84,16 +84,16 @@ class T3DInput(Iterator):
 class T3DDictSubmodelBuilder:
     def __init__(self):
         self._NUM_FRAGMENTS_AFTER_TYPE = {
-            "Mesh": 15,
-            "FreeSpotLight": 14,
-            "Stars": 9
+            "mesh": 15,
+            "freespotlight": 14,
+            "stars": 9
         }
 
     def build_from_fragments(self, fragments_loader):
         dct = {}
         __, dct["type"] = next(fragments_loader)
 
-        num_iterations = self._NUM_FRAGMENTS_AFTER_TYPE[dct["type"]]
+        num_iterations = self._NUM_FRAGMENTS_AFTER_TYPE[dct["type"].lower()]
         for _ in range(num_iterations):
 
             identifier, value = next(fragments_loader)

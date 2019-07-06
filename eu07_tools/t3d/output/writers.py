@@ -61,7 +61,7 @@ class SubmodelWriter(abc.ABC):
             value = format_submodel_name(value)
         # HACK: It's easier to type all keys of string properties
         # than typing keys of all numeric properties...
-        elif key_lower in "type anim map":
+        elif key_lower in "type anim map numverts":
             pass
         else:
             value = format_number(value)
