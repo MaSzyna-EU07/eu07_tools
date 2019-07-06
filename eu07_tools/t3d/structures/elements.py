@@ -1,6 +1,6 @@
 import abc
 
-from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D
+from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, IndexedFactoryContainer
 
 
 def create_submodel(type, name):
@@ -90,7 +90,7 @@ class T3DSubmodel(T3DElement):
         self.name = name
         self.parent_name = "none"
         self.anim = "false"
-        self._diffuse = ColorRGB((255, 255, 255))
+        self._diffuse_color = ColorRGB((255, 255, 255))
         self.selfillum = 0
         self.max_distance = 1000
         self.min_distance = 0
@@ -102,12 +102,12 @@ class T3DSubmodel(T3DElement):
         ]
 
     @property
-    def diffuse(self):
-        return self._diffuse
+    def diffuse_color(self):
+        return self._diffuse_color
 
-    @diffuse.setter
-    def diffuse(self, diffuse):
-        self._diffuse = ColorRGB(diffuse)
+    @diffuse_color.setter
+    def diffuse_color(self, diffuse_color):
+        self._diffuse_color = ColorRGB(diffuse_color)
 
 
 
@@ -135,55 +135,33 @@ class T3DMeshSubmodel(T3DSubmodel):
     def __init__(self, name):
         super().__init__(name)   
         self.submodel_type = "Mesh"
-        self._ambient = ColorRGB((255, 255, 255)) 
-        self._specular = ColorRGB((255, 255, 255))
+        self._ambient_color = ColorRGB((255, 255, 255)) 
+        self._specular_color = ColorRGB((255, 255, 255))
         self.wire = False
         self.wire_size = 1.0
         self.opacity = 100.0
         self.map = "none"
-        self.triangles = []
+        self.triangles = IndexedFactoryContainer(T3DTriangle)
 
     @property
-    def ambient(self):
-        return self._ambient
+    def ambient_color(self):
+        return self._ambient_color
 
-    @ambient.setter
-    def ambient(self, ambient):
-        self._ambient = ColorRGB(ambient)
+    @ambient_color.setter
+    def ambient_color(self, ambient_color):
+        self._ambient_color = ColorRGB(ambient_color)
 
     @property
-    def specular(self) -> ColorRGB:
-        return self._specular
+    def specular_color(self) -> ColorRGB:
+        return self._specular_color
 
-    @specular.setter
-    def specular(self, specular):
-        self._specular = ColorRGB(specular)
+    @specular_color.setter
+    def specular_color(self, specular_color):
+        self._specular_color = ColorRGB(specular_color)
 
     @property
     def num_verts(self):
         return len(self.triangles) * 3
-
-    def add_triangle(self, vertices, smooth=0):
-        """ 
-        Add new triangle to triangles list.
-
-        :param vertices: iterable containg 3 sequences of floats. Each sequence should have 5 elements, or 8, if there are explicit normal vectors.
-        :type vertices: `Iterable[Sequence[float]]`
-        :param smooth: smooth bitflag - should be -1 if there are explicit normal vectors
-        :type smooth: `int`, optional, default: 0
-        """
-        self.triangles.append(
-            T3DTriangle(vertices, smooth)
-        )
-
-    def remove_triangle(self, triangle):
-        """ 
-        Remove triangle from triangles list.
-
-        :param triangle: triangle to remove
-        :type triangle: `T3DTriangle`
-        """
-        self.triangles.remove(triangle)
 
 
 class T3DTriangle:
@@ -248,27 +226,7 @@ class T3DStarsSubmodel(T3DSubmodel):
     def __init__(self, name):
         super().__init__(name)
         self.submodel_type = "Stars"
-        self.stars = []
-
-    def add_star(self, location, color):
-        """ 
-        Add new star to stars list
-        
-        :param location: location of star
-        :type location: `Sequence[float]`
-        """
-        self.stars.append(
-            T3DStar(location, color)
-        )
-
-    def remove_star(self, star):
-        """ 
-        Remove star from stars list
-        
-        :param star: star to remove
-        :type star: `T3DStar`
-        """
-        self.stars.remove(star)
+        self.stars = IndexedFactoryContainer(T3DStar)
 
     @property
     def num_verts(self):

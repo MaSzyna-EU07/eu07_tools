@@ -3,7 +3,7 @@ import struct
 from eu07_tools.utils import BinaryScanner
 from .structures import E3DStruct
 
-#TODO: Refactor magic numbers
+
 def load(file):
     inp = E3DInput(file)
     return inp.load()

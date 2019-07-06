@@ -1,4 +1,6 @@
-class FactoryContainer:
+import collections
+
+class IndexedFactoryContainer(collections.abc.Sequence):
     def __init__(self, cls):
         self.cls = cls
         self._items = []
@@ -11,8 +13,8 @@ class FactoryContainer:
     def remove(self, instance):
         self._items.remove(instance)
 
-    def index(self, instance):
-        return self._items.index(instance)
+    def __getitem__(self, index):
+        return self._items[index]
 
-    def __getitem__(self, key):
-        return self._items[key]
+    def __len__(self):
+        return len(self._items)

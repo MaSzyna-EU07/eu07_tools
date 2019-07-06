@@ -79,9 +79,9 @@ class SubmodelWriter(abc.ABC):
 class MeshSubmodelWriter(SubmodelWriter):
     # internal, overriden:
     def _write_specific_properties(self, submodel):
-        self._write_property("Ambient", submodel.ambient)
-        self._write_property("Diffuse", submodel.diffuse)
-        self._write_property("Specular", submodel.specular)
+        self._write_property("Ambient", submodel.ambient_color)
+        self._write_property("Diffuse", submodel.diffuse_color)
+        self._write_property("Specular", submodel.specular_color)
         self._write_property("SelfIllum", submodel.selfillum)
         self._write_property("Wire", submodel.wire)
         self._write_property("WireSize", submodel.wire_size)
@@ -100,7 +100,7 @@ class MeshSubmodelWriter(SubmodelWriter):
 class FreeSpotLightSubmodelWriter(SubmodelWriter):
     # internal, overriden:
     def _write_specific_properties(self, submodel):
-        self._write_property("Diffuse", submodel.diffuse)
+        self._write_property("Diffuse", submodel.diffuse_color)
         self._write_property("SelfIllum", submodel.selfillum)
         self._write_property("NearAttenStart", submodel.near_atten_start)
         self._write_property("NearAttenEnd", submodel.near_atten_end)
@@ -117,7 +117,7 @@ class FreeSpotLightSubmodelWriter(SubmodelWriter):
 class StarsSubmodelWriter(SubmodelWriter):
     # internal, overriden:
     def _write_specific_properties(self, submodel):
-        self._write_property("Diffuse", submodel.diffuse)
+        self._write_property("Diffuse", submodel.diffuse_color)
         self._write_property("SelfIllum", submodel.selfillum)
 
     def _write_geometry(self, submodel):

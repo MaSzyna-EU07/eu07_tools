@@ -40,22 +40,22 @@ class T3DInput(Iterator):
         submodel = create_submodel(dct["type"], dct["name"])
         submodel.parent_name = parent_name
         submodel.anim = dct["anim"]
-        submodel.diffuse = dct["diffuse"]
+        submodel.diffuse_color = dct["diffuse"]
         submodel.selfillum = dct["selfillum"]
         submodel.max_distance = dct["maxdistance"]
         submodel.min_distance = dct["mindistance"]
         submodel.transform = dct["transform"]
 
         if dct["type"] == "Mesh":
-            submodel.ambient = dct["ambient"]
-            submodel.specular = dct["specular"]
+            submodel.ambient_color = dct["ambient"]
+            submodel.specular_color = dct["specular"]
             submodel.wire = dct["wire"]
             submodel.wire_size = dct["wiresize"]
             submodel.opacity = dct["opacity"]
             submodel.map = dct["map"]
 
             for unit in dct["geometry"]:
-                submodel.add_triangle(unit[1:], unit[0])
+                submodel.triangles.new(unit[1:], unit[0])
 
         elif dct["type"] == "FreeSpotLight":
             submodel.near_atten_start = dct["nearattenstart"]
@@ -76,7 +76,7 @@ class T3DInput(Iterator):
                         ((encoded_color >> 16) & 0xff) / 255.0
                     )
 
-                    submodel.add_star(vertex[:3], decoded_color)
+                    submodel.stars.new(vertex[:3], decoded_color)
 
         return submodel
         
