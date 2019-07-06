@@ -1,6 +1,6 @@
 import abc
 
-from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, IndexedFactoryContainer
+from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactoryContainer
 
 
 def create_submodel(type, name):
@@ -164,7 +164,7 @@ class T3DMeshSubmodel(T3DSubmodel):
         return len(self.triangles) * 3
 
 
-class TrianglesFactoryContainer(IndexedFactoryContainer):
+class TrianglesFactoryContainer(FactoryContainer):
     def __init__(self, cls, initial_list=None):
         super().__init__(cls, initial_list)
 
@@ -236,7 +236,7 @@ class T3DStarsSubmodel(T3DSubmodel):
     def __init__(self, name):
         super().__init__(name)
         self.submodel_type = "Stars"
-        self.stars = IndexedFactoryContainer(T3DStar)
+        self.stars = FactoryContainer(T3DStar)
 
     @property
     def num_verts(self):

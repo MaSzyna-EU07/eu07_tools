@@ -144,3 +144,13 @@ class ColorRGB(BaseVector):
     @b.setter
     def b(self, b):
         self._values[2] = b
+
+
+class ColorRGBA(ColorRGB):
+    @property
+    def a(self):
+        return self._values[3]
+
+    @a.setter
+    def a(self, a):
+        self._values[3] = a

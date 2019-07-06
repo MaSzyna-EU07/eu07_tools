@@ -1,4 +1,4 @@
-from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB, IndexedFactoryContainer
+from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB, ColorRGBA, FactoryContainer
 from .asset_searcher import AssetSearcher
 from .input import TokenStream
 from .input import BinaryScanner

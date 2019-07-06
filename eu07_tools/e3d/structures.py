@@ -1,12 +1,12 @@
-from eu07_tools.utils import IndexedFactoryContainer, Vertex3D
+from eu07_tools.utils import FactoryContainer, Vertex3D, ColorRGBA
 
 class E3DStruct:
     def __init__(self):
-        self.submodels = IndexedFactoryContainer(E3DSubmodel)
-        self.names = IndexedFactoryContainer(str)
-        self.matrices = IndexedFactoryContainer(list)
-        self.vertices = IndexedFactoryContainer(Vertex3D)
-        self.materials = IndexedFactoryContainer(str, ["none?"])
+        self.submodels = FactoryContainer(E3DSubmodel)
+        self.names = FactoryContainer(str)
+        self.matrices = FactoryContainer(list)
+        self.vertices = FactoryContainer(Vertex3D)
+        self.materials = FactoryContainer(str, ["none"])
 
 
 class E3DSubmodel:
@@ -26,10 +26,10 @@ class E3DSubmodel:
         self.num_verts = 0
         self.light_level_treshold = 0
         self.light_emission_treshold = 0
-        self.ambient_color = []
-        self.diffuse_color = []
-        self.specular_color = []
-        self.emission_color =[]
+        self._ambient_color = ColorRGBA((1, 1, 1, 1))
+        self._diffuse_color = ColorRGBA((1, 1, 1, 1))
+        self._specular_color = ColorRGBA((1, 1, 1, 1))
+        self._emission_color = ColorRGBA((1, 1, 1, 1))
         self.wire_size = 0
         self.max_distance = 1000
         self.min_distance = 0
@@ -41,3 +41,27 @@ class E3DSubmodel:
         self.cos_falloff_angle = 0
         self.cos_hotspot_angle = 0
         self.cos_view_angle = 0
+
+    @property
+    def ambient_color(self):
+        return self._ambient_color
+
+    @ambient_color.setter
+    def ambient_color(self, ambient_color):
+        self._ambient_color = ColorRGBA(ambient_color)
+
+    @property
+    def diffuse_color(self):
+        return self._diffuse_color
+
+    @diffuse_color.setter
+    def diffuse_color(self, diffuse_color):
+        self._diffuse_color = diffuse_color
+
+    @property
+    def specular_color(self):
+        return self._specular_color
+
+    @specular_color.setter
+    def specular_color(self, specular_color):
+        self._specular_color = specular_color

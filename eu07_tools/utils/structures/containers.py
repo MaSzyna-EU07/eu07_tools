@@ -1,6 +1,6 @@
 import collections
 
-class IndexedFactoryContainer(collections.abc.Sequence):
+class FactoryContainer(collections.abc.Sequence):
     def __init__(self, cls, initial_list=None):
         self.cls = cls
         self._items = [] if initial_list is None else initial_list
