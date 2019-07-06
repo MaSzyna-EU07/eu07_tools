@@ -141,7 +141,7 @@ class T3DMeshSubmodel(T3DSubmodel):
         self.wire_size = 1.0
         self.opacity = 100.0
         self.map = "none"
-        self.triangles = IndexedFactoryContainer(T3DTriangle)
+        self.triangles = TrianglesFactoryContainer(T3DTriangle)
 
     @property
     def ambient_color(self):
@@ -162,6 +162,16 @@ class T3DMeshSubmodel(T3DSubmodel):
     @property
     def num_verts(self):
         return len(self.triangles) * 3
+
+
+class TrianglesFactoryContainer(IndexedFactoryContainer):
+    def __init__(self, cls):
+        super().__init__(cls)
+
+    def new(self, vertices, smooth):
+        self._items.append(
+            T3DTriangle(vertices, smooth)
+        )
 
 
 class T3DTriangle:
