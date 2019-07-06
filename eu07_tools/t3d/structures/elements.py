@@ -165,11 +165,11 @@ class T3DMeshSubmodel(T3DSubmodel):
 
 
 class TrianglesFactoryContainer(IndexedFactoryContainer):
-    def __init__(self, cls, initial_list=[]):
-        super().__init__(cls)
+    def __init__(self, cls, initial_list=None):
+        super().__init__(cls, initial_list)
 
     def new(self, vertices, smooth):
-        triangle = T3DTriangle(vertices, smooth)
+        triangle = self.cls(vertices, smooth)
         self._items.append(triangle)
         return triangle
 
