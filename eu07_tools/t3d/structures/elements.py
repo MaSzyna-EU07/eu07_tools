@@ -130,7 +130,7 @@ class T3DMeshSubmodel(T3DSubmodel):
     :ivar num_verts: number of vertices in all triangles, >=0
     :type num_verts: `int`
     :ivar triangles: list of triangles
-    :type map: `List[T3DTriangle]`
+    :type map: `IndexedFactoryContainer[T3DTriangle]`
     """
     def __init__(self, name):
         super().__init__(name)   
@@ -165,13 +165,13 @@ class T3DMeshSubmodel(T3DSubmodel):
 
 
 class TrianglesFactoryContainer(IndexedFactoryContainer):
-    def __init__(self, cls):
+    def __init__(self, cls, initial_list=[]):
         super().__init__(cls)
 
     def new(self, vertices, smooth):
-        self._items.append(
-            T3DTriangle(vertices, smooth)
-        )
+        triangle = T3DTriangle(vertices, smooth)
+        self._items.append(triangle)
+        return triangle
 
 
 class T3DTriangle:
@@ -231,7 +231,7 @@ class T3DStarsSubmodel(T3DSubmodel):
     :ivar num_verts: number of stars
     :type num_verts: `int`
     :ivar stars: list of stars
-    :type stars: `List[T3DStar]`
+    :type stars: `IndexedFactoryContainer[T3DStar]`
     """
     def __init__(self, name):
         super().__init__(name)

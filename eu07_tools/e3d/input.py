@@ -50,7 +50,7 @@ class E3DInput:
         NUM_SUBMODELS = chunk_size // _SUBMODEL_SIZE
 
         for _ in range(NUM_SUBMODELS):
-            submodel = self.data.create_submodel()
+            submodel = self.data.submodels.new()
 
             submodel.next_id = self._scanner.read_int()
             submodel.first_child_id = self._scanner.read_int()
@@ -83,14 +83,13 @@ class E3DInput:
             # skip pad bytes
             self._scanner.read_bytes(100)
             
-            self.data.submodels.append(submodel)
 
     def _read_VNT0(self, chunk_size):
         num_verts = chunk_size // _VERTEX_SIZE
 
         for _ in range(num_verts):
             vertex = [self._scanner.read_float() for _ in range(8)]
-            self.data.vertices.append(vertex)
+            self.data.vertices.new(vertex)
                 
 
     def _read_TRA0(self, chunk_size):
@@ -98,7 +97,7 @@ class E3DInput:
 
         for _ in range(num_matrices):
             matrix = [self._scanner.read_float() for _ in range(16)]
-            self.data.matrices.append(matrix)
+            self.data.matrices.new(matrix)
 
     def _read_TEX0(self, chunk_size):
         self._read_zero_separated_values(chunk_size, self.data.materials)
@@ -111,7 +110,7 @@ class E3DInput:
         values = data.strip("\x00").split("\x00")
 
         for value in values:
-            collection.append(value)
+            collection.new(value)
 
 
 

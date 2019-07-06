@@ -1,13 +1,12 @@
+from eu07_tools.utils import IndexedFactoryContainer, Vertex3D
+
 class E3DStruct:
     def __init__(self):
-        self.submodels = []
-        self.names = []
-        self.matrices = []
-        self.vertices = []
-        self.materials = [None]
-
-    def create_submodel(self):
-        return E3DSubmodel()
+        self.submodels = IndexedFactoryContainer(E3DSubmodel)
+        self.names = IndexedFactoryContainer(str)
+        self.matrices = IndexedFactoryContainer(list)
+        self.vertices = IndexedFactoryContainer(Vertex3D)
+        self.materials = IndexedFactoryContainer(str, ["none?"])
 
 
 class E3DSubmodel:

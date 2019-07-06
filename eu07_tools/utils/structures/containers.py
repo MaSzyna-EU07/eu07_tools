@@ -1,9 +1,9 @@
 import collections
 
 class IndexedFactoryContainer(collections.abc.Sequence):
-    def __init__(self, cls):
+    def __init__(self, cls, initial_list=[]):
         self.cls = cls
-        self._items = []
+        self._items = initial_list
 
     def new(self, *args):
         instance = self.cls(args)
