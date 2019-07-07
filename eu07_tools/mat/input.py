@@ -1,10 +1,10 @@
 from .structures import create_mat_mapping
 from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS
-from eu07_tools.utils import TokenStream
+from eu07_tools.utils import TextScanner
 
 
 def load(file):
-    token_stream = TokenStream.from_file(file)
+    token_stream = TextScanner.from_file(file)
     return _load_mapping(token_stream)
 
 # TODO: Texturesets

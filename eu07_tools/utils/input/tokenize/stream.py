@@ -6,7 +6,7 @@ from .tokenizer import Tokenizer
 from .accessor import TokensAccessor
 
 
-class TokenStream:
+class TextScanner:
     """ This class provides API for extracting tokens from text data. """
     _tokenizer = Tokenizer()
 
@@ -14,7 +14,7 @@ class TokenStream:
         self._accessor = accessor
 
     @classmethod
-    def from_file(cls, stream: TextIOWrapper, read_comments: bool=False) -> TokenStream:
+    def from_file(cls, stream: TextIOWrapper, read_comments: bool=False) -> TextScanner:
         """ Return new TokenStream instance with tokens readed from given file-like object. """
         tokens_iter = cls._tokenizer.tokenize_file(stream, read_comments)
         accessor = TokensAccessor(tokens_iter)

@@ -1,5 +1,5 @@
 from collections.abc import Iterator
-from eu07_tools.utils.input import TokenStream
+from eu07_tools.utils.input import TextScanner
 from eu07_tools.t3d.structures import create_submodel, create_include
 from . import type_cast
 
@@ -110,7 +110,7 @@ class T3DFragmentsLoader(Iterator):
         return cls(file)
 
     def __init__(self, file):
-        self._token_stream = TokenStream.from_file(file)
+        self._token_stream = TextScanner.from_file(file)
         self._fragments_iterator = self._iter_fragments()
 
     def __next__(self):

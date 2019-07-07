@@ -1,4 +1,4 @@
-from .stream import TokenStream
+from .stream import TextScanner
 from .accessor import TokensAccessor
 from .tokenizer import Tokenizer
 

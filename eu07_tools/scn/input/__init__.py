@@ -1,12 +1,12 @@
 from collections.abc import Iterator
 import functools
 
-from eu07_tools.utils.input import TokenStream
+from eu07_tools.utils.input import TextScanner
 import eu07_tools.scn.structures as scnstruct
 
 class SCNIterativeLoader(Iterator):
     def __init__(self, file):
-        self._token_stream = TokenStream.from_file(file)
+        self._token_stream = TextScanner.from_file(file)
         self._iterator = self._load()
 
         self._element_loaders = {

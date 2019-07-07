@@ -38,6 +38,49 @@ class SCNNodeTrack(SCNNode):
         self.vradius = 0
         self.trackbed = "none"
         self.railprofile = "none"
+
+class SCNNodeTrackNormal(SCNNodeTrack):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track:normal"
+
+class SCNNodeTrackSwitch(SCNNodeTrack):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track:switch"
+        self.segments = (TrackSegment(), TrackSegment())
+
+class SCNNodeTrackRoad(SCNNodeTrack):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track:road"
+
+class SCNNodeTrackCross(SCNNodeTrack):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track:cross"
+        self.segments = (TrackSegment(), TrackSegment())
+
+class SCNNodeTrackRiver(SCNNodeTrack):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track:river"
+
+class SCNNodeTrackTurn(SCNNodeTrack):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track:turn"
+
+class SCNNodeTrackTable(SCNNodeTrack):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track:table"
+
+class SCNNodeTrackTributary(SCNNodeTrack):
+    def __init__(self, name):
+        super().__init__(name)
+        self.typename = "node:track:tributary"
+        self.segments = (TrackSegment(), TrackSegment())
     
 class TrackSegment:
     def __init__(self):
