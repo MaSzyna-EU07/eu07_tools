@@ -249,7 +249,54 @@ class SCNIterativeLoader(Iterator):
     def _load_node_track(self, name):
         # TODO: Track loading
         self._get_tokens_before("endtrack")
-        return scnstruct.SCNNodeTrack(name)
+
+        track = scnstruct.SCNNodeTrack(name)
+        track.length = float(self._get_token())
+        track.width = float(self._get_token())
+        track.friction = float(self._get_token())
+        track.sound_distance = float(self._get_token())
+        track.quality_flag = int(self._get_token())
+        track.damage_flag = int(self._get_token())
+        track.environment = self._get_token()
+        track.visible = (self._get_token() == "vis")
+        track.material1 = self._get_token()
+        track.material2 = self._get_token()
+        track.mapping_length = float(self._get_token())
+        track.tex_param1 = self._get_token()
+        track.tex_param2 = self._get_token()
+        track.tex_param3 = self._get_token()
+        
+        optionals = self._get_tokens_before("endtrack")
+        if "event0" in optionals:
+            track.event0 = self._get_token()
+        if "event1" in optionals:
+            track.event1 = self._get_token()
+        if "event2" in optionals:
+            track.event2 = self._get_token()
+        if "eventall0" in optionals:
+            track.eventall0 = self._get_token()
+        if "eventall1" in optionals:
+            track.eventall1 = self._get_token()
+        if "eventall2" in optionals:
+            track.eventall2 = self._get_token()
+        if "isolated" in optionals:
+            track.isolated = self._get_token()
+        if "overhead" in optionals:
+            track.overhead = int(self._get_token())
+        if "angle1" in optionals:
+            track.angle1 = int(self._get_token())
+        if "angle2" in optionals:
+            track.angle2 = int(self._get_token())
+        if "fouling1" in optionals:
+            track.fouling1 = self._get_token()
+        if "fouling2" in optionals:
+            track.fouling2 = self._get_token()
+        if "vradius" in optionals:
+            track.vradius = float(self._get_token())
+        if "trackbed" in optionals:
+            track.trackbed = self._get_token()
+        if "railprofile" in optionals:
+            track.railprofile = self._get_token()
 
     def _load_node_traction(self, name):
         traction = scnstruct.SCNNodeTraction(name)
