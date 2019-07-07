@@ -1,21 +1,31 @@
 from eu07_tools.utils import BinaryWriter
 
-from .common import SUBMODEL_SIZE
+from .common import SUBMODEL_SIZE, VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE
 
 class E3DOutput:
     def __init__(self, file, model):
         self._writer = BinaryWriter(file)
+        self._file = file
         self._model = model
 
     def dump(self):
         self._writer.write_string("E3D0")
-        self._writer.write_int(0) # TODO: Calculate e3d0 chunk size
+
         self._dump_SUB0()
         self._dump_VNT0()
+        self._dump_TEX0()
+        self._dump_NAM0()
+        self._dump_TRA0()
+        
+        # Get E3D0 data size and write it
+        self._file.seek(0, 2)
+        size = self._file.tell() - (CHUNK_HEADER_SIZE - 4)
+        self._file.seek(4, 0)
+
+        self._writer.write_int(size)
 
     def _dump_SUB0(self):
         self._writer.write_string("SUB0")
-
         chunk_size = len(self._model.submodels) * SUBMODEL_SIZE
         self._writer.write_int(chunk_size)
 
@@ -47,10 +57,41 @@ class E3DOutput:
             self._writer.write_float(submodel.cos_falloff_angle)
             self._writer.write_float(submodel.cos_hotspot_angle)
             self._writer.write_float(submodel.cos_view_angle)
-            self._writer.write_pad_bytes(100)
+            self._writer.write_bytes(b"\0" * 100)
 
     def _dump_VNT0(self):
+        self._writer.write_string("VNT0")
+        chunk_size = len(self._model.vertices) * VERTEX_SIZE
+        self._writer.write_int(chunk_size)
+
         for vertex in self._model.vertices:
             self._writer.write_float_list(vertex)
 
-    def _dump_TEX0(self)
+    def _dump_TEX0(self):
+        if self._model.materials:
+            self._writer.write_string("TEX0")
+            chunk_size = sum((len(m) for m in self._model.materials)) + len(self._model.materials) + 1
+            self._writer.write_int(chunk_size)
+
+            self._writer.write_bytes(b"\0")
+            for material in self._model.materials:
+                self._writer.write_string(material)
+                self._writer.write_bytes(b"\0")
+
+    def _dump_NAM0(self):
+        if self._model.names:
+            self._writer.write_string("NAM0")
+            chunk_size = sum((len(m) for m in self._model.materials)) + len(self._model.materials)
+            self._writer.write_int(chunk_size)
+
+            for name in self._model.names:
+                self._writer.write_string(name)
+                self._writer.write_bytes(b"\0")
+
+    def _dump_TRA0(self):
+        self._writer.write_string("TEX0")
+        chunk_size = len(self._model.matrices) * MATRIX_SIZE
+        self._writer.write_int(chunk_size)
+
+        for matrix in self._model.matrices:
+            self._writer.write_float_list(matrix)

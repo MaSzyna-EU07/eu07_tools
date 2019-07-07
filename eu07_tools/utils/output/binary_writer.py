@@ -5,9 +5,8 @@ class BinaryWriter:
         self._file = file
 
     # TODO: Ensure if it is correct way to pad
-    def write_pad_bytes(self, amount):
-        binary = struct.pack(f"{amount}x")
-        self._file.write(binary)
+    def write_bytes(self, bytes_):
+        self._file.write(bytes_)
 
     def write_int(self, value):
         binary = struct.pack("i", value)

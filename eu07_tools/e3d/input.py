@@ -2,7 +2,7 @@ import struct
 
 from eu07_tools.utils import BinaryScanner
 from .structures import E3DModel
-from .common import VERTEX_SIZE, CHUNK_HEADER_SIZE, TRA0_MATRIX_SIZE, SUBMODEL_SIZE
+from .common import VERTEX_SIZE, CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE
 
 
 def load(file):
@@ -91,7 +91,7 @@ class E3DInput:
                 
 
     def _read_TRA0(self, chunk_size):
-        num_matrices = chunk_size // TRA0_MATRIX_SIZE
+        num_matrices = chunk_size // MATRIX_SIZE
 
         for _ in range(num_matrices):
             matrix = [self._scanner.read_float() for _ in range(16)]
