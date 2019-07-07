@@ -21,5 +21,5 @@ class BinaryWriter:
         self._file.write(binary)
 
     def write_string(self, value):
-        binary = struct.pack(f"{len(value)}s")
+        binary = struct.pack(f"{len(value)}s", value.encode("utf-8"))
         self._file.write(binary)

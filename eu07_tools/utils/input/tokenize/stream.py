@@ -19,7 +19,24 @@ class TextScanner:
         tokens_iter = cls._tokenizer.tokenize_file(stream, read_comments)
         accessor = TokensAccessor(tokens_iter)
         return cls(accessor)
-    # TODO: Custom separators, custom comments?
+    
+    def read_string(self):
+        return self._accessor.get_token()
+
+    def read_float(self):
+        return float(self.read_string())
+
+    def read_int(self):
+        return int(self.read_string())
+
+    def read_strings(self, amount):
+        return [self.read_string() for _ in range(amount)]
+
+    def read_floats(self, amount):
+        return [self.read_float() for _ in range(amount)]
+
+    def read_ints(self, amount):
+        return [self.read_int() for _ in range(amount)]
 
     def get_token(self) -> str:
         """ Return next token. 

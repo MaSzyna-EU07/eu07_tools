@@ -1,10 +1,9 @@
 import collections
-from typing import Iterable
 
 from .vectors import VectorXYZ, VectorUV
 
 
-class Vertex3D(collections.abc.Iterable):
+class Vertex3D(collections.abc.Sequence):
     def __init__(self, values):
         values = list(values)
         num_values = len(values)
@@ -13,7 +12,7 @@ class Vertex3D(collections.abc.Iterable):
             self._location = VectorXYZ(values[:3])
             self._normal = (
                 VectorXYZ(values[3:6]) if num_values == 8 
-                else VectorXYZ((0, 0, 0))
+                else VectorXYZ((0.0, 0.0, 0.0))
             )
             self._mapping = VectorUV(values[-2:])
         else:
@@ -47,7 +46,13 @@ class Vertex3D(collections.abc.Iterable):
 
     @property
     def has_normal(self):
-        return self._normal != VectorXYZ((0, 0, 0))
+        return self._normal != VectorXYZ((0.0, 0.0, 0.0))
+
+    def __len__(self):
+        return 8 if self.has_normal else 5
+
+    def __getitem__(self, index):
+        return list(self)[index]
 
     def __iter__(self):
         normal = self._normal if self.has_normal else []

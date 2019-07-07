@@ -2,13 +2,16 @@ from eu07_tools.utils import BinaryWriter
 
 from .common import SUBMODEL_SIZE, VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE
 
+def dump(model, file):
+    E3DOutput(model, file).run()
+
 class E3DOutput:
-    def __init__(self, file, model):
+    def __init__(self, model, file):
         self._writer = BinaryWriter(file)
         self._file = file
         self._model = model
 
-    def dump(self):
+    def run(self):
         self._writer.write_string("E3D0")
 
         self._dump_SUB0()

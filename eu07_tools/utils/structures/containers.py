@@ -6,7 +6,7 @@ class FactorySequence(collections.abc.Sequence):
         self._items = [] if initial_list is None else initial_list
 
     def new(self, *args):
-        instance = self.cls(args)
+        instance = self.cls(*args)
         self._items.append(instance)
         return instance
 
