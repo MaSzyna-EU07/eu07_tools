@@ -21,7 +21,7 @@ class E3DSubmodel:
         self.material_id = 0
 
         self.flags = 0
-        self.transform_id = 0
+        self.matrix_id = 0
         self.num_verts = 0
         self.visibility_light_treshold = 0
         self.selfillum = 0

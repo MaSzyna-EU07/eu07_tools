@@ -2,16 +2,14 @@ import struct
 
 from eu07_tools.utils import BinaryScanner
 from .structures import E3DModel
+from .common import VERTEX_SIZE, CHUNK_HEADER_SIZE, TRA0_MATRIX_SIZE, SUBMODEL_SIZE
 
 
 def load(file):
     inp = E3DInput(file)
     return inp.load()
     
-_VERTEX_SIZE = 8 * 4
-_TRA0_MATRIX_SIZE = 16 * 4
-_HEADER_SIZE = 8
-_SUBMODEL_SIZE = 256
+
 
 class E3DInput:
     def __init__(self, file):
@@ -26,7 +24,7 @@ class E3DInput:
         self._scanner = BinaryScanner(file)
 
     def load(self):
-        self._scanner.read_bytes(_HEADER_SIZE)
+        self._scanner.read_bytes(CHUNK_HEADER_SIZE)
 
         self.model = E3DModel()
 
@@ -47,7 +45,7 @@ class E3DInput:
 
 
     def _read_SUB0(self, chunk_size):
-        NUM_SUBMODELS = chunk_size // _SUBMODEL_SIZE
+        NUM_SUBMODELS = chunk_size // SUBMODEL_SIZE
 
         for _ in range(NUM_SUBMODELS):
             submodel = self.model.submodels.new()
@@ -58,7 +56,7 @@ class E3DInput:
             submodel.name_id = self._scanner.read_int()
             submodel.anim_id = self._scanner.read_int()
             submodel.flags = self._scanner.read_int()
-            submodel.transform_id = self._scanner.read_int()
+            submodel.matrix_id = self._scanner.read_int()
             submodel.num_verts = self._scanner.read_int()
             submodel.first_vertex_id = self._scanner.read_int()
             submodel.material_id = self._scanner.read_int()
@@ -85,7 +83,7 @@ class E3DInput:
             
 
     def _read_VNT0(self, chunk_size):
-        num_verts = chunk_size // _VERTEX_SIZE
+        num_verts = chunk_size // VERTEX_SIZE
 
         for _ in range(num_verts):
             vertex = [self._scanner.read_float() for _ in range(8)]
@@ -93,7 +91,7 @@ class E3DInput:
                 
 
     def _read_TRA0(self, chunk_size):
-        num_matrices = chunk_size // _TRA0_MATRIX_SIZE
+        num_matrices = chunk_size // TRA0_MATRIX_SIZE
 
         for _ in range(num_matrices):
             matrix = [self._scanner.read_float() for _ in range(16)]

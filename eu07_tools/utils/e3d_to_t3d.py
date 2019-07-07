@@ -45,7 +45,7 @@ class ModelConverter:
             t3d_sm.selfillum = e3d_sm.selfillum
 
             if e3d_sm.transform_id != -1:
-                t3d_sm.transform = e3d.matrices[e3d_sm.transform_id]
+                t3d_sm.transform = e3d.matrices[e3d_sm.matrix_id]
 
             if type_ == "Mesh":
                 t3d_sm.ambient_color = e3d_sm.ambient_color[:3] * 255
