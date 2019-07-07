@@ -103,6 +103,7 @@ class PathFinder:
         """
         
         rel_path = rel_path.lstrip("\\").lstrip("/").lower()
+        rel_path = rel_path.replace("\\", "/")
         for lookup in self.lookups:
             full_path = Path(lookup, rel_path)
 
