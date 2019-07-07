@@ -1,7 +1,7 @@
 import struct
 
 from eu07_tools.utils import BinaryScanner
-from .structures import E3DStruct
+from .structures import E3DModel
 
 
 def load(file):
@@ -28,7 +28,7 @@ class E3DInput:
     def load(self):
         self._scanner.read_bytes(_HEADER_SIZE)
 
-        self.data = E3DStruct()
+        self.model = E3DModel()
 
         while not self._scanner.is_empty:
             chunk_id, chunk_size = self._read_header()
@@ -37,7 +37,7 @@ class E3DInput:
 
             chunk_read(chunk_size)
     
-        return self.data
+        return self.model
 
     def _read_header(self):
         chunk_id = self._scanner.read_str(4)
@@ -50,7 +50,7 @@ class E3DInput:
         NUM_SUBMODELS = chunk_size // _SUBMODEL_SIZE
 
         for _ in range(NUM_SUBMODELS):
-            submodel = self.data.submodels.new()
+            submodel = self.model.submodels.new()
 
             submodel.next_id = self._scanner.read_int()
             submodel.first_child_id = self._scanner.read_int()
@@ -62,8 +62,8 @@ class E3DInput:
             submodel.num_verts = self._scanner.read_int()
             submodel.first_vertex_id = self._scanner.read_int()
             submodel.material_id = self._scanner.read_int()
-            submodel.light_level_treshold = self._scanner.read_float()
-            submodel.light_emission_treshold = self._scanner.read_float()
+            submodel.visibility_light_treshold = self._scanner.read_float()
+            submodel.selfillum = self._scanner.read_float()
             submodel.ambient_color = [self._scanner.read_float() for _ in range(4)]
             submodel.diffuse_color = [self._scanner.read_float() for _ in range(4)]
             submodel.specular_color = [self._scanner.read_float() for _ in range(4)]
@@ -89,7 +89,7 @@ class E3DInput:
 
         for _ in range(num_verts):
             vertex = [self._scanner.read_float() for _ in range(8)]
-            self.data.vertices.new(vertex)
+            self.model.vertices.new(vertex)
                 
 
     def _read_TRA0(self, chunk_size):
@@ -97,13 +97,13 @@ class E3DInput:
 
         for _ in range(num_matrices):
             matrix = [self._scanner.read_float() for _ in range(16)]
-            self.data.matrices.new(matrix)
+            self.model.matrices.new(matrix)
 
     def _read_TEX0(self, chunk_size):
-        self._read_zero_separated_values(chunk_size, self.data.materials)
+        self._read_zero_separated_values(chunk_size, self.model.materials)
 
     def _read_NAM0(self, chunk_size):
-        self._read_zero_separated_values(chunk_size, self.data.names)
+        self._read_zero_separated_values(chunk_size, self.model.names)
 
     def _read_zero_separated_values(self, chunk_size, collection):
         data = self._scanner.read_str(chunk_size - 8)

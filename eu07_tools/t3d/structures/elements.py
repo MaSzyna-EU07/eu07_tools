@@ -1,6 +1,6 @@
 import abc
 
-from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactoryContainer
+from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
 
 
 def create_submodel(type, name):
@@ -130,7 +130,7 @@ class T3DMeshSubmodel(T3DSubmodel):
     :ivar num_verts: number of vertices in all triangles, >=0
     :type num_verts: `int`
     :ivar triangles: list of triangles
-    :type map: `IndexedFactoryContainer[T3DTriangle]`
+    :type map: `FactorySequence[T3DTriangle]`
     """
     def __init__(self, name):
         super().__init__(name)   
@@ -141,7 +141,7 @@ class T3DMeshSubmodel(T3DSubmodel):
         self.wire_size = 1.0
         self.opacity = 100.0
         self.map = "none"
-        self.triangles = TrianglesFactoryContainer(T3DTriangle)
+        self.triangles = TrianglesFactorySequence(T3DTriangle)
 
     @property
     def ambient_color(self):
@@ -164,7 +164,7 @@ class T3DMeshSubmodel(T3DSubmodel):
         return len(self.triangles) * 3
 
 
-class TrianglesFactoryContainer(FactoryContainer):
+class TrianglesFactorySequence(FactorySequence):
     def __init__(self, cls, initial_list=None):
         super().__init__(cls, initial_list)
 
@@ -231,12 +231,12 @@ class T3DStarsSubmodel(T3DSubmodel):
     :ivar num_verts: number of stars
     :type num_verts: `int`
     :ivar stars: list of stars
-    :type stars: `IndexedFactoryContainer[T3DStar]`
+    :type stars: `FactorySequence[T3DStar]`
     """
     def __init__(self, name):
         super().__init__(name)
         self.submodel_type = "Stars"
-        self.stars = FactoryContainer(T3DStar)
+        self.stars = FactorySequence(T3DStar)
 
     @property
     def num_verts(self):
