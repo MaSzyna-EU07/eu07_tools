@@ -26,6 +26,9 @@ class BinaryScanner:
         fmt = f"{size}s"
         return struct.unpack(fmt, bytes_)[0].decode("utf-8")
 
+    def read_floats(self, amount):
+        return [self.read_float() for _ in range(amount)]
+
 # internal:
     def _calc_file_size(self):
         self._file.seek(0, 2)

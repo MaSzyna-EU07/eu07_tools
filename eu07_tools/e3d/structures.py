@@ -6,7 +6,7 @@ class E3DModel:
         self.names = FactorySequence(str)
         self.matrices = FactorySequence(list)
         self.vertices = FactorySequence(Vertex3D)
-        self.materials = FactorySequence(str, ["none"])
+        self.materials = FactorySequence(str, [""])
 
 
 class E3DSubmodel:

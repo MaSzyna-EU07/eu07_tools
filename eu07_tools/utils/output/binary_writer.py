@@ -16,7 +16,7 @@ class BinaryWriter:
         binary = struct.pack("f", value)
         self._file.write(binary)
 
-    def write_float_list(self, values):
+    def write_floats(self, values):
         binary = struct.pack(f"{len(values)}f", *values)
         self._file.write(binary)
 

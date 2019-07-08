@@ -33,7 +33,8 @@ class E3DInput:
 
             chunk_read = self._chunk_readers.get(chunk_id)
 
-            chunk_read(chunk_size)
+            data_size = chunk_size - CHUNK_HEADER_SIZE
+            chunk_read(data_size)
     
         return self.model
 
@@ -44,8 +45,8 @@ class E3DInput:
         return chunk_id, chunk_size
 
 
-    def _read_SUB0(self, chunk_size):
-        NUM_SUBMODELS = chunk_size // SUBMODEL_SIZE
+    def _read_SUB0(self, data_size):
+        NUM_SUBMODELS = data_size // SUBMODEL_SIZE
 
         for _ in range(NUM_SUBMODELS):
             submodel = self.model.submodels.new()
@@ -62,10 +63,10 @@ class E3DInput:
             submodel.material_id = self._scanner.read_int()
             submodel.visibility_light_treshold = self._scanner.read_float()
             submodel.selfillum = self._scanner.read_float()
-            submodel.ambient_color = [self._scanner.read_float() for _ in range(4)]
-            submodel.diffuse_color = [self._scanner.read_float() for _ in range(4)]
-            submodel.specular_color = [self._scanner.read_float() for _ in range(4)]
-            submodel.emission_color = [self._scanner.read_float() for _ in range(4)]
+            submodel.ambient_color = self._scanner.read_floats(4)
+            submodel.diffuse_color = self._scanner.read_floats(4) 
+            submodel.specular_color = self._scanner.read_floats(4) 
+            submodel.emission_color = self._scanner.read_floats(4)
             submodel.wire_size = self._scanner.read_float()
             submodel.max_distance = self._scanner.read_float()
             submodel.min_distance = self._scanner.read_float()
@@ -82,29 +83,29 @@ class E3DInput:
             self._scanner.read_bytes(100)
             
 
-    def _read_VNT0(self, chunk_size):
-        num_verts = chunk_size // VERTEX_SIZE
+    def _read_VNT0(self, data_size):
+        num_verts = data_size // VERTEX_SIZE
 
         for _ in range(num_verts):
             vertex = [self._scanner.read_float() for _ in range(8)]
             self.model.vertices.new(vertex)
                 
 
-    def _read_TRA0(self, chunk_size):
-        num_matrices = chunk_size // MATRIX_SIZE
+    def _read_TRA0(self, data_size):
+        num_matrices = data_size // MATRIX_SIZE
 
         for _ in range(num_matrices):
             matrix = [self._scanner.read_float() for _ in range(16)]
             self.model.matrices.new(matrix)
 
-    def _read_TEX0(self, chunk_size):
-        self._read_zero_separated_values(chunk_size, self.model.materials)
+    def _read_TEX0(self, data_size):
+        self._read_zero_separated_values(data_size, self.model.materials)
 
-    def _read_NAM0(self, chunk_size):
-        self._read_zero_separated_values(chunk_size, self.model.names)
+    def _read_NAM0(self, data_size):
+        self._read_zero_separated_values(data_size, self.model.names)
 
-    def _read_zero_separated_values(self, chunk_size, collection):
-        data = self._scanner.read_str(chunk_size - 8)
+    def _read_zero_separated_values(self, data_size, collection):
+        data = self._scanner.read_str(data_size)
         values = data.strip("\x00").split("\x00")
 
         for value in values:

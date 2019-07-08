@@ -12,7 +12,18 @@ class E3DOutput:
         self._model = model
 
     def run(self):
+
+        main_chunk_size = sum((
+            CHUNK_HEADER_SIZE,
+            self._calc_SUB0_size(),
+            self._calc_VNT0_size(),
+            self._calc_TEX0_size(),
+            self._calc_NAM0_size(),
+            self._calc_TRA0_size()
+        ))
+
         self._writer.write_string("E3D0")
+        self._writer.write_int(main_chunk_size)
 
         self._dump_SUB0()
         self._dump_VNT0()
@@ -20,16 +31,10 @@ class E3DOutput:
         self._dump_NAM0()
         self._dump_TRA0()
         
-        # Get E3D0 data size and write it
-        self._file.seek(0, 2)
-        size = self._file.tell() - (CHUNK_HEADER_SIZE - 4)
-        self._file.seek(4, 0)
-
-        self._writer.write_int(size)
-
+        
     def _dump_SUB0(self):
         self._writer.write_string("SUB0")
-        chunk_size = len(self._model.submodels) * SUBMODEL_SIZE
+        chunk_size = self._calc_SUB0_size()
         self._writer.write_int(chunk_size)
 
         for submodel in self._model.submodels:
@@ -45,10 +50,10 @@ class E3DOutput:
             self._writer.write_int(submodel.material_id)
             self._writer.write_float(submodel.visibility_light_treshold)
             self._writer.write_float(submodel.selfillum)
-            self._writer.write_float_list(submodel.ambient_color)
-            self._writer.write_float_list(submodel.diffuse_color)
-            self._writer.write_float_list(submodel.specular_color)
-            self._writer.write_float_list(submodel.emission_color)
+            self._writer.write_floats(submodel.ambient_color)
+            self._writer.write_floats(submodel.diffuse_color)
+            self._writer.write_floats(submodel.specular_color)
+            self._writer.write_floats(submodel.emission_color)
             self._writer.write_float(submodel.wire_size)
             self._writer.write_float(submodel.max_distance)
             self._writer.write_float(submodel.min_distance)
@@ -60,41 +65,60 @@ class E3DOutput:
             self._writer.write_float(submodel.cos_falloff_angle)
             self._writer.write_float(submodel.cos_hotspot_angle)
             self._writer.write_float(submodel.cos_view_angle)
-            self._writer.write_bytes(b"\0" * 100)
+            self._writer.write_bytes(b"\x00" * 100)
 
     def _dump_VNT0(self):
         self._writer.write_string("VNT0")
-        chunk_size = len(self._model.vertices) * VERTEX_SIZE
+        chunk_size = self._calc_VNT0_size()
         self._writer.write_int(chunk_size)
 
         for vertex in self._model.vertices:
-            self._writer.write_float_list(vertex)
+            self._writer.write_floats(vertex)
 
     def _dump_TEX0(self):
         if self._model.materials:
             self._writer.write_string("TEX0")
-            chunk_size = sum((len(m) for m in self._model.materials)) + len(self._model.materials) + 1
+            chunk_size = self._calc_TEX0_size()
             self._writer.write_int(chunk_size)
 
-            self._writer.write_bytes(b"\0")
             for material in self._model.materials:
                 self._writer.write_string(material)
-                self._writer.write_bytes(b"\0")
+                self._writer.write_bytes(b"\x00")
 
     def _dump_NAM0(self):
         if self._model.names:
             self._writer.write_string("NAM0")
-            chunk_size = sum((len(m) for m in self._model.materials)) + len(self._model.materials)
+            chunk_size = self._calc_NAM0_size()
             self._writer.write_int(chunk_size)
 
             for name in self._model.names:
                 self._writer.write_string(name)
-                self._writer.write_bytes(b"\0")
+                self._writer.write_bytes(b"\x00")
 
     def _dump_TRA0(self):
-        self._writer.write_string("TEX0")
-        chunk_size = len(self._model.matrices) * MATRIX_SIZE
+        self._writer.write_string("TRA0")
+        chunk_size = self._calc_TRA0_size()
         self._writer.write_int(chunk_size)
 
         for matrix in self._model.matrices:
-            self._writer.write_float_list(matrix)
+            self._writer.write_floats(matrix)
+
+    def _calc_SUB0_size(self):
+        return (len(self._model.submodels) * SUBMODEL_SIZE) + CHUNK_HEADER_SIZE
+
+    def _calc_VNT0_size(self):
+        return (len(self._model.vertices) * VERTEX_SIZE) + CHUNK_HEADER_SIZE
+
+    def _calc_TEX0_size(self):
+        num_null_bytes = len(self._model.materials)
+        return sum(
+            (len(m) for m in self._model.materials)
+        ) + num_null_bytes + CHUNK_HEADER_SIZE
+
+    def _calc_NAM0_size(self):
+        return sum(
+            (len(m) for m in self._model.names)
+        ) + len(self._model.names) + CHUNK_HEADER_SIZE
+
+    def _calc_TRA0_size(self):
+        return (len(self._model.matrices) * MATRIX_SIZE) + CHUNK_HEADER_SIZE
