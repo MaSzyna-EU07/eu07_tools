@@ -1,11 +1,19 @@
 from eu07_tools.utils.structures import Vertex3D, ColorRGB, VectorXYZ, FactorySequence
 
+
 class SCNNode:
     def __init__(self, name):
         self.typename = ""
         self.name = ""
         self.max_distance = -1
         self.min_distance = 0
+
+from .lines import SCNNodeLineLoop, SCNNodeLines, SCNNodeLineStrip
+from .track import (
+    SCNNodeTrack, SCNNodeTrackCross, SCNNodeTrackNormal, SCNNodeTrackRiver,
+    SCNNodeTrackRoad, SCNNodeTrackSwitch, SCNNodeTrackTable, SCNNodeTrackTributary, SCNNodeTrackTurn)
+from .traction import SCNNodeTraction, SCNNodeTractionPowerSource
+from .triangles import SCNNodeTriangleFan, SCNNodeTriangles, SCNNodeTriangleStrip, SCNTrianglesMaterial
 
 
 class SCNNodeDynamic(SCNNode):

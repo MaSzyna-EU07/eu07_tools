@@ -1,4 +1,4 @@
-from eu07_tools.utils import VectorXYZ
+from eu07_tools.utils import VectorXYZ, TypedSequenceWrapper
 from . import SCNNode
 
 class SCNNodeTrack(SCNNode):
@@ -20,7 +20,7 @@ class SCNNodeTrack(SCNNode):
         self.geometry_param1 = 0
         self.geometry_param2 = 0
         self.geometry_param3 = 0
-        self.segments = (TrackSegment())
+        self.segments = tuple((TrackSegment(), TrackSegment()))
         self.velocity = 0
 
         self.event0 = "none"
@@ -48,7 +48,7 @@ class SCNNodeTrackSwitch(SCNNodeTrack):
     def __init__(self, name):
         super().__init__(name)
         self.typename = "node:track:switch"
-        self.segments = (TrackSegment(), TrackSegment())
+        self.segments = tuple((TrackSegment(), TrackSegment()))
 
 class SCNNodeTrackRoad(SCNNodeTrack):
     def __init__(self, name):
@@ -59,7 +59,7 @@ class SCNNodeTrackCross(SCNNodeTrack):
     def __init__(self, name):
         super().__init__(name)
         self.typename = "node:track:cross"
-        self.segments = (TrackSegment(), TrackSegment())
+        self.segments = tuple((TrackSegment(), TrackSegment()))
 
 class SCNNodeTrackRiver(SCNNodeTrack):
     def __init__(self, name):
@@ -80,7 +80,7 @@ class SCNNodeTrackTributary(SCNNodeTrack):
     def __init__(self, name):
         super().__init__(name)
         self.typename = "node:track:tributary"
-        self.segments = (TrackSegment(), TrackSegment())
+        self.segments = tuple((TrackSegment(), TrackSegment()))
     
 class TrackSegment:
     def __init__(self):

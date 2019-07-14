@@ -4,9 +4,12 @@ import functools
 from eu07_tools.utils.input import TextScanner
 import eu07_tools.scn.structures as scnstruct
 
+def load(file):
+    return SCNIterativeLoader(file)
+
 class SCNIterativeLoader(Iterator):
     def __init__(self, file):
-        self._token_stream = TextScanner.from_file(file)
+        self._scanner = TextScanner.from_file(file)
         self._iterator = self._load()
 
         self._element_loaders = {
@@ -43,9 +46,6 @@ class SCNIterativeLoader(Iterator):
             "triangle_fan": self._load_node_triangle_fan,
         }
 
-        self._get_token = self._token_stream.get_token
-        self._get_tokens = self._token_stream.get_tokens
-        self._get_tokens_before = self._token_stream.get_tokens_before
 
     @classmethod
     def from_file(cls, file):
@@ -56,7 +56,7 @@ class SCNIterativeLoader(Iterator):
 
     def _load(self):
         while True:
-            token = self._token_stream.get_token().lower()
+            token = self._scanner.read_string().lower()
 
             if token == "":
                 return
@@ -70,28 +70,28 @@ class SCNIterativeLoader(Iterator):
 
     def _load_atmo(self):
         atmo = scnstruct.SCNAtmo()
-        atmo.sky_color = list(self._get_typed_tokens(3, float))
-        atmo.fog_start = float(self._get_token())
-        atmo.fog_end = float(self._get_token())
+        atmo.sky_color = self._scanner.read_floats(3)
+        atmo.fog_start = self._scanner.read_float()
+        atmo.fog_end = self._scanner.read_float()
         
         if atmo.fog_end > 0:
-            atmo.fog_color = list(self._get_typed_tokens(3, float))
+            atmo.fog_color = self._scanner.read_floats(3)
 
-        token = self._get_token().lower()
+        token = self._scanner.read_string().lower()
 
         if token != "endatmo":
             atmo.overcast = float(token)
-            self._get_token()
+            self._scanner.read_string()
 
         return atmo
 
 
     def _load_camera(self):
         camera = scnstruct.SCNCamera()
-        camera.position = list(self._get_typed_tokens(3, float))
-        camera.rotation = list(self._get_typed_tokens(3, float))
+        camera.position = self._scanner.read_floats(3)
+        camera.rotation = self._scanner.read_floats(3)
 
-        token = self._get_token()
+        token = self._scanner.read_string()
 
         if token != "endcamera":
             camera.index = int(token)
@@ -102,15 +102,15 @@ class SCNIterativeLoader(Iterator):
 
     def _load_config(self):
         # TODO: Config loading
-        list(self._get_tokens_before("endconfig"))
+        self._scanner.get_strings_before("endconfig")
         return None
 
     def _load_description(self):
-        list(self._get_tokens_before("enddescription"))
+        self._scanner.get_strings_before("enddescription")
         return None
 
     def _load_event(self):
-        list(self._get_tokens_before("endevent"))
+        self._scanner.get_strings_before("endevent")
         return None
 
     def _load_firstinit(self):
@@ -118,25 +118,25 @@ class SCNIterativeLoader(Iterator):
 
     def _load_include(self):
         include = scnstruct.SCNInclude()
-        include.path, *parameters = self._get_tokens_before("end")
+        include.path, *parameters = self._scanner.get_strings_before("end")
         for p_value in parameters:
             include.append_parameter_value(p_value)
 
         return include
 
     def _load_light(self):
-        self._get_tokens_before("endlight")
+        self._scanner.get_strings_before("endlight")
         return None
 
     def _load_lua(self):
         lua = scnstruct.SCNLua()
-        lua.path = self._get_token()
+        lua.path = self._scanner.read_string()
         return lua
 
     def _load_node(self):
-        max_distance = float(self._get_token())
-        min_distance = float(self._get_token())
-        name, subtype = self._get_tokens(2)
+        max_distance = self._scanner.read_float()
+        min_distance = self._scanner.read_float()
+        name, subtype = self._scanner.read_strings(2)
 
         load_node = self._node_loaders.get(subtype)
 
@@ -150,43 +150,43 @@ class SCNIterativeLoader(Iterator):
 
     def _load_node_dynamic(self, name):
         dynamic = scnstruct.SCNNodeDynamic(name)
-        dynamic.base_path, dynamic.map, dynamic.mmd_path = self._get_tokens(3)
+        dynamic.base_path, dynamic.map, dynamic.mmd_path = self._scanner.read_strings(3)
 
         if not self._is_trainset_opened:
-            dynamic.track_name = self._get_token()
+            dynamic.track_name = self._scanner.read_string()
 
-        dynamic.offset = float(self._get_token())
-        dynamic.driver_type = self._get_token()
+        dynamic.offset = self._scanner.read_float()
+        dynamic.driver_type = self._scanner.read_string()
 
         if self._is_trainset_opened:
-            dynamic.coupling = self._get_token()
+            dynamic.coupling = self._scanner.read_string()
         else:
-            dynamic.initial_velocity = float(self._get_token())
+            dynamic.initial_velocity = self._scanner.read_float()
         
-        dynamic.load_count = float(self._get_token())
+        dynamic.load_count = self._scanner.read_float()
 
         if dynamic.load_count > 0:
-            dynamic.load_type = self._get_token()
+            dynamic.load_type = self._scanner.read_string()
 
-        token = self._get_token()
+        token = self._scanner.read_string()
 
         if token != "enddynamic":
-            __, dynamic.destination, __ = self._get_tokens(3)
+            __, dynamic.destination, __ = self._scanner.read_strings(3)
 
         return dynamic
 
     def _load_node_eventlauncher(self, name):
         launcher = scnstruct.SCNNodeEventlauncher(name)
-        *launcher.location, launcher.radius = self._get_typed_tokens(4, float)
-        launcher.key = self._get_token()
-        launcher.delta_time = float(self._get_token())
-        launcher.first_event_name, launcher.second_event_name = self._get_tokens(2)
+        *launcher.location, launcher.radius = self._scanner.read_floats(4)
+        launcher.key = self._scanner.read_string()
+        launcher.delta_time = self._scanner.read_float()
+        launcher.first_event_name, launcher.second_event_name = self._scanner.read_strings(2)
 
         if launcher.second_event_name != "condition":
-            launcher.memcell_name = self._get_tokens(2)
-            launcher.check_mask = int(self._get_token)
+            launcher.memcell_name = self._scanner.read_strings(2)
+            launcher.check_mask = self._scanner.read_int()
         
-        self._get_token() # endtag
+        self._scanner.read_string() # endtag
 
         return launcher
 
@@ -206,156 +206,160 @@ class SCNIterativeLoader(Iterator):
         )
 
     def _generic_load_lines(self, node):
-        *node.color, node.thickness = self._get_typed_tokens(4, float)
+        *node.color, node.thickness = self._scanner.read_floats(4)
 
         while True:
-            token = self._get_token()
+            token = self._scanner.read_string()
 
             if token == "endlines":
                 break
             else:
-                vertex_co = [float(token)] + list(self._get_typed_tokens(2, float))
+                vertex_co = [float(token)] + self._scanner.read_floats(2)
                 node.add_vertex(vertex_co)
 
         return node
 
     def _load_node_memcell(self, name):
         memcell = scnstruct.SCNNodeMemcell(name)
-        memcell.location = self._get_typed_tokens(3, float)
-        memcell.values[0] = self._get_token()
-        memcell.values[1:] = self._get_typed_tokens(3, float)
-        memcell.track_name = self._get_token()
+        memcell.location = self._scanner.read_floats(3)
+        memcell.values[0] = self._scanner.read_string()
+        memcell.values[1:] = self._scanner.read_floats(3)
+        memcell.track_name = self._scanner.read_string()
 
         return memcell
 
     def _load_node_model(self, name):
         model = scnstruct.SCNNodeModel(name)
-        *model.location, model.rotation_y = self._get_typed_tokens(4, float)
-        model.path, model.map = self._get_tokens(2)
+        *model.location, model.rotation_y = self._scanner.read_floats(4)
+        model.path, model.map = self._scanner.read_strings(2)
 
-        model.light_states = [int(s) for s in self._get_tokens_before("endmodel")]
+        model.light_states = [int(s) for s in self._scanner.get_strings_before("endmodel")]
 
         return model
 
     def _load_node_sound(self, name):
         sound = scnstruct.SCNNodeSound(name)
-        sound.location = self._get_typed_tokens(3, float)
-        sound.path = self._get_token()
-        self._get_token()
+        sound.location = self._scanner.read_floats(3)
+        sound.path = self._scanner.read_string()
+        self._scanner.read_string()
 
         return sound
 
 
     def _load_node_track(self, name):
         # TODO: Track loading
-        self._get_tokens_before("endtrack")
-
-        subtype = self._get_token()
+        subtype = self._scanner.read_string()
 
         track = scnstruct.SCNNodeTrack(name)
-        track.length = float(self._get_token())
-        track.width = float(self._get_token())
-        track.friction = float(self._get_token())
-        track.sound_distance = float(self._get_token())
-        track.quality_flag = int(self._get_token())
-        track.damage_flag = int(self._get_token())
-        track.environment = self._get_token()
-        track.visible = (self._get_token() == "vis")
-        track.material1 = self._get_token()
-        track.material2 = self._get_token()
-        track.mapping_length = float(self._get_token())
-        track.tex_param1 = self._get_token()
-        track.tex_param2 = self._get_token()
-        track.tex_param3 = self._get_token()
+        track.length = self._scanner.read_float()
+        track.width = self._scanner.read_float()
+        track.friction = self._scanner.read_float()
+        track.sound_distance = self._scanner.read_float()
+        track.quality_flag = self._scanner.read_int()
+        track.damage_flag = self._scanner.read_int()
+        track.environment = self._scanner.read_string()
+        track.visible = (self._scanner.read_string() == "vis")
+        track.material1 = self._scanner.read_string()
+        track.mapping_length = self._scanner.read_float()
+        track.material2 = self._scanner.read_string()
+        track.tex_param1 = self._scanner.read_string()
+        track.tex_param2 = self._scanner.read_string()
+        track.tex_param3 = self._scanner.read_string()
 
-        track.segments[0].p1 = self._get_typed_tokens(3, float)
-        track.segments[0].p1.roll = float(self._get_token())
-        track.segments[0].cv1 = self._get_typed_tokens(3, float)
-        track.segments[0].cv2 = self._get_typed_tokens(3, float)
-        track.segments[0].p2 = self._get_typed_tokens(3, float)
-        track.segments[0].p2.roll = float(self._get_token())
+        track.segments[0].p1 = self._scanner.read_floats(3)
+        track.segments[0].p1.roll = self._scanner.read_float()
+        track.segments[0].cv1 = self._scanner.read_floats(3)
+        track.segments[0].cv2 = self._scanner.read_floats(3)
+        track.segments[0].p2 = self._scanner.read_floats(3)
+        track.segments[0].p2.roll = self._scanner.read_float()
 
         if subtype in "switch cross tributary":
-            track.segments[1].p1 = self._get_typed_tokens(3, float)
-            track.segments[1].p1.roll = float(self._get_token())
-            track.segments[1].cv1 = self._get_typed_tokens(3, float)
-            track.segments[1].cv2 = self._get_typed_tokens(3, float)
-            track.segments[1].p2 = self._get_typed_tokens(3, float)
-            track.segments[1].p2.roll = float(self._get_token())
+            track.segments[1].p1 = self._scanner.read_floats(3)
+            track.segments[1].p1.roll = self._scanner.read_float()
+            track.segments[1].cv1 = self._scanner.read_floats(3)
+            track.segments[1].cv2 = self._scanner.read_floats(3)
+            track.segments[1].p2 = self._scanner.read_floats(3)
+            track.segments[1].p2.roll = self._scanner.read_float()
 
         
-        optionals = self._get_tokens_before("endtrack")
-        if "event0" in optionals:
-            track.event0 = self._get_token()
-        if "event1" in optionals:
-            track.event1 = self._get_token()
-        if "event2" in optionals:
-            track.event2 = self._get_token()
-        if "eventall0" in optionals:
-            track.eventall0 = self._get_token()
-        if "eventall1" in optionals:
-            track.eventall1 = self._get_token()
-        if "eventall2" in optionals:
-            track.eventall2 = self._get_token()
-        if "isolated" in optionals:
-            track.isolated = self._get_token()
-        if "overhead" in optionals:
-            track.overhead = int(self._get_token())
-        if "angle1" in optionals:
-            track.angle1 = int(self._get_token())
-        if "angle2" in optionals:
-            track.angle2 = int(self._get_token())
-        if "fouling1" in optionals:
-            track.fouling1 = self._get_token()
-        if "fouling2" in optionals:
-            track.fouling2 = self._get_token()
-        if "vradius" in optionals:
-            track.vradius = float(self._get_token())
-        if "trackbed" in optionals:
-            track.trackbed = self._get_token()
-        if "railprofile" in optionals:
-            track.railprofile = self._get_token()
+        while True:
+            token = self._scanner.read_string()
+
+            if token == "endtrack":
+                break
+            if token == "event0":
+                track.event0 = self._scanner.read_string()
+            if token == "event1":
+                track.event1 = self._scanner.read_string()
+            if token == "event2":
+                track.event2 = self._scanner.read_string()
+            if token == "eventall0":
+                track.eventall0 = self._scanner.read_string()
+            if token == "eventall1":
+                track.eventall1 = self._scanner.read_string()
+            if token == "eventall2":
+                track.eventall2 = self._scanner.read_string()
+            if token == "isolated":
+                track.isolated = self._scanner.read_string()
+            if token == "overhead":
+                track.overhead = self._scanner.read_int()
+            if token == "angle1":
+                track.angle1 = self._scanner.read_int()
+            if token == "angle2":
+                track.angle2 = self._scanner.read_int()
+            if token == "fouling1":
+                track.fouling1 = self._scanner.read_string()
+            if token == "fouling2":
+                track.fouling2 = self._scanner.read_string()
+            if token == "vradius":
+                track.vradius = self._scanner.read_float()
+            if token == "trackbed":
+                track.trackbed = self._scanner.read_string()
+            if token == "railprofile":
+                track.railprofile = self._scanner.read_string()
+
+        return track
 
     def _load_node_traction(self, name):
         traction = scnstruct.SCNNodeTraction(name)
 
-        traction.powersource_name = self._get_token()
-        traction.nominal_voltage = float(self._get_token())
-        traction.max_current = float(self._get_token())
-        traction.resistivity = float(self._get_token())
-        traction.wire_material_type = self._get_token()
-        traction.wire_thickness = float(self._get_token())
-        traction.damage_flag = int(self._get_token())
-        p1 = list(self._get_typed_tokens(3, float))
-        p2 = list(self._get_typed_tokens(3, float))
-        p3 = list(self._get_typed_tokens(3, float))
-        p4 = list(self._get_typed_tokens(3, float))
-        traction.min_height, traction.segment_length = self._get_typed_tokens(2, float)
-        traction.wires_type = int(self._get_token())
+        traction.powersource_name = self._scanner.read_string()
+        traction.nominal_voltage = self._scanner.read_float()
+        traction.max_current = self._scanner.read_float()
+        traction.resistivity = self._scanner.read_float()
+        traction.wire_material_type = self._scanner.read_string()
+        traction.wire_thickness = self._scanner.read_float()
+        traction.damage_flag = self._scanner.read_int()
+        p1 = self._scanner.read_floats(3)
+        p2 = self._scanner.read_floats(3)
+        p3 = self._scanner.read_floats(3)
+        p4 = self._scanner.read_floats(3)
+        traction.min_height, traction.segment_length = self._scanner.read_floats(2)
+        traction.wires_type = self._scanner.read_int()
         
         if traction.wires_type != 0:
-            traction.wire_offset = float(self._get_token())
-        traction.visible = (True if self._get_token() == "vis" else False)
+            traction.wire_offset = self._scanner.read_float()
+        traction.visible = (self._scanner.read_string() == "vis")
         
-        token = self._get_token()
+        token = self._scanner.read_string()
 
         if token == "parallel":
-            traction.parallel_name = self._get_token()
+            traction.parallel_name = self._scanner.read_string()
 
         return traction
 
     def _load_node_tractionpowersource(self, name):
         power_source = scnstruct.SCNNodeTractionPowerSource(name)
-        power_source.location = self._get_typed_tokens(3, float)
-        power_source.nominal_voltage = float(self._get_token())
-        power_source.voltage_frequency = float(self._get_token())
-        power_source.internal_resistance = float(self._get_token())
-        power_source.max_output_current = float(self._get_token())
-        power_source.fast_fuse_timeout = float(self._get_token())
-        power_source.fast_fuse_repetition = int(self._get_token())
-        power_source.slow_fuse_timeout = float(self._get_token())
+        power_source.location = self._scanner.read_floats(3)
+        power_source.nominal_voltage = self._scanner.read_float()
+        power_source.voltage_frequency = self._scanner.read_float()
+        power_source.internal_resistance = self._scanner.read_float()
+        power_source.max_output_current = self._scanner.read_float()
+        power_source.fast_fuse_timeout = self._scanner.read_float()
+        power_source.fast_fuse_repetition = self._scanner.read_int()
+        power_source.slow_fuse_timeout = self._scanner.read_float()
 
-        optional = list(self._get_tokens_before("end"))
+        optional = list(self._scanner.get_strings_before("end"))
 
         power_source.recuperation = ("recuperation" in optional)
         power_source.section = ("section" in optional)
@@ -379,58 +383,58 @@ class SCNIterativeLoader(Iterator):
 
 
     def _generic_load_triangles(self, node):
-        token = self._get_token()
+        token = self._scanner.read_string()
         map_ = token
 
         if token == "material":
-            self._get_token()
-            ambient = list(self._get_typed_tokens(3, float))
-            self._get_token()
-            diffuse = list(self._get_typed_tokens(3, float))
-            self._get_token()
-            specular = list(self._get_typed_tokens(3, float))
-            self._get_token()
+            self._scanner.read_string()
+            ambient = list(self._scanner.read_floats(3))
+            self._scanner.read_string()
+            diffuse = list(self._scanner.read_floats(3))
+            self._scanner.read_string()
+            specular = list(self._scanner.read_floats(3))
+            self._scanner.read_string()
 
             node.material = scnstruct.SCNTrianglesMaterial(ambient, diffuse, specular)
-            map_ = self._get_token()
+            map_ = self._scanner.read_string()
             
         node.map = map_
 
         # TODO: Optimize
-        tokens = self._get_tokens_before("endtri")
+        tokens = self._scanner.get_strings_before("endtri")
         tokens = [token for token in tokens if token != "end"]
         num_verts = len(tokens) // 8
 
         for vi in range(num_verts):
-            node.add_vertex(
+            node.vertices.new(
                 [float(x) for x in tokens[8 * vi : 8 * vi + 8]]
             )
 
         return node
 
     def _load_origin(self):
-        vector = list(self._get_typed_tokens(3, float))
+        vector = self._scanner.read_floats(3)
         return scnstruct.SCNOrigin(vector)
 
     def _load_endorigin(self):
         return scnstruct.SCNEndOrigin()
 
     def _load_rotate(self):
-        vector = list(self._get_typed_tokens(3, float))
+        vector = self._scanner.read_floats(3)
         return scnstruct.SCNRotate(vector)
 
     def _load_sky(self):
         sky = scnstruct.SCNSky()
-        sky.model_path, __ = self._get_tokens(2)
+        sky.model_path, __ = self._scanner.read_strings(2)
         return sky
 
     def _load_test(self):
-        list(self._get_tokens_before("endtest"))
+        list(self._scanner.get_strings_before("endtest"))
         return None
 
     def _load_time(self):
         time = scnstruct.SCNTime()
-        time.inital_time, time.sunset_time, time.sunrise_time = self._get_tokens(3)
+        time.inital_time, time.sunset_time, time.sunrise_time = self._scanner.read_strings(3)
         return time
 
     def _load_trainset(self):
@@ -438,13 +442,10 @@ class SCNIterativeLoader(Iterator):
 
         trainset = scnstruct.SCNTrainset()
 
-        trainset.timetable_path, trainset.track_name = self._get_tokens(2)
-        trainset.offset, trainset.velocity = self._get_typed_tokens(2, float)
+        trainset.timetable_path, trainset.track_name = self._scanner.read_strings(2)
+        trainset.offset, trainset.velocity = self._scanner.read_floats(2)
         return trainset
 
     def _load_endtrainset(self):
         self._is_trainset_opened = False
         return scnstruct.SCNEndTrainset()
-
-    def _get_typed_tokens(self, count, type_):
-        return (type_(self._get_token()) for _ in range(count))

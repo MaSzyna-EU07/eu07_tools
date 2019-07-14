@@ -1,5 +1,5 @@
 from . import SCNNode
-from eu07_tools.utils import VectorXYZ
+from eu07_tools.utils import VectorXYZ, TypedSequenceWrapper
 
 class SCNNodeTraction(SCNNode):
     def __init__(self, name):
@@ -12,16 +12,48 @@ class SCNNodeTraction(SCNNode):
         self.wire_material_type = "Cu"
         self.wire_thickness = 1.0
         self.damage_flag = 0
-        self.points = (
-            VectorXYZ((0, 0, 0)), VectorXYZ((0, 0, 0)),
-            VectorXYZ((0, 0, 0)), VectorXYZ((0, 0, 0))
-        )
+        self._p1 = VectorXYZ((0, 0, 0))
+        self._p2 = VectorXYZ((0, 0, 0))
+        self._p3 = VectorXYZ((0, 0, 0))
+        self._p4 = VectorXYZ((0, 0, 0))
         self.min_height = 0
         self.segment_length = 0
         self.wires_type = 1
         self.wire_offset = 0
         self.visible = True
         self.parallel_name = "none"
+
+    @property
+    def p1(self):
+        return self._p1
+
+    @p1.setter
+    def p1(self, p1):
+        self._p1 = VectorXYZ(p1)
+
+    @property
+    def p2(self):
+        return self._p2
+
+    @p2.setter
+    def p2(self, p2):
+        self._p2 = VectorXYZ(p2)
+
+    @property
+    def p3(self):
+        return self._p3
+
+    @p3.setter
+    def p3(self, p3):
+        self._p3 = VectorXYZ(p3)
+
+    @property
+    def p4(self):
+        return self._p4
+
+    @p4.setter
+    def p4(self, p4):
+        self._p4 = VectorXYZ(p4)
 
 
 class SCNNodeTractionPowerSource(SCNNode):

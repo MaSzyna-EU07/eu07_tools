@@ -38,6 +38,9 @@ class TextScanner:
     def read_ints(self, amount):
         return [self.read_int() for _ in range(amount)]
 
+    def get_strings_before(self, endmark):
+        return list(self._accessor.get_tokens_before(endmark))
+
     def get_token(self) -> str:
         """ Return next token. 
         If there are no tokens in stream, an empty string will be returned.
