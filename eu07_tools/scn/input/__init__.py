@@ -34,7 +34,22 @@ class SCNIterativeLoader(Iterator):
         }
 
         self._event_loaders = {
-
+            "addvalues": self._load_event_addvalues,
+            "copyvalues": self._load_event_copyvalues,
+            "getvalues": self._load_event_getvalues,
+            "logvalues": self._load_event_logvalues,
+            "putvalues": self._load_event_putvalues,
+            "updatevalues": self._load_event_updatevalues,
+            "animation": self._load_event_animation,
+            "lights": self._load_event_lights,
+            "trackvel": self._load_event_trackvel,
+            "visible": self._load_event_visible,
+            "voltage": self._load_event_voltage,
+            "whois": self._load_event_whois,
+            "friction": self._load_event_friction,
+            "multiple": self._load_event_multiple,
+            "switch": self._load_event_switch,
+            "sound": self._load_event_sound,
         }
 
         self._node_loaders = {
@@ -110,7 +125,21 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_event(self):
-        self._scanner.get_strings_before("endevent")
+        name = self._scanner.read_string()
+        subtype = self._scanner.read_string().lower()
+        delay = self._scanner.read_float()
+        node_name = self._scanner.read_string()
+
+        load_event = self._event_loaders.get(subtype)
+        if load_event is not None:
+            event = load_event()
+
+            event.name = name
+            event.delay = delay
+            event.node_name = node_name
+        else:
+            self._scanner.get_strings_before("endevent")
+
         return None
 
     def _load_firstinit(self):
