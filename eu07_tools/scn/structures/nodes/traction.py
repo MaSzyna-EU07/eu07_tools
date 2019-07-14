@@ -12,7 +12,10 @@ class SCNNodeTraction(SCNNode):
         self.wire_material_type = "Cu"
         self.wire_thickness = 1.0
         self.damage_flag = 0
-        self.points = []
+        self.points = (
+            VectorXYZ((0, 0, 0)), VectorXYZ((0, 0, 0)),
+            VectorXYZ((0, 0, 0)), VectorXYZ((0, 0, 0))
+        )
         self.min_height = 0
         self.segment_length = 0
         self.wires_type = 1

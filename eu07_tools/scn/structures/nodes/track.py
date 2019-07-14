@@ -17,9 +17,9 @@ class SCNNodeTrack(SCNNode):
         self.material2 = "none"
         self.mapping_length = 4
         # TODO: Remove those params, replace with specific attributes in subclasses
-        self.tex_param1 = 0
-        self.tex_param2 = 0
-        self.tex_param3 = 0
+        self.geometry_param1 = 0
+        self.geometry_param2 = 0
+        self.geometry_param3 = 0
         self.segments = (TrackSegment())
         self.velocity = 0
 
@@ -84,13 +84,45 @@ class SCNNodeTrackTributary(SCNNodeTrack):
     
 class TrackSegment:
     def __init__(self):
-        self.p1 = TrackSegmentPoint()
-        self.cv1 = VectorXYZ((0, 0, 0))
-        self.cv2 = VectorXYZ((0, 0, 0)) 
-        self.p2 = TrackSegmentPoint()
+        self._p1 = TrackSegmentPoint((0, 0, 0))
+        self._cv1 = VectorXYZ((0, 0, 0))
+        self._cv2 = VectorXYZ((0, 0, 0)) 
+        self._p2 = TrackSegmentPoint((0, 0, 0))
         self.radius = 0
 
+    @property
+    def p1(self):
+        return self._p1
+
+    @p1.setter
+    def p1(self, p1):
+        self._p1 = TrackSegmentPoint(p1)
+
+    @property
+    def cv1(self):
+        return self._cv1
+
+    @cv1.setter
+    def cv1(self, cv1):
+        self._cv1 = VectorXYZ(cv1)
+
+    @property
+    def cv2(self):
+        return self._cv2
+
+    @cv2.setter
+    def cv2(self, cv2):
+        self._cv2 = VectorXYZ(cv2)
+
+    @property
+    def p2(self):
+        return self._p2
+
+    @p2.setter
+    def p2(self, p2):
+        self._p2 = TrackSegmentPoint(p2)
+
 class TrackSegmentPoint(VectorXYZ):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, values):
+        super().__init__(values)
         self.roll = 0

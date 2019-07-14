@@ -18,3 +18,6 @@ class FactorySequence(collections.abc.Sequence):
 
     def __len__(self):
         return len(self._items)
+
+    def __eq__(self, other):
+        return self._items == list(other)

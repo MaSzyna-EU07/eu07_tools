@@ -250,6 +250,8 @@ class SCNIterativeLoader(Iterator):
         # TODO: Track loading
         self._get_tokens_before("endtrack")
 
+        subtype = self._get_token()
+
         track = scnstruct.SCNNodeTrack(name)
         track.length = float(self._get_token())
         track.width = float(self._get_token())
@@ -265,6 +267,22 @@ class SCNIterativeLoader(Iterator):
         track.tex_param1 = self._get_token()
         track.tex_param2 = self._get_token()
         track.tex_param3 = self._get_token()
+
+        track.segments[0].p1 = self._get_typed_tokens(3, float)
+        track.segments[0].p1.roll = float(self._get_token())
+        track.segments[0].cv1 = self._get_typed_tokens(3, float)
+        track.segments[0].cv2 = self._get_typed_tokens(3, float)
+        track.segments[0].p2 = self._get_typed_tokens(3, float)
+        track.segments[0].p2.roll = float(self._get_token())
+
+        if subtype in "switch cross tributary":
+            track.segments[1].p1 = self._get_typed_tokens(3, float)
+            track.segments[1].p1.roll = float(self._get_token())
+            track.segments[1].cv1 = self._get_typed_tokens(3, float)
+            track.segments[1].cv2 = self._get_typed_tokens(3, float)
+            track.segments[1].p2 = self._get_typed_tokens(3, float)
+            track.segments[1].p2.roll = float(self._get_token())
+
         
         optionals = self._get_tokens_before("endtrack")
         if "event0" in optionals:

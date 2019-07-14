@@ -28,15 +28,16 @@ class ModelConverter:
             258: "ik2"
         }
 
-        self._hierachy_buffer = []
+        self._parenting = {}  
 
     def e3d_to_t3d(self, e3d):
-        for e3d_sm in e3d.submodels:
+        for submodel_id, e3d_sm in enumerate(e3d.submodels):
 
             type_ = self._TYPEID_TO_TYPENAME[e3d_sm.type_id]
             name = e3d.names[e3d_sm.name_id]
             t3d_sm = eu07_tools.t3d.create_submodel(type_, name)
-            # TODO: Parenting
+
+            
 
             t3d_sm.diffuse_color = e3d_sm.diffuse_color[:3] * 255
             t3d_sm.anim = self._ANIMID_TO_ANIMTYPENAME[e3d_sm.anim_id]
@@ -81,3 +82,7 @@ class ModelConverter:
                     t3d_sm.stars.new(vertex.location, vertex.mapping.u)
 
         yield t3d_sm
+
+        
+
+        

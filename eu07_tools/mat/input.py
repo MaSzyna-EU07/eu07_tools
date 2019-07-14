@@ -28,8 +28,8 @@ def _load_mapping(token_stream):
             token = token_stream.get_token()
 
             # Unify naming
-            key = key.replace("0", "_diffuse")
-            key = key.replace("1", "_normal")
+            key = key.replace("1", "_diffuse")
+            key = key.replace("2", "_normal")
 
             if token == "[":
                 value = list(token_stream.get_tokens_before("]"))
