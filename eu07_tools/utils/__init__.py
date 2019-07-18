@@ -11,7 +11,7 @@ def find_root(filepath):
 
     for part in filepath.parts:
         # TODO: More dirs?
-        if part in "models dynamic textures scripts sounds shaders":
+        if part in "models dynamic textures scripts sounds shaders scenery":
             break
         root /= part
 

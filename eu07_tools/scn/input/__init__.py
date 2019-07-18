@@ -247,8 +247,6 @@ class SCNIterativeLoader(Iterator):
 
 
     def _load_node_track(self, name):
-        print(name)
-        # TODO: Track loading
         subtype = self._scanner.read_string().lower()
 
         if subtype == "normal":
@@ -406,8 +404,8 @@ class SCNIterativeLoader(Iterator):
 
 
     def _generic_load_triangles(self, node):
-        map_ = "none"
         token = self._scanner.read_string()
+        map_ = token
 
         if token == "material":
             self._scanner.read_string()
