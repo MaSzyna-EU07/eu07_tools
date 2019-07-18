@@ -33,24 +33,6 @@ class SCNIterativeLoader(Iterator):
             "endtrainset": self._load_endtrainset,
         }
 
-        self._event_loaders = {
-            "addvalues": self._load_event_addvalues,
-            "copyvalues": self._load_event_copyvalues,
-            "getvalues": self._load_event_getvalues,
-            "logvalues": self._load_event_logvalues,
-            "putvalues": self._load_event_putvalues,
-            "updatevalues": self._load_event_updatevalues,
-            "animation": self._load_event_animation,
-            "lights": self._load_event_lights,
-            "trackvel": self._load_event_trackvel,
-            "visible": self._load_event_visible,
-            "voltage": self._load_event_voltage,
-            "whois": self._load_event_whois,
-            "friction": self._load_event_friction,
-            "multiple": self._load_event_multiple,
-            "switch": self._load_event_switch,
-            "sound": self._load_event_sound,
-        }
 
         self._node_loaders = {
             "dynamic": self._load_node_dynamic,
@@ -81,7 +63,7 @@ class SCNIterativeLoader(Iterator):
             if load_element:
                 element = load_element()
                 if element:
-                    yield element.typename, element
+                    yield element
 
     def _load_atmo(self):
         atmo = scnstruct.SCNAtmo()
@@ -125,20 +107,9 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_event(self):
-        name = self._scanner.read_string()
-        subtype = self._scanner.read_string().lower()
-        delay = self._scanner.read_float()
-        node_name = self._scanner.read_string()
+        
 
-        load_event = self._event_loaders.get(subtype)
-        if load_event is not None:
-            event = load_event()
-
-            event.name = name
-            event.delay = delay
-            event.node_name = node_name
-        else:
-            self._scanner.get_strings_before("endevent")
+        self._scanner.get_strings_before("endevent")
 
         return None
 
@@ -277,9 +248,25 @@ class SCNIterativeLoader(Iterator):
 
     def _load_node_track(self, name):
         # TODO: Track loading
-        subtype = self._scanner.read_string()
+        subtype = self._scanner.read_string().lower()
 
-        track = scnstruct.SCNNodeTrack(name)
+        if subtype == "normal":
+            track = scnstruct.SCNNodeTrackNormal(name)
+        elif subtype == "road":
+            track = scnstruct.SCNNodeTrackRoad(name)
+        elif subtype == "river":
+            track = scnstruct.SCNNodeTrackRiver(name)
+        elif subtype == "switch":
+            track = scnstruct.SCNNodeTrackSwitch(name)
+        elif subtype == "cross":
+            track = scnstruct.SCNNodeTrackCross(name)
+        elif subtype == "tributary":
+            track = scnstruct.SCNNodeTrackTributary(name)
+        elif subtype == "turn":
+            track = scnstruct.SCNNodeTrackTurn(name)
+        elif subtype == "table":
+            track = scnstruct.SCNNodeTrackTable(name)
+
         track.length = self._scanner.read_float()
         track.width = self._scanner.read_float()
         track.friction = self._scanner.read_float()
@@ -301,14 +288,17 @@ class SCNIterativeLoader(Iterator):
         track.segments[0].cv2 = self._scanner.read_floats(3)
         track.segments[0].p2 = self._scanner.read_floats(3)
         track.segments[0].p2.roll = self._scanner.read_float()
+        track.segments[0].radius = self._scanner.read_float()
 
-        if subtype in "switch cross tributary":
+        is_junction = (subtype in "switch cross tributary")
+        if is_junction:
             track.segments[1].p1 = self._scanner.read_floats(3)
             track.segments[1].p1.roll = self._scanner.read_float()
             track.segments[1].cv1 = self._scanner.read_floats(3)
             track.segments[1].cv2 = self._scanner.read_floats(3)
             track.segments[1].p2 = self._scanner.read_floats(3)
             track.segments[1].p2.roll = self._scanner.read_float()
+            track.segments[1].radius = self._scanner.read_float()
 
         
         while True:
@@ -316,35 +306,35 @@ class SCNIterativeLoader(Iterator):
 
             if token == "endtrack":
                 break
-            if token == "event0":
+            elif token == "event0":
                 track.event0 = self._scanner.read_string()
-            if token == "event1":
+            elif token == "event1":
                 track.event1 = self._scanner.read_string()
-            if token == "event2":
+            elif token == "event2":
                 track.event2 = self._scanner.read_string()
-            if token == "eventall0":
+            elif token == "eventall0":
                 track.eventall0 = self._scanner.read_string()
-            if token == "eventall1":
+            elif token == "eventall1":
                 track.eventall1 = self._scanner.read_string()
-            if token == "eventall2":
+            elif token == "eventall2":
                 track.eventall2 = self._scanner.read_string()
-            if token == "isolated":
+            elif token == "isolated":
                 track.isolated = self._scanner.read_string()
-            if token == "overhead":
+            elif token == "overhead":
                 track.overhead = self._scanner.read_int()
-            if token == "angle1":
+            elif token == "angle1":
                 track.angle1 = self._scanner.read_int()
-            if token == "angle2":
+            elif token == "angle2":
                 track.angle2 = self._scanner.read_int()
-            if token == "fouling1":
+            elif token == "fouling1":
                 track.fouling1 = self._scanner.read_string()
-            if token == "fouling2":
+            elif token == "fouling2":
                 track.fouling2 = self._scanner.read_string()
-            if token == "vradius":
+            elif token == "vradius":
                 track.vradius = self._scanner.read_float()
-            if token == "trackbed":
+            elif token == "trackbed":
                 track.trackbed = self._scanner.read_string()
-            if token == "railprofile":
+            elif token == "railprofile":
                 track.railprofile = self._scanner.read_string()
 
         return track
@@ -359,11 +349,12 @@ class SCNIterativeLoader(Iterator):
         traction.wire_material_type = self._scanner.read_string()
         traction.wire_thickness = self._scanner.read_float()
         traction.damage_flag = self._scanner.read_int()
-        p1 = self._scanner.read_floats(3)
-        p2 = self._scanner.read_floats(3)
-        p3 = self._scanner.read_floats(3)
-        p4 = self._scanner.read_floats(3)
-        traction.min_height, traction.segment_length = self._scanner.read_floats(2)
+        traction.p1 = self._scanner.read_floats(3)
+        traction.p2 = self._scanner.read_floats(3)
+        traction.p3 = self._scanner.read_floats(3)
+        traction.p4 = self._scanner.read_floats(3)
+        traction.min_height = self._scanner.read_float()
+        traction.segment_length = self._scanner.read_float()
         traction.wires_type = self._scanner.read_int()
         
         if traction.wires_type != 0:
@@ -412,16 +403,16 @@ class SCNIterativeLoader(Iterator):
 
 
     def _generic_load_triangles(self, node):
+        map_ = "none"
         token = self._scanner.read_string()
-        map_ = token
 
         if token == "material":
             self._scanner.read_string()
-            ambient = list(self._scanner.read_floats(3))
+            ambient = self._scanner.read_floats(3)
             self._scanner.read_string()
-            diffuse = list(self._scanner.read_floats(3))
+            diffuse = self._scanner.read_floats(3)
             self._scanner.read_string()
-            specular = list(self._scanner.read_floats(3))
+            specular = self._scanner.read_floats(3)
             self._scanner.read_string()
 
             node.material = scnstruct.SCNTrianglesMaterial(ambient, diffuse, specular)
@@ -429,16 +420,11 @@ class SCNIterativeLoader(Iterator):
             
         node.map = map_
 
-        # TODO: Optimize
-        tokens = self._scanner.get_strings_before("endtri")
-        tokens = [token for token in tokens if token != "end"]
-        num_verts = len(tokens) // 8
-
-        for vi in range(num_verts):
-            node.vertices.new(
-                [float(x) for x in tokens[8 * vi : 8 * vi + 8]]
-            )
-
+        vertex_endmark = ""
+        while vertex_endmark != "endtri":
+            node.vertices.new(self._scanner.read_floats(8))
+            vertex_endmark = self._scanner.read_string()
+        
         return node
 
     def _load_origin(self):
