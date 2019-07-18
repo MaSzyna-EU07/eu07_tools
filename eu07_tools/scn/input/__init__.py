@@ -404,19 +404,24 @@ class SCNIterativeLoader(Iterator):
 
 
     def _generic_load_triangles(self, node):
-        token = self._scanner.read_string()
+        token = self._scanner.read_string().lower()
         map_ = token
 
         if token == "material":
-            self._scanner.read_string()
-            ambient = self._scanner.read_floats(3)
-            self._scanner.read_string()
-            diffuse = self._scanner.read_floats(3)
-            self._scanner.read_string()
-            specular = self._scanner.read_floats(3)
-            self._scanner.read_string()
+            node.material = scnstruct.SCNTrianglesMaterial()
 
-            node.material = scnstruct.SCNTrianglesMaterial(ambient, diffuse, specular)
+            while True:
+                token = self._scanner.read_string().lower()
+
+                if token == "endmaterial":
+                    break
+                elif "ambient" in token:
+                    node.material.ambient = self._scanner.read_floats(3)
+                elif "diffuse" in token:
+                    node.material.diffuse = self._scanner.read_floats(3)
+                elif "specular" in token:
+                    node.material.specular = self._scanner.read_floats(3)
+
             map_ = self._scanner.read_string()
             
         node.map = map_

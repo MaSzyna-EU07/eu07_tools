@@ -26,10 +26,10 @@ class SCNNodeTriangleFan(SCNNodeTriangles):
 
 
 class SCNTrianglesMaterial:
-    def __init__(self, ambient, diffuse, specular):
-        self._ambient = ColorRGB(ambient)
-        self._diffuse = ColorRGB(diffuse)
-        self._specular = ColorRGB(specular)
+    def __init__(self):
+        self._ambient = None
+        self._diffuse = None
+        self._specular = None
 
     @property
     def ambient(self):
@@ -37,7 +37,10 @@ class SCNTrianglesMaterial:
 
     @ambient.setter
     def ambient(self, color):
-        self._ambient = ColorRGB(color)
+        if color is None:
+            self._ambient = None
+        else:
+            self._ambient = ColorRGB(color)
 
     @property
     def diffuse(self):
@@ -45,7 +48,10 @@ class SCNTrianglesMaterial:
 
     @diffuse.setter
     def diffuse(self, color):
-        self._diffuse = ColorRGB(color)
+        if color is None:
+            self._diffuse = None
+        else:
+            self._diffuse = ColorRGB(color)
 
     @property
     def specular(self):
@@ -53,4 +59,7 @@ class SCNTrianglesMaterial:
 
     @specular.setter
     def specular(self, color):
-        self._specular = ColorRGB(color)
+        if color is None:
+            self._specular = None
+        else:
+            self._specular = ColorRGB(color)
