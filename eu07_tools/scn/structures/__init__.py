@@ -3,6 +3,14 @@ from eu07_tools.utils.structures import VectorXYZ, ColorRGB
 from .nodes import *
 
 
+def create_element(typename, name="none"):
+    if typename == "atmo":
+        return SCNAtmo()
+    elif typename == "include":
+        return SCNInclude()
+    
+
+
 class SCNAtmo:
     def __init__(self):
         self.typename = "atmo"
@@ -29,16 +37,7 @@ class SCNInclude:
     def __init__(self):
         self.typename = "include"
         self.path = ""
-        self._parameters = []
-
-    def append_parameter_value(self, value):
-        self._parameters.append(value)
-
-    def set_parameter_value(self, param_id, value):
-        self._parameters[param_id-1] = value
-
-    def get_parameter_value(self, param_id):
-        return self._parameters[param_id - 1]
+        self.parameters = []
 
 
 class SCNLua:

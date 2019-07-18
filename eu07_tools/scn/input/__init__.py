@@ -119,8 +119,7 @@ class SCNIterativeLoader(Iterator):
     def _load_include(self):
         include = scnstruct.SCNInclude()
         include.path, *parameters = self._scanner.get_strings_before("end")
-        for p_value in parameters:
-            include.append_parameter_value(p_value)
+        include.parameters = parameters
 
         return include
 
