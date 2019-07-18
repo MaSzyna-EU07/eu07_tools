@@ -247,6 +247,7 @@ class SCNIterativeLoader(Iterator):
 
 
     def _load_node_track(self, name):
+        print(name)
         # TODO: Track loading
         subtype = self._scanner.read_string().lower()
 
@@ -275,12 +276,14 @@ class SCNIterativeLoader(Iterator):
         track.damage_flag = self._scanner.read_int()
         track.environment = self._scanner.read_string()
         track.visible = (self._scanner.read_string() == "vis")
-        track.material1 = self._scanner.read_string()
-        track.mapping_length = self._scanner.read_float()
-        track.material2 = self._scanner.read_string()
-        track.tex_param1 = self._scanner.read_string()
-        track.tex_param2 = self._scanner.read_string()
-        track.tex_param3 = self._scanner.read_string()
+
+        if track.visible:
+            track.material1 = self._scanner.read_string()
+            track.mapping_length = self._scanner.read_float()
+            track.material2 = self._scanner.read_string()
+            track.tex_param1 = self._scanner.read_string()
+            track.tex_param2 = self._scanner.read_string()
+            track.tex_param3 = self._scanner.read_string()
 
         track.segments[0].p1 = self._scanner.read_floats(3)
         track.segments[0].p1.roll = self._scanner.read_float()
