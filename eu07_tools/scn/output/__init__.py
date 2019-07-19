@@ -92,8 +92,52 @@ class SCNOutput:
         
         self._writer.write("enddynamic\n")
 
-        
+    def _dump_node_eventlauncher(self, launcher):
+        self._writer.write_string("eventlauncher")
+        self._writer.write_floats(launcher.location)
+        self._writer.write_float(launcher.rotation)
+        self._writer.write_string(launcher.key)
+        self._writer.write_float(launcher.delta_time)
+        self._writer.write_string(launcher.first_event_name)
+        self._writer.write_string(launcher.second_event_name)
+
+        if launcher.second_event_name == "condition":
+            self._writer.write_string(launcher.memcell_name)
+            self._writer.write_int(launcher.check_mask)
+
+        self._writer.write_string("end\n")
+
+    def _dump_node_lines(self, lines):
+        self._writer.write_string("lines")
+        self._generic_dump_lines(lines)
+
+    def _dump_node_lines(self, lines):
+        self._writer.write_string("line_loop")
+        self._generic_dump_lines(lines)
+
+    def _dump_node_lines(self, lines):
+        self._writer.write_string("line_strip")
+        self._generic_dump_lines(lines)
             
+    def _generic_dump_lines(self, lines):
+        self._writer.write_floats(lines.color)
+        self._writer.write_float(lines.thickness)
+
+        num_verts = len(lines.vertices)
+        for vertex_id, vertex in enumerate(lines.vertices):
+            self._writer.write_floats(vertex)
+
+            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendline\n" 
+            self._writer.write_string(endtag)
+
+    def _dump_node_memcell(self, memcell):
+        # TODO: Those parameters are incomplete - fix it
+        self._writer.write_string("memcell")
+        self._writer.write_floats(memcell.location)
+        self._writer.write_string(memcell.values[0])
+        self._writer.write_floats(memcell.values[1:])
+        self._writer.write_string(memcell.track_name)
+        self._writer.write_string("endmemcell")
 
     def _dump_origin(self, origin):
         self._writer.write_string("origin")

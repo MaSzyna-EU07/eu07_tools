@@ -211,7 +211,7 @@ class SCNIterativeLoader(Iterator):
         while True:
             token = self._scanner.read_string()
 
-            if token == "endlines":
+            if token == "endline":
                 break
             else:
                 vertex_co = [float(token)] + self._scanner.read_floats(2)
@@ -220,6 +220,7 @@ class SCNIterativeLoader(Iterator):
         return node
 
     def _load_node_memcell(self, name):
+        # TODO: Those parameters are incomplete - fix it
         memcell = scnstruct.SCNNodeMemcell(name)
         memcell.location = self._scanner.read_floats(3)
         memcell.values[0] = self._scanner.read_string()
