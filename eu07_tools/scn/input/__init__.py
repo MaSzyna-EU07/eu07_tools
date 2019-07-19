@@ -92,15 +92,13 @@ class IterativeLoader(Iterator):
 
         if token != "endcamera":
             camera.index = int(token)
-        else:
-            pass # TODO: Automatic camera indexing
 
         return camera
 
     def _load_config(self):
         config = eu07_tools.scn.create_element("config")
-        self._scanner.get_strings_before("endconfig")
-        return None
+        config.content = " ".join(self._scanner.get_strings_before("endconfig"))
+        return config
 
     def _load_description(self):
         description = eu07_tools.scn.create_element("description")
@@ -258,12 +256,12 @@ class IterativeLoader(Iterator):
         track.quality_flag = self._scanner.read_int()
         track.damage_flag = self._scanner.read_int()
         track.environment = self._scanner.read_string()
-        track.visible = (self._scanner.read_string() == "vis")
+        track.is_visible = (self._scanner.read_string() == "vis")
 
-        if track.visible:
-            track.material1 = self._scanner.read_string()
+        if track.is_visible:
+            track.map1 = self._scanner.read_string()
             track.mapping_length = self._scanner.read_float()
-            track.material2 = self._scanner.read_string()
+            track.map2 = self._scanner.read_string()
             track.tex_param1 = self._scanner.read_string()
             track.tex_param2 = self._scanner.read_string()
             track.tex_param3 = self._scanner.read_string()
@@ -330,7 +328,7 @@ class IterativeLoader(Iterator):
         traction.powersource_name = self._scanner.read_string()
         traction.nominal_voltage = self._scanner.read_float()
         traction.max_current = self._scanner.read_float()
-        traction.resistivity = self._scanner.read_float()
+        traction.resistance = self._scanner.read_float()
         traction.wire_material_type = self._scanner.read_string()
         traction.wire_thickness = self._scanner.read_float()
         traction.damage_flag = self._scanner.read_int()
@@ -341,10 +339,8 @@ class IterativeLoader(Iterator):
         traction.min_height = self._scanner.read_float()
         traction.segment_length = self._scanner.read_float()
         traction.wires_type = self._scanner.read_int()
-        
-        if traction.wires_type != 0:
-            traction.wire_offset = self._scanner.read_float()
-        traction.visible = (self._scanner.read_string() == "vis")
+        traction.wire_offset = self._scanner.read_float()
+        traction.is_visible = (self._scanner.read_string() == "vis")
         
         token = self._scanner.read_string()
 
@@ -392,8 +388,7 @@ class IterativeLoader(Iterator):
         map_ = token
 
         if token == "material":
-            # TODO: What to do with it
-            triangles.material.used = True
+            triangles.material.is_used = True
 
             while True:
                 token = self._scanner.read_string().lower()

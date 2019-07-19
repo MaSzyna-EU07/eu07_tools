@@ -128,7 +128,7 @@ class NodeTrack(Node):
         self.quality_flag = 0
         self.damage_flag = 0
         self.environment = "flat"
-        self.visible = True
+        self.is_visible = True
         self.map1 = "none"
         self.map2 = "none"
         self.mapping_length = 4
@@ -258,7 +258,7 @@ class NodeTraction(Node):
         self.powersource_name = "none"
         self.nominal_voltage = 0
         self.max_current = 0
-        self.resistivity = 0
+        self.resistance = 0
         self.wire_material_type = "Cu"
         self.wire_thickness = 1.0
         self.damage_flag = 0
@@ -270,7 +270,7 @@ class NodeTraction(Node):
         self.segment_length = 0
         self.wires_type = 1
         self.wire_offset = 0
-        self.visible = True
+        self.is_visible = True
         self.parallel_name = "none"
 
     @property
@@ -341,7 +341,7 @@ class NodeTriangles(Node):
 
 class _TrianglesMaterial:
     def __init__(self):
-        self.used = False
+        self.is_used = False
         self._ambient = ColorRGB((255, 255, 255))
         self._diffuse = ColorRGB((255, 255, 255))
         self._specular = ColorRGB((255, 255, 255))

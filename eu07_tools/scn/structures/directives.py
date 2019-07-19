@@ -37,7 +37,7 @@ class Camera:
 
 class Config:
     def __init__(self):
-        pass
+        self.content = ""
 
 
 class Description:

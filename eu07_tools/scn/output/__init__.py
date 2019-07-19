@@ -27,11 +27,12 @@ class SCNOutput:
             "node:dynamic": self._dump_node_dynamic,
             "node:eventlauncher": self._dump_node_eventlauncher,
             "node:lines": self._dump_node_lines,
-            "node:line_loop": self._dump_node_line_loop,
-            "node:line_strip": self._dump_node_line_strip,
+            "node:memcell": self._dump_node_memcell,
             "node:model": self._dump_node_model,
-            "node:tractionpowersource": self._dump_node_tractionpowersource,
             "node:sound": self._dump_node_sound,
+            "node:track": self._dump_node_track,
+            "node:traction": self._dump_node_traction,
+            "node:tractionpowersource": self._dump_node_tractionpowersource,
             "node:triangles": self._dump_node_triangles,
         }
 
@@ -43,6 +44,7 @@ class SCNOutput:
 
             if dump is not None:
                 dump(e)
+                self._writer.write_string("\n")
 
     def _dump_atmo(self, atmo):
         self._writer.write_string("atmo")
@@ -67,7 +69,7 @@ class SCNOutput:
         self._writer.write_string("endcamera\n")
 
     def _dump_config(self, config):
-        pass
+        self._writer.write_string(f"config {config.content} endconfig\n")
 
     def _dump_event(self, event):
         pass
@@ -83,6 +85,41 @@ class SCNOutput:
 
     def _dump_lua(self, lua):
         self._writer.write_string(f"lua {lua.path}\n")
+
+    def _dump_origin(self, origin):
+        self._writer.write_string("origin")
+        self._writer.write_floats(origin)
+        self._writer.write_string("\n")
+
+    def _dump_endorigin(self, endorigin):
+        self._writer.write_string("endorigin\n")
+
+    def _dump_rotate(self, rotate):
+        self._writer.write_string("rotate")
+        self._writer.write_floats(rotate)
+        self._writer.write_string("\n")
+
+    def _dump_sky(self, sky):
+        self._writer.write_string(f"sky {sky.model_path} endsky\n")
+
+    def _dump_time(self, time):
+        self._writer.write_string("time")
+        self._writer.write_string(time.initial_time)
+        self._writer.write_string(time.sunset_time)
+        self._writer.write_string(time.sunrise_time)
+        self._writer.write_string("endtime\n")
+
+    def _dump_trainset(self, trainset):
+        self._writer.write_string("trainset")
+        self._writer.write_string(trainset.timetable_path)
+        self._writer.write_string(trainset.track_name)
+        self._writer.write_float(trainset.offset)
+        self._writer.write_floats(trainset.velocity)
+        self._is_trainset_opened = True
+
+    def _dump_endtrainset(self, endtrainset):
+        self._writer.write_string("endtrainset\n")
+        self._is_trainset_opened = False
 
     def _dump_node(self, node):
         self._writer.write_string("node")
@@ -136,18 +173,14 @@ class SCNOutput:
         self._writer.write_string("end\n")
 
     def _dump_node_lines(self, lines):
-        self._writer.write_string("lines")
-        self._generic_dump_lines(lines)
+        if lines.subtype == "normal":
+            type_ = "lines"
+        elif lines.subtype == "loop":
+            type_ = "line_loop"
+        elif lines.subtype == "strip":
+            type_ = "line_strip"
 
-    def _dump_node_line_loop(self, lines):
-        self._writer.write_string("line_loop")
-        self._generic_dump_lines(lines)
-
-    def _dump_node_line_strip(self, lines):
-        self._writer.write_string("line_strip")
-        self._generic_dump_lines(lines)
-            
-    def _generic_dump_lines(self, lines):
+        self._writer.write_string(type_)
         self._writer.write_floats(lines.color)
         self._writer.write_float(lines.thickness)
 
@@ -185,6 +218,122 @@ class SCNOutput:
 
         self._writer.write_string("endmodel\n")
 
+    def _dump_node_sound(self, sound):
+        self._writer.write_string("sound")
+        self._writer.write_floats(sound.location)
+        self._writer.write_string(sound.path)
+        self._writer.write_string("endsound")
+
+    def _dump_node_track(self, track):
+        self._writer.write_string(track.subtype)
+        self._writer.write_float(track.length)
+        self._writer.write_float(track.width)
+        self._writer.write_float(track.friction)
+        self._writer.write_float(track.sound_distance)
+        self._writer.write_int(track.quality_flag)
+        self._writer.write_int(track.damage_flag)
+        self._writer.write_string(track.environment)
+        self._writer.write_string("vis\n" if track.is_visible else "unvis\n")
+
+        if track.is_visible:
+            self._writer.write_string(track.map1)
+            self._writer.write_float(track.mapping_length)
+            self._writer.write_string(track.map2)
+            self._writer.write_float(track.tex_param1)
+            self._writer.write_float(track.tex_param2)
+            self._writer.write_float(track.tex_param3)
+            self._writer.write_string("\n")
+
+        self._writer.write_floats(track.p1)
+        self._writer.write_float(track.p1_roll)
+        self._writer.write_string("\n")
+        self._writer.write_floats(track.cv1)
+        self._writer.write_string("\n")
+        self._writer.write_floats(track.cv2)
+        self._writer.write_string("\n")
+        self._writer.write_floats(track.p2)
+        self._writer.write_float(track.p2_roll)
+        self._writer.write_string("\n")
+        self._writer.write_float(track.radius1)
+        self._writer.write_string("\n")
+
+        if track.subtype in "switch cross tributary":
+            self._writer.write_floats(track.p3)
+            self._writer.write_float(track.p3_roll)
+            self._writer.write_string("\n")
+            self._writer.write_floats(track.cv3)
+            self._writer.write_string("\n")
+            self._writer.write_floats(track.cv4)
+            self._writer.write_string("\n")
+            self._writer.write_floats(track.p4)
+            self._writer.write_float(track.p4_roll)
+            self._writer.write_string("\n")
+            self._writer.write_float(track.radius2)
+            self._writer.write_string("\n")
+
+        if track.event0 != "none":
+            self._writer.write_string(f"event0 {track.event0}\n")
+        if track.event1 != "none":
+            self._writer.write_string(f"event1 {track.event1}\n")
+        if track.event2 != "none":
+            self._writer.write_string(f"event2 {track.event2}\n")
+        if track.eventall0 != "none":
+            self._writer.write_string(f"eventall0 {track.eventall0}\n")
+        if track.eventall1 != "none":
+            self._writer.write_string(f"eventall1 {track.eventall1}\n")
+        if track.eventall2 != "none":
+            self._writer.write_string(f"eventall2 {track.eventall2}\n")
+        if track.isolated != "none":
+            self._writer.write_string(f"isolated {track.isolated}\n")
+        if track.overhead != -1:
+            self._writer.write_int(f"overhead {track.overhead}\n")
+        if track.angle1 != 0:
+            self._writer.write_float(f"angle1 {track.angle1}\n")
+        if track.angle2 != 0:
+            self._writer.write_float(f"angle2 {track.angle2}\n")
+        if track.fouling1 != "none":
+            self._writer.write_string(f"fouling1 {track.fouling1}\n")
+        if track.fouling2 != "none":
+            self._writer.write_string(f"fouling2 {track.fouling2}\n")
+        if track.vradius != 0:
+            self._writer.write_float(f"vradius {track.vradius}\n")
+        if track.trackbed != "none":
+            self._writer.write_string(f"trackbed {track.trackbed}\n")
+        if track.railprofile != "none":
+            self._writer.write_string(f"railprofile {track.railprofile}\n")
+        
+        self._writer.write_string("endtrack\n")
+
+    def _dump_node_traction(self, traction):
+        self._writer.write_string("traction")
+        self._writer.write_string(traction.powersource_name)
+        self._writer.write_float(traction.nominal_voltage)
+        self._writer.write_float(traction.max_current)
+        self._writer.write_float(traction.resistance)
+        self._writer.write_string(traction.wire_material_type)
+        self._writer.write_float(traction.wire_thickness)
+        self._writer.write_int(traction.damage_flag)
+        self._writer.write_string("\n")
+        self._writer.write_floats(traction.p1)
+        self._writer.write_string("\n")
+        self._writer.write_floats(traction.p2)
+        self._writer.write_string("\n")
+        self._writer.write_floats(traction.p3)
+        self._writer.write_string("\n")
+        self._writer.write_floats(traction.p4)
+        self._writer.write_string("\n")
+        self._writer.write_float(traction.min_height)
+        self._writer.write_float(traction.segment_length)
+        self._writer.write_int(traction.wires_type)
+        self._writer.write_float(traction.wire_offset)
+
+        self._writer.write_string("vis\n" if traction.is_visible else "unvis\n")
+
+        if traction.parallel_name != "none":
+            self._writer.write_string(f"parallel {traction.parallel_name}\n")
+
+        self._writer.write_string("endtraction\n")
+
     def _dump_node_tractionpowersource(self, power_source):
         self._writer.write_string("tractionpowersource\n")
         self._writer.write_floats(power_source.location)
@@ -206,27 +355,17 @@ class SCNOutput:
 
         self._writer.write_string("end\n")
 
-
-    def _dump_node_sound(self, sound):
-        self._writer.write_string("sound")
-        self._writer.write_floats(sound.location)
-        self._writer.write_string(sound.path)
-        self._writer.write_string("endsound")
-
     def _dump_node_triangles(self, triangles):
-        self._writer.write_string("triangles")
-        self._generic_dump_triangles(triangles)
+        if triangles.subtype == "normal":
+            type_ = "triangles"
+        elif triangles.subtype == "fan":
+            type_ = "triangle_fan"
+        elif triangles.subtype == "strip":
+            type_ = "triangle_strip"
 
-    def _dump_node_triangle_strip(self, triangles):
-        self._writer.write_string("triangle_strip")
-        self._generic_dump_triangles(triangles)
+        self._writer.write_string(type_)
 
-    def _dump_node_triangle_fan(self, triangles):
-        self._writer.write_string("triangle_fan")
-        self._generic_dump_triangles(triangles)
-
-    def _generic_dump_triangles(self, triangles):
-        if triangles.material:
+        if triangles.material.is_used:
             self._writer.write_string("material")
             if triangles.material.ambient:
                 self._writer.write_string("ambient:")
@@ -248,39 +387,6 @@ class SCNOutput:
             endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendtri\n" 
             self._writer.write_string(endtag)
 
-    def _dump_origin(self, origin):
-        self._writer.write_string("origin")
-        self._writer.write_floats(origin)
-        self._writer.write_string("\n")
 
-    def _dump_endorigin(self, endorigin):
-        self._writer.write_string("endorigin\n")
-
-    def _dump_rotate(self, rotate):
-        self._writer.write_string("rotate")
-        self._writer.write_floats(rotate)
-        self._writer.write_string("\n")
-
-    def _dump_sky(self, sky):
-        self._writer.write_string(f"sky {sky.model_path} endsky\n")
-
-    def _dump_time(self, time):
-        self._writer.write_string("time")
-        self._writer.write_string(time.initial_time)
-        self._writer.write_string(time.sunset_time)
-        self._writer.write_string(time.sunrise_time)
-        self._writer.write_string("endtime\n")
-
-    def _dump_trainset(self, trainset):
-        self._writer.write_string("trainset")
-        self._writer.write_string(trainset.timetable_path)
-        self._writer.write_string(trainset.track_name)
-        self._writer.write_float(trainset.offset)
-        self._writer.write_floats(trainset.velocity)
-        self._is_trainset_opened = True
-
-    def _dump_endtrainset(self, endtrainset):
-        self._writer.write_string("endtrainset\n")
-        self._is_trainset_opened = False
 
     
