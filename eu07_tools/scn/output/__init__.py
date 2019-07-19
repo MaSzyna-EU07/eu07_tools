@@ -8,7 +8,31 @@ class SCNOutput:
     def __init__(self, file):
         self._writer = TextWriter(file)
         self._dumpers = {
-            "atmo": self._dump_atmo
+            "atmo": self._dump_atmo,
+            "camera": self._dump_camera,
+            "config": self._dump_config,
+            "event": self._dump_event,
+            "firstinit": self._dump_firstinit,
+            "include": self._dump_include,
+            "lua": self._dump_lua,
+            "node": self._dump_node,
+            "origin": self._dump_origin,
+            "endorigin": self._dump_endorigin,
+            "rotate": self._dump_rotate,
+            "trainset": self._dump_trainset,
+            "endtrainset": self._dump_endtrainset
+        }
+
+        self._node_dumpers = {
+            "node:dynamic": self._dump_node_dynamic,
+            "node:eventlauncher": self._dump_node_eventlauncher,
+            "node:lines": self._dump_node_lines,
+            "node:line_loop": self._dump_node_line_loop,
+            "node:line_strip": self._dump_node_line_strip,
+            "node:model": self._dump_node_model,
+            "node:tractionpowersource": self._dump_node_tractionpowersource,
+            "node:sound": self._dump_node_sound,
+            "node:triangles": self._dump_node_triangles,
         }
 
         self._is_trainset_opened = False
@@ -66,6 +90,10 @@ class SCNOutput:
         self._writer.write_float(node.min_distance)
         self._writer.write_string(node.name)
 
+        node_dump = self._node_dumpers.get(node.typename)
+        if node_dump is not None:
+            node_dump(node)
+
     def _dump_node_dynamic(self, dynamic):
         # TODO: Might be not good - ensure if parameters are in good order
         self._writer.write_string(dynamic.base_path)
@@ -90,7 +118,7 @@ class SCNOutput:
         if dynamic.destination != "none":
             self._writer.write_string(f"destination {dynamic.destination}")
         
-        self._writer.write("enddynamic\n")
+        self._writer.write_string("enddynamic\n")
 
     def _dump_node_eventlauncher(self, launcher):
         self._writer.write_string("eventlauncher")
@@ -111,11 +139,11 @@ class SCNOutput:
         self._writer.write_string("lines")
         self._generic_dump_lines(lines)
 
-    def _dump_node_lines(self, lines):
+    def _dump_node_line_loop(self, lines):
         self._writer.write_string("line_loop")
         self._generic_dump_lines(lines)
 
-    def _dump_node_lines(self, lines):
+    def _dump_node_line_strip(self, lines):
         self._writer.write_string("line_strip")
         self._generic_dump_lines(lines)
             
@@ -136,7 +164,7 @@ class SCNOutput:
         self._writer.write_string(memcell.values[0])
         self._writer.write_floats(memcell.values[1:])
         self._writer.write_string(memcell.track_name)
-        self._writer.write_string("endmemcell")
+        self._writer.write_string("endmemcell\n")
 
     def _dump_node_model(self, model):
         self._writer.write_string("model")
@@ -144,8 +172,19 @@ class SCNOutput:
         self._writer.write_float(model.rotation_y)
         self._writer.write_string(model.path)
         self._writer.write_string(model.map)
-        # TODO: lights
-        self._writer.write_string("endmodel")
+
+        if model.light_states:
+            self._writer.write_string("lights")
+            if model.light_states:
+                self._writer.write_floats(model.light_states)
+
+            if model.light_colors:
+                self._writer.write_string("lightcolors")
+                for color in model.light_colors:
+                    hexcolor = "".join(hex(int(x))[2:] for x in color)
+                    self._writer.write_string(hexcolor)
+
+        self._writer.write_string("endmodel\n")
 
     def _dump_node_tractionpowersource(self, power_source):
         self._writer.write_string("tractionpowersource\n")
@@ -166,7 +205,7 @@ class SCNOutput:
         if power_source.section:
             self._writer.write_string("section\n")
 
-        self._writer.write_string("end")
+        self._writer.write_string("end\n")
 
 
     def _dump_node_sound(self, sound):
@@ -233,7 +272,7 @@ class SCNOutput:
         self._writer.write_string(time.sunrise_time)
         self._writer.write_string("endtime\n")
 
-    def _dump_trainset(self, trainset)
+    def _dump_trainset(self, trainset):
         self._writer.write_string("trainset")
         self._writer.write_string(trainset.timetable_path)
         self._writer.write_string(trainset.track_name)

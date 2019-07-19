@@ -5,9 +5,9 @@ from eu07_tools.utils.input import TextScanner
 import eu07_tools.scn.structures as scnstruct
 
 def load(file):
-    return SCNIterativeLoader(file)
+    return IterativeLoader(file)
 
-class SCNIterativeLoader(Iterator):
+class IterativeLoader(Iterator):
     def __init__(self, file):
         self._scanner = TextScanner.from_file(file)
         self._iterator = self._load()
@@ -66,7 +66,7 @@ class SCNIterativeLoader(Iterator):
                     yield element
 
     def _load_atmo(self):
-        atmo = scnstruct.SCNAtmo()
+        atmo = scnstruct.Atmo()
         atmo.sky_color = self._scanner.read_floats(3)
         atmo.fog_start = self._scanner.read_float()
         atmo.fog_end = self._scanner.read_float()
@@ -84,7 +84,7 @@ class SCNIterativeLoader(Iterator):
 
 
     def _load_camera(self):
-        camera = scnstruct.SCNCamera()
+        camera = scnstruct.Camera()
         camera.location = self._scanner.read_floats(3)
         camera.rotation = self._scanner.read_floats(3)
 
@@ -112,10 +112,10 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_firstinit(self):
-        return scnstruct.SCNFirstInit()
+        return scnstruct.FirstInit()
 
     def _load_include(self):
-        include = scnstruct.SCNInclude()
+        include = scnstruct.Include()
         include.path, *parameters = self._scanner.get_strings_before("end")
         include.parameters = parameters
 
@@ -126,7 +126,7 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_lua(self):
-        lua = scnstruct.SCNLua()
+        lua = scnstruct.Lua()
         lua.path = self._scanner.read_string()
         return lua
 
@@ -146,7 +146,7 @@ class SCNIterativeLoader(Iterator):
             return node
 
     def _load_node_dynamic(self, name):
-        dynamic = scnstruct.SCNNodeDynamic(name)
+        dynamic = scnstruct.NodeDynamic(name)
         dynamic.base_path, dynamic.map, dynamic.mmd_path = self._scanner.read_strings(3)
 
         if not self._is_trainset_opened:
@@ -176,7 +176,7 @@ class SCNIterativeLoader(Iterator):
         return dynamic
 
     def _load_node_eventlauncher(self, name):
-        launcher = scnstruct.SCNNodeEventlauncher(name)
+        launcher = scnstruct.NodeEventlauncher(name)
         *launcher.location, launcher.radius = self._scanner.read_floats(4)
         launcher.key = self._scanner.read_string()
         launcher.delta_time = self._scanner.read_float()
@@ -192,17 +192,17 @@ class SCNIterativeLoader(Iterator):
 
     def _load_node_lines(self, name):
         return self._generic_load_lines(
-            scnstruct.SCNNodeLines(name)
+            scnstruct.NodeLines(name)
         )
 
     def _load_node_line_loop(self, name):
         return self._generic_load_lines(
-            scnstruct.SCNNodeLineLoop(name)
+            scnstruct.NodeLineLoop(name)
         )
 
     def _load_node_line_strip(self, name):
         return self._generic_load_lines(
-            scnstruct.SCNNodeLineStrip(name)
+            scnstruct.NodeLineStrip(name)
         )
 
     def _generic_load_lines(self, node):
@@ -220,8 +220,7 @@ class SCNIterativeLoader(Iterator):
         return node
 
     def _load_node_memcell(self, name):
-        # TODO: Those parameters are incomplete - fix it
-        memcell = scnstruct.SCNNodeMemcell(name)
+        memcell = scnstruct.NodeMemcell(name)
         memcell.location = self._scanner.read_floats(3)
         memcell.values[0] = self._scanner.read_string()
         memcell.values[1:] = self._scanner.read_floats(3)
@@ -230,16 +229,15 @@ class SCNIterativeLoader(Iterator):
         return memcell
 
     def _load_node_model(self, name):
-        model = scnstruct.SCNNodeModel(name)
+        model = scnstruct.NodeModel(name)
         *model.location, model.rotation_y = self._scanner.read_floats(4)
         model.path, model.map = self._scanner.read_strings(2)
 
-        model.light_states = [int(s) for s in self._scanner.get_strings_before("endmodel")]
-
+        #TODO: Lights
         return model
 
     def _load_node_sound(self, name):
-        sound = scnstruct.SCNNodeSound(name)
+        sound = scnstruct.NodeSound(name)
         sound.location = self._scanner.read_floats(3)
         sound.path = self._scanner.read_string()
         self._scanner.read_string()
@@ -251,21 +249,21 @@ class SCNIterativeLoader(Iterator):
         subtype = self._scanner.read_string().lower()
 
         if subtype == "normal":
-            track = scnstruct.SCNNodeTrackNormal(name)
+            track = scnstruct.NodeTrackNormal(name)
         elif subtype == "road":
-            track = scnstruct.SCNNodeTrackRoad(name)
+            track = scnstruct.NodeTrackRoad(name)
         elif subtype == "river":
-            track = scnstruct.SCNNodeTrackRiver(name)
+            track = scnstruct.NodeTrackRiver(name)
         elif subtype == "switch":
-            track = scnstruct.SCNNodeTrackSwitch(name)
+            track = scnstruct.NodeTrackSwitch(name)
         elif subtype == "cross":
-            track = scnstruct.SCNNodeTrackCross(name)
+            track = scnstruct.NodeTrackCross(name)
         elif subtype == "tributary":
-            track = scnstruct.SCNNodeTrackTributary(name)
+            track = scnstruct.NodeTrackTributary(name)
         elif subtype == "turn":
-            track = scnstruct.SCNNodeTrackTurn(name)
+            track = scnstruct.NodeTrackTurn(name)
         elif subtype == "table":
-            track = scnstruct.SCNNodeTrackTable(name)
+            track = scnstruct.NodeTrackTable(name)
 
         track.length = self._scanner.read_float()
         track.width = self._scanner.read_float()
@@ -342,7 +340,7 @@ class SCNIterativeLoader(Iterator):
         return track
 
     def _load_node_traction(self, name):
-        traction = scnstruct.SCNNodeTraction(name)
+        traction = scnstruct.NodeTraction(name)
 
         traction.powersource_name = self._scanner.read_string()
         traction.nominal_voltage = self._scanner.read_float()
@@ -371,7 +369,7 @@ class SCNIterativeLoader(Iterator):
         return traction
 
     def _load_node_tractionpowersource(self, name):
-        power_source = scnstruct.SCNNodeTractionPowerSource(name)
+        power_source = scnstruct.NodeTractionPowerSource(name)
         power_source.location = self._scanner.read_floats(3)
         power_source.nominal_voltage = self._scanner.read_float()
         power_source.voltage_frequency = self._scanner.read_float()
@@ -390,17 +388,17 @@ class SCNIterativeLoader(Iterator):
 
     def _load_node_triangles(self, name):
         return self._generic_load_triangles(
-            scnstruct.SCNNodeTriangles(name)
+            scnstruct.NodeTriangles(name)
         )
 
     def _load_node_triangle_strip(self, name):
         return self._generic_load_triangles(
-            scnstruct.SCNNodeTriangleStrip(name)
+            scnstruct.NodeTriangleStrip(name)
         )
 
     def _load_node_triangle_fan(self, name):
         return self._generic_load_triangles(
-            scnstruct.SCNNodeTriangleFan(name)
+            scnstruct.NodeTriangleFan(name)
         )
 
 
@@ -409,7 +407,7 @@ class SCNIterativeLoader(Iterator):
         map_ = token
 
         if token == "material":
-            node.material = scnstruct.SCNTrianglesMaterial()
+            node.material = scnstruct.TrianglesMaterial()
 
             while True:
                 token = self._scanner.read_string().lower()
@@ -436,17 +434,17 @@ class SCNIterativeLoader(Iterator):
 
     def _load_origin(self):
         vector = self._scanner.read_floats(3)
-        return scnstruct.SCNOrigin(vector)
+        return scnstruct.Origin(vector)
 
     def _load_endorigin(self):
-        return scnstruct.SCNEndOrigin()
+        return scnstruct.EndOrigin()
 
     def _load_rotate(self):
         vector = self._scanner.read_floats(3)
-        return scnstruct.SCNRotate(vector)
+        return scnstruct.Rotate(vector)
 
     def _load_sky(self):
-        sky = scnstruct.SCNSky()
+        sky = scnstruct.Sky()
         sky.model_path, __ = self._scanner.read_strings(2)
         return sky
 
@@ -455,14 +453,14 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_time(self):
-        time = scnstruct.SCNTime()
+        time = scnstruct.Time()
         time.inital_time, time.sunset_time, time.sunrise_time = self._scanner.read_strings(3)
         return time
 
     def _load_trainset(self):
         self._is_trainset_opened = True
 
-        trainset = scnstruct.SCNTrainset()
+        trainset = scnstruct.Trainset()
 
         trainset.timetable_path, trainset.track_name = self._scanner.read_strings(2)
         trainset.offset, trainset.velocity = self._scanner.read_floats(2)
@@ -470,4 +468,4 @@ class SCNIterativeLoader(Iterator):
 
     def _load_endtrainset(self):
         self._is_trainset_opened = False
-        return scnstruct.SCNEndTrainset()
+        return scnstruct.EndTrainset()
