@@ -11,6 +11,7 @@ class IterativeLoader(Iterator):
     def __init__(self, file):
         self._scanner = TextScanner.from_file(file)
         self._iterator = self._load()
+        self._file = file
 
         self._element_loaders = {
             "atmo": self._load_atmo,
@@ -43,13 +44,17 @@ class IterativeLoader(Iterator):
             "triangle_fan": self._load_node_triangle_fan,
         }
 
+        self._is_trainset_open = False
+
 
     @classmethod
     def from_file(cls, file):
         return cls(file)
 
     def __next__(self):
+        # TODO: Syntax error report
         return next(self._iterator)
+            
 
     def _load(self):
         while True:
@@ -106,7 +111,7 @@ class IterativeLoader(Iterator):
         return None
 
     def _load_event(self):
-        camera = eu07_tools.scn.create_element("event")
+        event = eu07_tools.scn.create_element("event")
         self._scanner.get_strings_before("endevent")
         return None
 
@@ -130,6 +135,46 @@ class IterativeLoader(Iterator):
         lua.path = self._scanner.read_string()
         return lua
 
+    def _load_origin(self):
+        origin = eu07_tools.scn.create_element("origin")
+        origin.vector = self._scanner.read_floats(3)
+        return origin
+
+    def _load_endorigin(self):
+        return eu07_tools.scn.create_element("endorigin")
+
+    def _load_rotate(self):
+        rotate = eu07_tools.scn.create_element("rotate")
+        rotate.vector = self._scanner.read_floats(3)
+        return rotate
+
+    def _load_sky(self):
+        sky = eu07_tools.scn.create_element("sky")
+        sky.model_path, __ = self._scanner.read_strings(2)
+        return sky
+
+    def _load_test(self):
+        self._scanner.get_strings_before("endtest")
+        return None
+
+    def _load_time(self):
+        time = eu07_tools.scn.create_element("time")
+        time.inital_time, time.sunset_time, time.sunrise_time = self._scanner.read_strings(3)
+        return time
+
+    def _load_trainset(self):
+        trainset = eu07_tools.scn.create_element("trainset")
+
+        trainset.timetable_path, trainset.track_name = self._scanner.read_strings(2)
+        trainset.offset, trainset.velocity = self._scanner.read_floats(2)
+        self._is_trainset_open = True
+        #TODO: Assignments
+        return trainset
+
+    def _load_endtrainset(self):
+        self._is_trainset_open = False
+        return eu07_tools.scn.create_element("endtrainset")
+
     def _load_node(self):
         max_distance = self._scanner.read_float()
         min_distance = self._scanner.read_float()
@@ -149,29 +194,33 @@ class IterativeLoader(Iterator):
         dynamic = eu07_tools.scn.create_element("node:dynamic", name)
         dynamic.base_path, dynamic.map, dynamic.mmd_path = self._scanner.read_strings(3)
 
-        if not self._is_trainset_opened:
+        if not self._is_trainset_open:
             dynamic.track_name = self._scanner.read_string()
 
         dynamic.offset = self._scanner.read_float()
         dynamic.driver_type = self._scanner.read_string()
          # TODO: Might be not good - ensure if parameters are in good order
 
-        if self._is_trainset_opened:
-            dynamic.coupling = self._scanner.read_string()
-        else:
-            dynamic.coupling = "3"
+        
+        dynamic.coupling = (
+            self._scanner.read_string() if self._is_trainset_open
+            else "3"
+        )
 
-        dynamic.velocity = self._scanner.read_float()
+        if not self._is_trainset_open:
+            dynamic.velocity = self._scanner.read_float()
     
         dynamic.load_count = self._scanner.read_float()
 
-        if dynamic.load_count > 0:
+        if dynamic.load_count:
             dynamic.load_type = self._scanner.read_string()
 
-        token = self._scanner.read_string()
-
-        if token != "enddynamic":
-            __, dynamic.destination, __ = self._scanner.read_strings(3)
+            if dynamic.load_type == "enddynamic":
+                dynamic.load_count = 0
+                dynamic.load_type = "none"
+                return dynamic
+        
+        self._scanner.read_string()
 
         return dynamic
 
@@ -262,9 +311,9 @@ class IterativeLoader(Iterator):
             track.map1 = self._scanner.read_string()
             track.mapping_length = self._scanner.read_float()
             track.map2 = self._scanner.read_string()
-            track.tex_param1 = self._scanner.read_string()
-            track.tex_param2 = self._scanner.read_string()
-            track.tex_param3 = self._scanner.read_string()
+            track.tex_param1 = self._scanner.read_float()
+            track.tex_param2 = self._scanner.read_float()
+            track.tex_param3 = self._scanner.read_float()
 
         track.p1 = self._scanner.read_floats(3)
         track.p1_roll = self._scanner.read_float()
@@ -413,42 +462,4 @@ class IterativeLoader(Iterator):
         
         return triangles
 
-    def _load_origin(self):
-        origin = eu07_tools.scn.create_element("origin")
-        origin.vector = self._scanner.read_floats(3)
-        return origin
-
-    def _load_endorigin(self):
-        return eu07_tools.scn.create_element("endorigin")
-
-    def _load_rotate(self):
-        rotate = eu07_tools.scn.create_element("rotate")
-        rotate.vector = self._scanner.read_floats(3)
-        return rotate
-
-    def _load_sky(self):
-        sky = eu07_tools.scn.create_element("sky")
-        sky.model_path, __ = self._scanner.read_strings(2)
-        return sky
-
-    def _load_test(self):
-        self._scanner.get_strings_before("endtest")
-        return None
-
-    def _load_time(self):
-        time = eu07_tools.scn.create_element("time")
-        time.inital_time, time.sunset_time, time.sunrise_time = self._scanner.read_strings(3)
-        return time
-
-    def _load_trainset(self):
-        trainset = eu07_tools.scn.create_element("trainset")
-
-        trainset.timetable_path, trainset.track_name = self._scanner.read_strings(2)
-        trainset.offset, trainset.velocity = self._scanner.read_floats(2)
-        self._is_trainset_opened = True
-        #TODO: Assignments
-        return trainset
-
-    def _load_endtrainset(self):
-        self._is_trainset_opened = False
-        return eu07_tools.scn.create_element("endtrainset")
+    

@@ -15,15 +15,13 @@ class SCNOutput:
             "firstinit": self._dump_firstinit,
             "include": self._dump_include,
             "lua": self._dump_lua,
-            "node": self._dump_node,
             "origin": self._dump_origin,
             "endorigin": self._dump_endorigin,
             "rotate": self._dump_rotate,
+            "sky": self._dump_sky,
+            "time": self._dump_time,
             "trainset": self._dump_trainset,
-            "endtrainset": self._dump_endtrainset
-        }
-
-        self._node_dumpers = {
+            "endtrainset": self._dump_endtrainset,
             "node:dynamic": self._dump_node_dynamic,
             "node:eventlauncher": self._dump_node_eventlauncher,
             "node:lines": self._dump_node_lines,
@@ -40,8 +38,9 @@ class SCNOutput:
 
     def dump_from_iterable(self, elements):
         for e in elements:
-            dump = self._dumpers.get(e.typename)
+            dump = self._dumpers.get(e.type)
 
+            print(e, dump.__name__)
             if dump is not None:
                 dump(e)
                 self._writer.write_string("\n")
@@ -88,7 +87,7 @@ class SCNOutput:
 
     def _dump_origin(self, origin):
         self._writer.write_string("origin")
-        self._writer.write_floats(origin)
+        self._writer.write_floats(origin.vector)
         self._writer.write_string("\n")
 
     def _dump_endorigin(self, endorigin):
@@ -96,7 +95,7 @@ class SCNOutput:
 
     def _dump_rotate(self, rotate):
         self._writer.write_string("rotate")
-        self._writer.write_floats(rotate)
+        self._writer.write_floats(rotate.vector)
         self._writer.write_string("\n")
 
     def _dump_sky(self, sky):
@@ -114,25 +113,23 @@ class SCNOutput:
         self._writer.write_string(trainset.timetable_path)
         self._writer.write_string(trainset.track_name)
         self._writer.write_float(trainset.offset)
-        self._writer.write_floats(trainset.velocity)
+        self._writer.write_float(trainset.velocity)
         self._is_trainset_opened = True
 
     def _dump_endtrainset(self, endtrainset):
         self._writer.write_string("endtrainset\n")
         self._is_trainset_opened = False
 
-    def _dump_node(self, node):
+    def _node_dump_header(self, node):
         self._writer.write_string("node")
         self._writer.write_float(node.max_distance)
         self._writer.write_float(node.min_distance)
         self._writer.write_string(node.name)
 
-        node_dump = self._node_dumpers.get(node.typename)
-        if node_dump is not None:
-            node_dump(node)
-
     def _dump_node_dynamic(self, dynamic):
         # TODO: Might be not good - ensure if parameters are in good order
+        self._node_dump_header(dynamic)
+        self._writer.write_string("dynamic")
         self._writer.write_string(dynamic.base_path)
         self._writer.write_string(dynamic.map)
         self._writer.write_string(dynamic.mmd_path)
@@ -158,6 +155,7 @@ class SCNOutput:
         self._writer.write_string("enddynamic\n")
 
     def _dump_node_eventlauncher(self, launcher):
+        self._node_dump_header(launcher)
         self._writer.write_string("eventlauncher")
         self._writer.write_floats(launcher.location)
         self._writer.write_float(launcher.rotation)
@@ -173,6 +171,7 @@ class SCNOutput:
         self._writer.write_string("end\n")
 
     def _dump_node_lines(self, lines):
+        self._node_dump_header(lines)
         if lines.subtype == "normal":
             type_ = "lines"
         elif lines.subtype == "loop":
@@ -192,6 +191,7 @@ class SCNOutput:
             self._writer.write_string(endtag)
 
     def _dump_node_memcell(self, memcell):
+        self._node_dump_header(memcell)
         self._writer.write_string("memcell")
         self._writer.write_floats(memcell.location)
         self._writer.write_string(memcell.values[0])
@@ -200,6 +200,7 @@ class SCNOutput:
         self._writer.write_string("endmemcell\n")
 
     def _dump_node_model(self, model):
+        self._node_dump_header(model)
         self._writer.write_string("model")
         self._writer.write_floats(model.location)
         self._writer.write_float(model.rotation_y)
@@ -219,12 +220,14 @@ class SCNOutput:
         self._writer.write_string("endmodel\n")
 
     def _dump_node_sound(self, sound):
+        self._node_dump_header(sound)
         self._writer.write_string("sound")
         self._writer.write_floats(sound.location)
         self._writer.write_string(sound.path)
         self._writer.write_string("endsound")
 
     def _dump_node_track(self, track):
+        self._node_dump_header(track)
         self._writer.write_string(track.subtype)
         self._writer.write_float(track.length)
         self._writer.write_float(track.width)
@@ -286,17 +289,25 @@ class SCNOutput:
         if track.isolated != "none":
             self._writer.write_string(f"isolated {track.isolated}\n")
         if track.overhead != -1:
-            self._writer.write_int(f"overhead {track.overhead}\n")
+            self._writer.write_string("overhead")
+            self._writer.write_int(track.overhead)
+            self._writer.write_string("\n")
         if track.angle1 != 0:
-            self._writer.write_float(f"angle1 {track.angle1}\n")
+            self._writer.write_string("angle1")
+            self._writer.write_float(track.angle1)
+            self._writer.write_string("\n")
         if track.angle2 != 0:
-            self._writer.write_float(f"angle2 {track.angle2}\n")
+            self._writer.write_string("angle2")
+            self._writer.write_float(track.angle2)
+            self._writer.write_string("\n")
         if track.fouling1 != "none":
             self._writer.write_string(f"fouling1 {track.fouling1}\n")
         if track.fouling2 != "none":
             self._writer.write_string(f"fouling2 {track.fouling2}\n")
         if track.vradius != 0:
-            self._writer.write_float(f"vradius {track.vradius}\n")
+            self._writer.write_string("vradius")
+            self._writer.write_float(track.vradius)
+            self._writer.write_string("\n")
         if track.trackbed != "none":
             self._writer.write_string(f"trackbed {track.trackbed}\n")
         if track.railprofile != "none":
@@ -305,6 +316,7 @@ class SCNOutput:
         self._writer.write_string("endtrack\n")
 
     def _dump_node_traction(self, traction):
+        self._node_dump_header(traction)
         self._writer.write_string("traction")
         self._writer.write_string(traction.powersource_name)
         self._writer.write_float(traction.nominal_voltage)
@@ -335,6 +347,7 @@ class SCNOutput:
         self._writer.write_string("endtraction\n")
 
     def _dump_node_tractionpowersource(self, power_source):
+        self._node_dump_header(power_source)
         self._writer.write_string("tractionpowersource\n")
         self._writer.write_floats(power_source.location)
         self._writer.write_string("\n")
@@ -356,6 +369,7 @@ class SCNOutput:
         self._writer.write_string("end\n")
 
     def _dump_node_triangles(self, triangles):
+        self._node_dump_header(triangles)
         if triangles.subtype == "normal":
             type_ = "triangles"
         elif triangles.subtype == "fan":

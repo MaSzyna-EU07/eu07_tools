@@ -10,6 +10,22 @@ class Atmo:
         self._fog_color = ColorRGB((153, 179, 204))
         self.overcast = 0.1
 
+    @property
+    def sky_color(self):
+        return self._sky_color
+
+    @sky_color.setter
+    def sky_color(self, sky_color):
+        self._sky_color = ColorRGB(sky_color)
+
+    @property
+    def fog_color(self):
+        return self._fog_color
+
+    @fog_color.setter
+    def fog_color(self, fog_color):
+        self._fog_color = ColorRGB(fog_color)
+
 
 class Camera:
     def __init__(self):
@@ -37,12 +53,13 @@ class Camera:
 
 class Config:
     def __init__(self):
+        self.type = "config"
         self.content = ""
 
 
 class Description:
     def __init__(self):
-        pass
+        self.type = "description"
 
 
 class Event:

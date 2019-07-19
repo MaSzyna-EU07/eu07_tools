@@ -4,7 +4,7 @@ class TextWriter:
         self._separator = separator
 
     def write_int(self, value):
-        self._file.write(value + self._separator)
+        self._file.write(str(value) + self._separator)
 
     def write_float(self, value):
         formatted = str(round(value, 5))
