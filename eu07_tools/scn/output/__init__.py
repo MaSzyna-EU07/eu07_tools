@@ -131,13 +131,84 @@ class SCNOutput:
             self._writer.write_string(endtag)
 
     def _dump_node_memcell(self, memcell):
-        # TODO: Those parameters are incomplete - fix it
         self._writer.write_string("memcell")
         self._writer.write_floats(memcell.location)
         self._writer.write_string(memcell.values[0])
         self._writer.write_floats(memcell.values[1:])
         self._writer.write_string(memcell.track_name)
         self._writer.write_string("endmemcell")
+
+    def _dump_node_model(self, model):
+        self._writer.write_string("model")
+        self._writer.write_floats(model.location)
+        self._writer.write_float(model.rotation_y)
+        self._writer.write_string(model.path)
+        self._writer.write_string(model.map)
+        # TODO: lights
+        self._writer.write_string("endmodel")
+
+    def _dump_node_tractionpowersource(self, power_source):
+        self._writer.write_string("tractionpowersource\n")
+        self._writer.write_floats(power_source.location)
+        self._writer.write_string("\n")
+        self._writer.write_float(power_source.nominal_voltage)
+        self._writer.write_floats(power_source.voltage_frequency)
+        self._writer.write_float(power_source.internal_resistance)
+        self._writer.write_float(power_source.max_output_current)
+        self._writer.write_string("\n")
+        self._writer.write_float(power_source.fast_fuse_timeout)
+        self._writer.write_int(power_source.fast_fuse_repetition)
+        self._writer.write_float(power_source.slow_fuse_timeout)
+        self._writer.write_string("\n")
+
+        if power_source.recuperation:
+            self._writer.write_string("recuperation\n")
+        if power_source.section:
+            self._writer.write_string("section\n")
+
+        self._writer.write_string("end")
+
+
+    def _dump_node_sound(self, sound):
+        self._writer.write_string("sound")
+        self._writer.write_floats(sound.location)
+        self._writer.write_string(sound.path)
+        self._writer.write_string("endsound")
+
+    def _dump_node_triangles(self, triangles):
+        self._writer.write_string("triangles")
+        self._generic_dump_triangles(triangles)
+
+    def _dump_node_triangle_strip(self, triangles):
+        self._writer.write_string("triangle_strip")
+        self._generic_dump_triangles(triangles)
+
+    def _dump_node_triangle_fan(self, triangles):
+        self._writer.write_string("triangle_fan")
+        self._generic_dump_triangles(triangles)
+
+    def _generic_dump_triangles(self, triangles):
+        if triangles.material:
+            self._writer.write_string("material")
+            if triangles.material.ambient:
+                self._writer.write_string("ambient:")
+                self._writer.write_floats(triangles.material.ambient)
+            if triangles.material.diffuse:
+                self._writer.write_string("diffuse:")
+                self._writer.write_floats(triangles.material.diffuse)
+            if triangles.material.specular:
+                self._writer.write_string("specular:")
+                self._writer.write_floats(triangles.material.specular)
+            self._writer.write_string("endmaterial")
+        
+        self._writer.write_string(triangles.map + "\n")
+
+        num_verts = len(triangles.vertices)
+        for vertex_id, vertex in enumerate(triangles.vertices):
+            self._writer.write_floats(vertex)
+
+            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendtri\n" 
+            self._writer.write_string(endtag)
 
     def _dump_origin(self, origin):
         self._writer.write_string("origin")
