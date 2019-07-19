@@ -32,7 +32,7 @@ _typename_to_class = {
 }
 
 def create_element(typename, name=""):
-    cls = _typename_to_class.get(typename)
+    cls = _typename_to_class.get(typename.lower())
     if not cls:
         raise ValueError("Unknown SCN element type name")
     

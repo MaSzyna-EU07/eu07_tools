@@ -2,7 +2,7 @@ from collections.abc import Iterator
 import functools
 
 from eu07_tools.utils.input import TextScanner
-import eu07_tools.scn.structures as scnstruct
+import eu07_tools.scn
 
 def load(file):
     return IterativeLoader(file)
@@ -66,7 +66,7 @@ class IterativeLoader(Iterator):
                     yield element
 
     def _load_atmo(self):
-        atmo = scnstruct.Atmo()
+        atmo = eu07_tools.scn.create_element("atmo")
         atmo.sky_color = self._scanner.read_floats(3)
         atmo.fog_start = self._scanner.read_float()
         atmo.fog_end = self._scanner.read_float()
@@ -84,7 +84,7 @@ class IterativeLoader(Iterator):
 
 
     def _load_camera(self):
-        camera = scnstruct.Camera()
+        camera = eu07_tools.scn.create_element("atmo")
         camera.location = self._scanner.read_floats(3)
         camera.rotation = self._scanner.read_floats(3)
 
@@ -98,35 +98,37 @@ class IterativeLoader(Iterator):
         return camera
 
     def _load_config(self):
-        # TODO: Config loading
+        config = eu07_tools.scn.create_element("config")
         self._scanner.get_strings_before("endconfig")
         return None
 
     def _load_description(self):
+        description = eu07_tools.scn.create_element("description")
         self._scanner.get_strings_before("enddescription")
         return None
 
     def _load_event(self):
+        camera = eu07_tools.scn.create_element("event")
         self._scanner.get_strings_before("endevent")
-
         return None
 
     def _load_firstinit(self):
-        return scnstruct.FirstInit()
+        return eu07_tools.scn.create_element("firstinit")
 
     def _load_include(self):
-        include = scnstruct.Include()
+        include = eu07_tools.scn.create_element("include")
         include.path, *parameters = self._scanner.get_strings_before("end")
         include.parameters = parameters
 
         return include
 
     def _load_light(self):
+        light = eu07_tools.scn.create_element("include")
         self._scanner.get_strings_before("endlight")
         return None
 
     def _load_lua(self):
-        lua = scnstruct.Lua()
+        lua = eu07_tools.scn.create_element("lua")
         lua.path = self._scanner.read_string()
         return lua
 
@@ -146,7 +148,7 @@ class IterativeLoader(Iterator):
             return node
 
     def _load_node_dynamic(self, name):
-        dynamic = scnstruct.NodeDynamic(name)
+        dynamic = eu07_tools.scn.create_element("node:dynamic", name)
         dynamic.base_path, dynamic.map, dynamic.mmd_path = self._scanner.read_strings(3)
 
         if not self._is_trainset_opened:
@@ -176,7 +178,7 @@ class IterativeLoader(Iterator):
         return dynamic
 
     def _load_node_eventlauncher(self, name):
-        launcher = scnstruct.NodeEventlauncher(name)
+        launcher = eu07_tools.scn.create_element("node:eventlauncher", name)
         *launcher.location, launcher.radius = self._scanner.read_floats(4)
         launcher.key = self._scanner.read_string()
         launcher.delta_time = self._scanner.read_float()
@@ -191,22 +193,22 @@ class IterativeLoader(Iterator):
         return launcher
 
     def _load_node_lines(self, name):
-        return self._generic_load_lines(
-            scnstruct.NodeLines(name)
-        )
+        lines = self._generic_load_lines(name)
+        return lines
 
     def _load_node_line_loop(self, name):
-        return self._generic_load_lines(
-            scnstruct.NodeLineLoop(name)
-        )
+        lines = self._generic_load_lines(name)
+        lines.subtype = "loop"
+        return lines
 
     def _load_node_line_strip(self, name):
-        return self._generic_load_lines(
-            scnstruct.NodeLineStrip(name)
-        )
-
-    def _generic_load_lines(self, node):
-        *node.color, node.thickness = self._scanner.read_floats(4)
+        lines = self._generic_load_lines(name)
+        lines.subtype = "strip"
+        return lines
+        
+    def _generic_load_lines(self, name):
+        lines = eu07_tools.scn.create_element("node:lines", name)
+        *lines.color, lines.thickness = self._scanner.read_floats(4)
 
         while True:
             token = self._scanner.read_string()
@@ -215,12 +217,12 @@ class IterativeLoader(Iterator):
                 break
             else:
                 vertex_co = [float(token)] + self._scanner.read_floats(2)
-                node.add_vertex(vertex_co)
+                lines.points.new(vertex_co)
 
-        return node
+        return lines
 
     def _load_node_memcell(self, name):
-        memcell = scnstruct.NodeMemcell(name)
+        memcell = eu07_tools.scn.create_element("node:memcell", name)
         memcell.location = self._scanner.read_floats(3)
         memcell.values[0] = self._scanner.read_string()
         memcell.values[1:] = self._scanner.read_floats(3)
@@ -229,7 +231,7 @@ class IterativeLoader(Iterator):
         return memcell
 
     def _load_node_model(self, name):
-        model = scnstruct.NodeModel(name)
+        model = eu07_tools.scn.create_element("node:model", name)
         *model.location, model.rotation_y = self._scanner.read_floats(4)
         model.path, model.map = self._scanner.read_strings(2)
 
@@ -237,7 +239,7 @@ class IterativeLoader(Iterator):
         return model
 
     def _load_node_sound(self, name):
-        sound = scnstruct.NodeSound(name)
+        sound = eu07_tools.scn.create_element("node:sound", name)
         sound.location = self._scanner.read_floats(3)
         sound.path = self._scanner.read_string()
         self._scanner.read_string()
@@ -246,24 +248,8 @@ class IterativeLoader(Iterator):
 
 
     def _load_node_track(self, name):
-        subtype = self._scanner.read_string().lower()
-
-        if subtype == "normal":
-            track = scnstruct.NodeTrackNormal(name)
-        elif subtype == "road":
-            track = scnstruct.NodeTrackRoad(name)
-        elif subtype == "river":
-            track = scnstruct.NodeTrackRiver(name)
-        elif subtype == "switch":
-            track = scnstruct.NodeTrackSwitch(name)
-        elif subtype == "cross":
-            track = scnstruct.NodeTrackCross(name)
-        elif subtype == "tributary":
-            track = scnstruct.NodeTrackTributary(name)
-        elif subtype == "turn":
-            track = scnstruct.NodeTrackTurn(name)
-        elif subtype == "table":
-            track = scnstruct.NodeTrackTable(name)
+        track = eu07_tools.scn.create_element("node:track", name)
+        track.subtype = self._scanner.read_string().lower()
 
         track.length = self._scanner.read_float()
         track.width = self._scanner.read_float()
@@ -282,25 +268,24 @@ class IterativeLoader(Iterator):
             track.tex_param2 = self._scanner.read_string()
             track.tex_param3 = self._scanner.read_string()
 
-        track.segments[0].p1 = self._scanner.read_floats(3)
-        track.segments[0].p1.roll = self._scanner.read_float()
-        track.segments[0].cv1 = self._scanner.read_floats(3)
-        track.segments[0].cv2 = self._scanner.read_floats(3)
-        track.segments[0].p2 = self._scanner.read_floats(3)
-        track.segments[0].p2.roll = self._scanner.read_float()
-        track.segments[0].radius = self._scanner.read_float()
+        track.p1 = self._scanner.read_floats(3)
+        track.p1_roll = self._scanner.read_float()
+        track.cv1 = self._scanner.read_floats(3)
+        track.cv2 = self._scanner.read_floats(3)
+        track.p2 = self._scanner.read_floats(3)
+        track.p2_roll = self._scanner.read_float()
+        track.radius1 = self._scanner.read_float()
 
-        is_junction = (subtype in "switch cross tributary")
+        is_junction = (track.subtype in "switch cross tributary")
         if is_junction:
-            track.segments[1].p1 = self._scanner.read_floats(3)
-            track.segments[1].p1.roll = self._scanner.read_float()
-            track.segments[1].cv1 = self._scanner.read_floats(3)
-            track.segments[1].cv2 = self._scanner.read_floats(3)
-            track.segments[1].p2 = self._scanner.read_floats(3)
-            track.segments[1].p2.roll = self._scanner.read_float()
-            track.segments[1].radius = self._scanner.read_float()
+            track.p3 = self._scanner.read_floats(3)
+            track.p3_roll = self._scanner.read_float()
+            track.cv3 = self._scanner.read_floats(3)
+            track.cv4 = self._scanner.read_floats(3)
+            track.p4 = self._scanner.read_floats(3)
+            track.p4_roll = self._scanner.read_float()
+            track.radius2 = self._scanner.read_float()
 
-        
         while True:
             token = self._scanner.read_string()
 
@@ -340,7 +325,7 @@ class IterativeLoader(Iterator):
         return track
 
     def _load_node_traction(self, name):
-        traction = scnstruct.NodeTraction(name)
+        traction = eu07_tools.scn.create_element("node:traction", name)
 
         traction.powersource_name = self._scanner.read_string()
         traction.nominal_voltage = self._scanner.read_float()
@@ -369,7 +354,7 @@ class IterativeLoader(Iterator):
         return traction
 
     def _load_node_tractionpowersource(self, name):
-        power_source = scnstruct.NodeTractionPowerSource(name)
+        power_source = eu07_tools.scn.create_element("node:tractionpowersource", name)
         power_source.location = self._scanner.read_floats(3)
         power_source.nominal_voltage = self._scanner.read_float()
         power_source.voltage_frequency = self._scanner.read_float()
@@ -387,27 +372,28 @@ class IterativeLoader(Iterator):
         return power_source
 
     def _load_node_triangles(self, name):
-        return self._generic_load_triangles(
-            scnstruct.NodeTriangles(name)
-        )
+        triangles = self._generic_load_triangles(name)
+        return triangles
 
     def _load_node_triangle_strip(self, name):
-        return self._generic_load_triangles(
-            scnstruct.NodeTriangleStrip(name)
-        )
+        triangles = self._generic_load_triangles(name)
+        triangles.subtype = "strip"
+        return triangles
 
     def _load_node_triangle_fan(self, name):
-        return self._generic_load_triangles(
-            scnstruct.NodeTriangleFan(name)
-        )
+        triangles = self._generic_load_triangles(name)
+        triangles.subtype = "fan"
+        return triangles
 
 
-    def _generic_load_triangles(self, node):
+    def _generic_load_triangles(self, name):
+        triangles = eu07_tools.scn.create_element("node:triangles", name)
         token = self._scanner.read_string().lower()
         map_ = token
 
         if token == "material":
-            node.material = scnstruct.TrianglesMaterial()
+            # TODO: What to do with it
+            triangles.material.used = True
 
             while True:
                 token = self._scanner.read_string().lower()
@@ -415,57 +401,59 @@ class IterativeLoader(Iterator):
                 if token == "endmaterial":
                     break
                 elif "ambient" in token:
-                    node.material.ambient = self._scanner.read_floats(3)
+                    triangles.material.ambient = self._scanner.read_floats(3)
                 elif "diffuse" in token:
-                    node.material.diffuse = self._scanner.read_floats(3)
+                    triangles.material.diffuse = self._scanner.read_floats(3)
                 elif "specular" in token:
-                    node.material.specular = self._scanner.read_floats(3)
+                    triangles.material.specular = self._scanner.read_floats(3)
 
             map_ = self._scanner.read_string()
             
-        node.map = map_
+        triangles.map = map_
 
         vertex_endmark = ""
         while vertex_endmark != "endtri":
-            node.vertices.new(self._scanner.read_floats(8))
+            triangles.vertices.new(self._scanner.read_floats(8))
             vertex_endmark = self._scanner.read_string()
         
-        return node
+        return triangles
 
     def _load_origin(self):
-        vector = self._scanner.read_floats(3)
-        return scnstruct.Origin(vector)
+        origin = eu07_tools.scn.create_element("origin")
+        origin.vector = self._scanner.read_floats(3)
+        return origin
 
     def _load_endorigin(self):
-        return scnstruct.EndOrigin()
+        return eu07_tools.scn.create_element("endorigin")
 
     def _load_rotate(self):
-        vector = self._scanner.read_floats(3)
-        return scnstruct.Rotate(vector)
+        rotate = eu07_tools.scn.create_element("rotate")
+        rotate.vector = self._scanner.read_floats(3)
+        return rotate
 
     def _load_sky(self):
-        sky = scnstruct.Sky()
+        sky = eu07_tools.scn.create_element("sky")
         sky.model_path, __ = self._scanner.read_strings(2)
         return sky
 
     def _load_test(self):
-        list(self._scanner.get_strings_before("endtest"))
+        self._scanner.get_strings_before("endtest")
         return None
 
     def _load_time(self):
-        time = scnstruct.Time()
+        time = eu07_tools.scn.create_element("time")
         time.inital_time, time.sunset_time, time.sunrise_time = self._scanner.read_strings(3)
         return time
 
     def _load_trainset(self):
-        self._is_trainset_opened = True
-
-        trainset = scnstruct.Trainset()
+        trainset = eu07_tools.scn.create_element("trainset")
 
         trainset.timetable_path, trainset.track_name = self._scanner.read_strings(2)
         trainset.offset, trainset.velocity = self._scanner.read_floats(2)
+        self._is_trainset_opened = True
+        #TODO: Assignments
         return trainset
 
     def _load_endtrainset(self):
         self._is_trainset_opened = False
-        return scnstruct.EndTrainset()
+        return eu07_tools.scn.create_element("endtrainset")

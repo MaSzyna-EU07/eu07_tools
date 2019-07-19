@@ -2,7 +2,7 @@ from eu07_tools.utils.structures import VectorXYZ, ColorRGB, Vertex3D, FactorySe
 
 class Node:
     def __init__(self, name):
-        self.typename = ""
+        self.type = ""
         self.name = ""
         self.max_distance = -1
         self.min_distance = 0
@@ -11,7 +11,7 @@ class Node:
 class NodeDynamic(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:dynamic"
+        self.type = "node:dynamic"
         self.base_path = "none"
         self.map = "none"
         self.mmd_path = "none"
@@ -28,7 +28,7 @@ class NodeDynamic(Node):
 class NodeEventlauncher(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:eventlauncher"
+        self.type = "node:eventlauncher"
         self._location = VectorXYZ((0, 0, 0))
         self.radius = -1
         self.key = "none"
@@ -50,7 +50,7 @@ class NodeEventlauncher(Node):
 class NodeLines(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:lines"
+        self.type = "node:lines"
         self.subtype = "normal"
         self._color = ColorRGB((0, 0, 0))
         self.thickness = 1.0
@@ -84,13 +84,13 @@ class NodeMemcell(Node):
 class NodeModel(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:model"
+        self.type = "node:model"
         self._location = VectorXYZ((0, 0, 0))
         self.rotation_y = 0
         self.path = ""
         self.map = ""
         self.light_states = []
-        self.light_colors = FactorySequence(ColorRGB)
+        self.light_colors = []
 
     @property
     def location(self):
@@ -103,7 +103,7 @@ class NodeModel(Node):
 class NodeSound(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:sound"
+        self.type = "node:sound"
         self._location = VectorXYZ((0, 0, 0))
         self.path = ""
 
@@ -119,7 +119,7 @@ class NodeSound(Node):
 class NodeTrack(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:track"
+        self.type = "node:track"
         self._subtype = "normal"
         self.length = 0
         self.width = 1.435
@@ -254,7 +254,7 @@ class NodeTrack(Node):
 class NodeTraction(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:traction"
+        self.type = "node:traction"
         self.powersource_name = "none"
         self.nominal_voltage = 0
         self.max_current = 0
@@ -309,7 +309,7 @@ class NodeTraction(Node):
 class NodeTractionPowerSource(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:tractionpowersource"
+        self.type = "node:tractionpowersource"
         self._location = VectorXYZ((0, 0, 0))
         self.nominal_voltage = 0
         self.voltage_frequency = 0
@@ -333,21 +333,18 @@ class NodeTractionPowerSource(Node):
 class NodeTriangles(Node):
     def __init__(self, name):
         super().__init__(name)
-        self.typename = "node:triangles"
+        self.type = "node:triangles"
         self.subtype = "normal"
-        self.vertices = FactorySequence(Vertex3D, [
-            Vertex3D((0, 0, 0, 0, 0, 0, 0, 0)),
-            Vertex3D((0, 0, 0, 0, 0, 0, 0, 0)),
-            Vertex3D((0, 0, 0, 0, 0, 0, 0, 0)),
-        ])
+        self.vertices = FactorySequence(Vertex3D)
         self.map = "none"
-        self.material = None
+        self.material = _TrianglesMaterial()
 
-class TrianglesMaterial:
+class _TrianglesMaterial:
     def __init__(self):
-        self._ambient = None
-        self._diffuse = None
-        self._specular = None
+        self.used = False
+        self._ambient = ColorRGB((255, 255, 255))
+        self._diffuse = ColorRGB((255, 255, 255))
+        self._specular = ColorRGB((255, 255, 255))
 
     @property
     def ambient(self):

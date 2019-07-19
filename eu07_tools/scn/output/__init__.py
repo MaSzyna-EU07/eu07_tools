@@ -181,8 +181,7 @@ class SCNOutput:
             if model.light_colors:
                 self._writer.write_string("lightcolors")
                 for color in model.light_colors:
-                    hexcolor = "".join(hex(int(x))[2:] for x in color)
-                    self._writer.write_string(hexcolor)
+                    self._writer.write_string(color)
 
         self._writer.write_string("endmodel\n")
 

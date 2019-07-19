@@ -3,7 +3,7 @@ from eu07_tools.utils.structures import VectorXYZ, ColorRGB, Vertex3D, FactorySe
 
 class Atmo:
     def __init__(self):
-        self.typename = "atmo"
+        self.type = "atmo"
         self._sky_color = ColorRGB((255, 255, 255))
         self.fog_start = 1700
         self.fog_end = 2000
@@ -13,7 +13,7 @@ class Atmo:
 
 class Camera:
     def __init__(self):
-        self.typename = "camera"
+        self.type = "camera"
         self._location = VectorXYZ((0, 0, 0))
         self._rotation = VectorXYZ((0, 0, 0))
         self.index = -1
@@ -48,7 +48,7 @@ class Description:
 class Event:
     def __init__(self, name):
         self.name = "name"
-        self.typename = "event"
+        self.type = "event"
         self.subtype = "multiple"
         self.delay = 0
         self.node_name = "none"
@@ -56,12 +56,12 @@ class Event:
 
 class FirstInit:
     def __init__(self):
-        self.typename = "firstinit"
+        self.type = "firstinit"
 
 
 class Include:
     def __init__(self):
-        self.typename = "include"
+        self.type = "include"
         self.path = ""
         self.parameters = []
 
@@ -73,35 +73,51 @@ class Light:
 
 class Lua:
     def __init__(self):
-        self.typename = "lua"
+        self.type = "lua"
         self.path = ""
 
 
-class Origin(VectorXYZ):
-    def __init__(self, values):
-        super().__init__(values)
-        self.typename = "origin"
+class Origin:
+    def __init__(self):
+        self.type = "origin"
+        self._vector = VectorXYZ((0, 0, 0))
+    
+    @property
+    def vector(self):
+        return self._vector
+
+    @vector.setter
+    def vector(self, vector):
+        self._vector = vector
 
 class EndOrigin:
     def __init__(self):
-        self.typename = "endorigin"
+        self.type = "endorigin"
 
 
-class Rotate(VectorXYZ):
+class Rotate:
     def __init__(self, values):
-        super().__init__(values)
-        self.typename = "rotate"
+        self.type = "rotate"
+        self._vector = VectorXYZ((0, 0, 0))
+    
+    @property
+    def vector(self):
+        return self._vector
+
+    @vector.setter
+    def vector(self, vector):
+        self._vector = vector
 
 
 class Sky:
     def __init__(self):
-        self.typename = "sky"
+        self.type = "sky"
         self.model_path = ""
 
 
 class Time:
     def __init__(self):
-        self.typename = "time"
+        self.type = "time"
         self.initial_time = ""
         self.sunset_time = ""
         self.sunrise_time = ""
@@ -109,12 +125,13 @@ class Time:
 
 class Trainset:
     def __init__(self):
-        self.typename = "trainset"
+        self.type = "trainset"
         self.timetable_path = "rozklad"
         self.track_name = "none"
         self.offset = 0
         self.velocity = 0
+        self.assignment = {}
 
 class EndTrainset:
     def __init__(self):
-        self.typename = "endtrainset"
+        self.type = "endtrainset"
