@@ -24,9 +24,26 @@ class SCNAtmo:
 class SCNCamera:
     def __init__(self):
         self.typename = "camera"
-        self._position = VectorXYZ((0, 0, 0))
+        self._location = VectorXYZ((0, 0, 0))
         self._rotation = VectorXYZ((0, 0, 0))
         self.index = -1
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, location):
+        self._location = VectorXYZ(location)
+
+    @property
+    def rotation(self):
+        return self._rotation
+
+    @rotation.setter
+    def rotation(self, rotation):
+        self._rotation = VectorXYZ(rotation)
+
 
 class SCNFirstInit:
     def __init__(self):

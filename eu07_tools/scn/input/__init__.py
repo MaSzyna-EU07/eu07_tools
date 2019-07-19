@@ -85,7 +85,7 @@ class SCNIterativeLoader(Iterator):
 
     def _load_camera(self):
         camera = scnstruct.SCNCamera()
-        camera.position = self._scanner.read_floats(3)
+        camera.location = self._scanner.read_floats(3)
         camera.rotation = self._scanner.read_floats(3)
 
         token = self._scanner.read_string()
@@ -107,8 +107,6 @@ class SCNIterativeLoader(Iterator):
         return None
 
     def _load_event(self):
-        
-
         self._scanner.get_strings_before("endevent")
 
         return None
@@ -156,12 +154,15 @@ class SCNIterativeLoader(Iterator):
 
         dynamic.offset = self._scanner.read_float()
         dynamic.driver_type = self._scanner.read_string()
+         # TODO: Might be not good - ensure if parameters are in good order
 
         if self._is_trainset_opened:
             dynamic.coupling = self._scanner.read_string()
         else:
-            dynamic.initial_velocity = self._scanner.read_float()
-        
+            dynamic.coupling = "3"
+
+        dynamic.velocity = self._scanner.read_float()
+    
         dynamic.load_count = self._scanner.read_float()
 
         if dynamic.load_count > 0:

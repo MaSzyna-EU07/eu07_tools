@@ -1,7 +1,7 @@
 from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB, ColorRGBA, FactorySequence, TypedSequenceWrapper
 from .asset_searcher import AssetSearcher
 from .input import TextScanner, BinaryScanner
-from .output import BinaryWriter
+from .output import BinaryWriter, TextWriter
 
 from pathlib import Path
 
