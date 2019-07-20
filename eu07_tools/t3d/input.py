@@ -110,7 +110,7 @@ class T3DInput:
         elif value == "true":
             return 1
         else:
-            return value
+            return float(value)
 
     def _load_geometry(self, submodel):
         self._scanner.read_string()

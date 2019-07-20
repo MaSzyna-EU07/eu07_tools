@@ -87,7 +87,7 @@ class IterativeLoader(Iterator):
 
         if token != "endatmo":
             atmo.overcast = float(token)
-            self._scanner.read_string()
+            self._scanner.read_string() # endtag
 
         return atmo
 
@@ -101,6 +101,7 @@ class IterativeLoader(Iterator):
 
         if token != "endcamera":
             camera.index = int(token)
+            self._scanner.read_string() # endtag
 
         return camera
 
@@ -164,6 +165,7 @@ class IterativeLoader(Iterator):
     def _load_time(self):
         time = eu07_tools.scn.create_element("time")
         time.inital_time, time.sunset_time, time.sunrise_time = self._scanner.read_strings(3)
+        self._scanner.read_string() # endtag
         return time
 
     def _load_trainset(self):
@@ -202,9 +204,7 @@ class IterativeLoader(Iterator):
             dynamic.track_name = self._scanner.read_string()
 
         dynamic.offset = self._scanner.read_float()
-        dynamic.driver_type = self._scanner.read_string()
-         # TODO: Might be not good - ensure if parameters are in good order
-
+        dynamic.driver_type = self._scanner.read_string().lower()
         
         dynamic.coupling = (
             self._scanner.read_string() if self._is_trainset_open
@@ -224,7 +224,7 @@ class IterativeLoader(Iterator):
                 dynamic.load_type = "none"
                 return dynamic
         
-        self._scanner.read_string()
+        self._scanner.read_string() # endtag
 
         return dynamic
 
@@ -278,6 +278,8 @@ class IterativeLoader(Iterator):
         memcell.values[0] = self._scanner.read_string()
         memcell.values[1:] = self._scanner.read_floats(3)
         memcell.track_name = self._scanner.read_string()
+        self._scanner.get_strings_before("memcell")
+
 
         return memcell
 
@@ -285,15 +287,17 @@ class IterativeLoader(Iterator):
         model = eu07_tools.scn.create_element("node:model", name)
         *model.location, model.rotation_y = self._scanner.read_floats(4)
         model.path, model.map = self._scanner.read_strings(2)
+        # TODO: Lights
+        self._scanner.get_strings_before("endmodel")
 
-        #TODO: Lights
+        
         return model
 
     def _load_node_sound(self, name):
         sound = eu07_tools.scn.create_element("node:sound", name)
         sound.location = self._scanner.read_floats(3)
         sound.path = self._scanner.read_string()
-        self._scanner.read_string()
+        self._scanner.read_string() # endtag
 
         return sound
 
@@ -308,8 +312,8 @@ class IterativeLoader(Iterator):
         track.sound_distance = self._scanner.read_float()
         track.quality_flag = self._scanner.read_int()
         track.damage_flag = self._scanner.read_int()
-        track.environment = self._scanner.read_string()
-        track.is_visible = (self._scanner.read_string() == "vis")
+        track.environment = self._scanner.read_string().lower()
+        track.is_visible = (self._scanner.read_string().lower() == "vis")
 
         if track.is_visible:
             track.map1 = self._scanner.read_string()
@@ -382,7 +386,7 @@ class IterativeLoader(Iterator):
         traction.nominal_voltage = self._scanner.read_float()
         traction.max_current = self._scanner.read_float()
         traction.resistance = self._scanner.read_float()
-        traction.wire_material_type = self._scanner.read_string()
+        traction.wire_material_type = self._scanner.read_string().lower()
         traction.wire_thickness = self._scanner.read_float()
         traction.damage_flag = self._scanner.read_int()
         traction.p1 = self._scanner.read_floats(3)
@@ -393,12 +397,13 @@ class IterativeLoader(Iterator):
         traction.segment_length = self._scanner.read_float()
         traction.wires_type = self._scanner.read_int()
         traction.wire_offset = self._scanner.read_float()
-        traction.is_visible = (self._scanner.read_string() == "vis")
+        traction.is_visible = (self._scanner.read_string().lower() == "vis")
         
         token = self._scanner.read_string()
 
         if token == "parallel":
             traction.parallel_name = self._scanner.read_string()
+            self._scanner.read_string() # endtag
 
         return traction
 
@@ -413,7 +418,7 @@ class IterativeLoader(Iterator):
         power_source.fast_fuse_repetition = self._scanner.read_int()
         power_source.slow_fuse_timeout = self._scanner.read_float()
 
-        optional = list(self._scanner.get_strings_before("end"))
+        optional = [x.lower() for x in self._scanner.get_strings_before("end")]
 
         power_source.recuperation = ("recuperation" in optional)
         power_source.section = ("section" in optional)
@@ -437,10 +442,10 @@ class IterativeLoader(Iterator):
 
     def _generic_load_triangles(self, name):
         triangles = eu07_tools.scn.create_element("node:triangles", name)
-        token = self._scanner.read_string().lower()
+        token = self._scanner.read_string()
         map_ = token
 
-        if token == "material":
+        if token.lower() == "material":
             triangles.material.is_used = True
 
             while True:

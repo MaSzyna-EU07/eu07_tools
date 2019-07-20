@@ -101,6 +101,8 @@ class T3DOutput:
         elif key_lower in "parent name":
             if " " in value:
                 self._writer.write_string(f"\"{value}\"")
+            else:
+                self._writer.write_string(value)
 
         elif key_lower in "type anim map numverts":
             self._writer.write_string(value)
