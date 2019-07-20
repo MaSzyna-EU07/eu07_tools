@@ -25,96 +25,50 @@ class T3DInput:
                 yield eu07_tools.t3d.create_include(path)
 
     def _load_submodel(self, parent_name):
-        __, type_ = self._scanner.read_strings(2)
-        __, name = self._scanner.read_strings(2)
+        type_ = self._read_property()
+        name = self._read_property()
 
         submodel = eu07_tools.t3d.create_submodel(type_, name)
 
         submodel.parent_name = parent_name
-        __, submodel.anim = self._scanner.read_strings(2)
+        submodel.anim = self._read_property()
 
         if submodel.type == "Mesh":
-            self._scanner.read_string()
-            submodel.ambient_color = self._scanner.read_floats(3)
-
-            self._scanner.read_string()
-            submodel.diffuse_color = self._scanner.read_floats(3)
-
-            self._scanner.read_string()
-            submodel.specular_color = self._scanner.read_floats(3)
-
-            submodel.selfillum = self._read_selfillum()
-
-            __, wire = self._scanner.read_strings(2)
-            submodel.wire = (wire == "true") 
-
-            self._scanner.read_string()
-            submodel.wire_size = self._scanner.read_float()
-
-            self._scanner.read_string()
-            submodel.opacity = self._scanner.read_float()
-
-            __, submodel.map = self._scanner.read_strings(2)
+            submodel.ambient_color = self._read_property()
+            submodel.diffuse_color = self._read_property()
+            submodel.specular_color = self._read_property()
+            submodel.selfillum = self._read_property()
+            submodel.wire = self._read_property()
+            submodel.wire_size = self._read_property()
+            submodel.opacity = self._read_property()
+            submodel.map = self._read_property()
 
         elif submodel.type == "FreeSpotLight":
-            self._scanner.read_string()
-            submodel.diffuse_color = self._scanner.read_floats(3)
-
-            submodel.selfillum = self._read_selfillum()
-
-            self._scanner.read_string()
-            submodel.near_atten_start = self._scanner.read_float()
-            
-            self._scanner.read_string()
-            submodel.near_atten_end = self._scanner.read_float()
-
-            __, use_near_atten = self._scanner.read_strings(2)
-            submodel.use_near_atten = (use_near_atten == "true") 
-            
-            self._scanner.read_string()
-            submodel.far_atten_decay_type = self._scanner.read_int()
-
-            self._scanner.read_string()
-            submodel.far_decay_radius = self._scanner.read_float()
-
-            self._scanner.read_string()
-            submodel.falloff_angle = self._scanner.read_float()
-           
-            self._scanner.read_string()
-            submodel.hotspot_angle = self._scanner.read_float()
+            submodel.diffuse_color = self._read_property()
+            submodel.selfillum = self._read_property()
+            submodel.near_atten_start = self._read_property()
+            submodel.near_atten_end = self._read_property()
+            submodel.use_near_atten = self._read_property()
+            submodel.far_atten_decay_type = self._read_property()
+            submodel.far_decay_radius = self._read_property()
+            submodel.falloff_angle = self._read_property()
+            submodel.hotspot_angle = self._read_property()
 
         elif submodel.type == "Stars":
-            self._scanner.read_string()
-            submodel.diffuse_color = self._scanner.read_floats(3)
+            submodel.diffuse_color = self._read_property()
+            submodel.selfillum = self._read_property()
 
-            submodel.selfillum = self._read_selfillum()
-
-        self._scanner.read_string()
-        submodel.max_distance = self._scanner.read_float()
-
-        self._scanner.read_string()
-        submodel.min_distance = self._scanner.read_float()
-
-        self._scanner.read_string()
-        submodel.transform = self._scanner.read_floats(16)
+        submodel.max_distance = self._read_property()
+        submodel.min_distance = self._read_property()
+        submodel.transform = self._read_property()
 
         if submodel.type in "Stars Mesh":
             self._load_geometry(submodel)
 
         return submodel
 
-    def _read_selfillum(self):
-        __, value = self._scanner.read_strings(2)
-        if value == "false":
-            return 0
-        elif value == "true":
-            return 1
-        else:
-            return float(value)
-
     def _load_geometry(self, submodel):
-        self._scanner.read_string()
-        num_total_verts = self._scanner.read_int()
+        num_total_verts = self._read_property()
         
         num_loaded_verts = 0
         MAX_UNIT_SIZE = 3
@@ -130,8 +84,8 @@ class T3DInput:
             num_loaded_verts += unit_size
 
             unit_flag = self._scanner.read_int()
-            vertex_size = 8 if unit_flag == -1 else 5
 
+            vertex_size = 8 if unit_flag == -1 else 5
             vertices = [self._scanner.read_floats(vertex_size) for _ in range(unit_size)]
 
             if submodel.type == "Mesh":
@@ -139,5 +93,39 @@ class T3DInput:
             elif submodel.type == "Stars":
                 for vertex in vertices:
                     submodel.stars.new(vertex[:3], vertex[3])
+
+    def _read_property(self):
+        propname = self._scanner.read_string().lower().rstrip(":")
+
+        if propname in ("ambient", "diffuse", "specular"):
+            value = self._scanner.read_floats(3)
+
+        elif propname in ("transform",):
+            value = self._scanner.read_floats(16)
+
+        elif propname in ("usenearatten", "wire"):
+            value = (self._scanner.read_string() == "true")
+
+        elif propname in ("selfillum",):
+            token = self._scanner.read_string()
+            if token == "false":
+                value = 0
+            elif token == "true":
+                value = 1
+            else:
+                value = float(token)
+
+        elif propname in ("numverts", "farattendecaytype"):
+            value = self._scanner.read_int()
+
+        elif propname in ("parent", "name", "map", "anim", "type"):
+            value = self._scanner.read_string()
+
+        else:
+            value = self._scanner.read_float()
+
+        return value
+
+    
 
             
