@@ -3,7 +3,7 @@ from eu07_tools.utils.structures import VectorXYZ, ColorRGB, Vertex3D, FactorySe
 class Node:
     def __init__(self, name):
         self.type = ""
-        self.name = ""
+        self.name = "none"
         self.max_distance = -1
         self.min_distance = 0
 

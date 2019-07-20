@@ -4,8 +4,8 @@ class TextScanner:
         return cls(file)
 
     def __init__(self, file):
-        tokens = Tokenizer().tokenize_file(file)
-        self._accessor = TokensAccessor(tokens) 
+        self._tokenizer = Tokenizer()
+        self._accessor = TokensAccessor(self._tokenizer.tokenize_file(file)) 
 
     def read_string(self):
         return self._accessor.get_token()
@@ -27,6 +27,10 @@ class TextScanner:
 
     def get_strings_before(self, endmark):
         return list(self._accessor.get_tokens_before(endmark))
+
+    @property
+    def line_number(self):
+        return self._tokenizer.line_no
 
 
 # Ugly legacy code written long time ago, might be refactored later,

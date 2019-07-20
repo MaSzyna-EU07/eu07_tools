@@ -52,12 +52,7 @@ class IterativeLoader(Iterator):
         return cls(file)
 
     def __next__(self):
-        try:
-            return next(self._iterator)
-        except StopIteration:
-            return
-        except:
-            raise ValueError(f"Bad syntax in file {self._file.name} in line {self._scanner.current_line_number}")
+        return next(self._iterator)
             
 
     def _load(self):
@@ -278,8 +273,7 @@ class IterativeLoader(Iterator):
         memcell.values[0] = self._scanner.read_string()
         memcell.values[1:] = self._scanner.read_floats(3)
         memcell.track_name = self._scanner.read_string()
-        self._scanner.get_strings_before("memcell")
-
+        self._scanner.read_string()
 
         return memcell
 
@@ -288,8 +282,6 @@ class IterativeLoader(Iterator):
         *model.location, model.rotation_y = self._scanner.read_floats(4)
         model.path, model.map = self._scanner.read_strings(2)
         # TODO: Lights
-        self._scanner.get_strings_before("endmodel")
-
         
         return model
 

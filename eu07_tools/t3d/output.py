@@ -48,6 +48,7 @@ class T3DOutput:
         elif submodel.type == "Stars":
             self._write_property("Diffuse", submodel.diffuse_color)
             self._write_property("SelfIllum", submodel.selfillum)
+            self._write_property("NumVerts", len(submodel.stars))
 
             num_groups = math.ceil(len(submodel.stars) / 3) 
 
@@ -67,6 +68,7 @@ class T3DOutput:
         self._write_property("Transform", submodel.transform)
 
         if submodel.type == "Mesh":
+            self._write_property("NumVerts", submodel.num_verts)
             for triangle in submodel.triangles:
                 self._writer.write_int(triangle.smooth)
                 self._writer.write_string("\n")
@@ -104,7 +106,7 @@ class T3DOutput:
             else:
                 self._writer.write_string(value)
 
-        elif key_lower in "type anim map numverts":
+        elif key_lower in "type anim map":
             self._writer.write_string(value)
 
         else:

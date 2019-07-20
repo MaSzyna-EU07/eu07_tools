@@ -137,6 +137,7 @@ class SCNOutput:
             self._writer.write_string(dynamic.track_name)
 
         self._writer.write_float(dynamic.offset)
+        self._writer.write_string(dynamic.driver_type)
 
         if self._is_trainset_opened:
             self._writer.write_string(dynamic.coupling)
@@ -147,9 +148,6 @@ class SCNOutput:
 
         if dynamic.load_count > 0:
             self._writer.write_string(dynamic.load_type)
-
-        if dynamic.destination != "none":
-            self._writer.write_string(f"destination {dynamic.destination}")
         
         self._writer.write_string("enddynamic\n")
 
@@ -391,13 +389,13 @@ class SCNOutput:
                 self._writer.write_floats(triangles.material.specular)
             self._writer.write_string("endmaterial")
         
-        self._writer.write_string(triangles.map + "\n\n")
+        self._writer.write_string(triangles.map + "\n")
 
         num_verts = len(triangles.vertices)
         for vertex_id, vertex in enumerate(triangles.vertices):
             self._writer.write_floats(vertex)
 
-            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendtri\n" 
+            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendtri\n\n" 
             self._writer.write_string(endtag)
 
 
