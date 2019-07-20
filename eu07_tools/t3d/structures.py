@@ -61,7 +61,7 @@ class T3DSubmodel(T3DElement):
 class T3DMeshSubmodel(T3DSubmodel):
     def __init__(self, name):
         super().__init__(name)   
-        self.submodel_type = "Mesh"
+        self.type = "Mesh"
         self._ambient_color = ColorRGB((255, 255, 255)) 
         self._specular_color = ColorRGB((255, 255, 255))
         self.wire = False
@@ -115,7 +115,7 @@ class T3DTriangle:
 class T3DFreeSpotLightSubmodel(T3DSubmodel):
     def __init__(self, name):
         super().__init__(name)
-        self.submodel_type = "FreeSpotLight"
+        self.type = "FreeSpotLight"
         self.near_atten_start = 40.0
         self.near_atten_end = 0.0
         self.use_near_atten = False
@@ -128,7 +128,7 @@ class T3DFreeSpotLightSubmodel(T3DSubmodel):
 class T3DStarsSubmodel(T3DSubmodel):
     def __init__(self, name):
         super().__init__(name)
-        self.submodel_type = "Stars"
+        self.type = "Stars"
         self.stars = FactorySequence(T3DStar)
 
     @property

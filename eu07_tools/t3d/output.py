@@ -2,7 +2,7 @@ import math
 
 from eu07_tools.utils import TextWriter
 
-def dump(self, elements, file):
+def dump(elements, file):
     T3DOutput(file).dump(elements)
 
 class T3DOutput:
@@ -20,7 +20,7 @@ class T3DOutput:
     def _dump_submodel(self, submodel):
         self._writer.write_string(f"//{'-' * 81}\n")
         self._write_property("Parent", submodel.parent_name)
-        self._write_property("Type", submodel.submodel_type)
+        self._write_property("Type", submodel.type)
         self._write_property("Name", submodel.name)
         self._write_property("Anim", submodel.anim)
 
@@ -33,14 +33,6 @@ class T3DOutput:
             self._write_property("WireSize", submodel.wire_size)
             self._write_property("Opacity", submodel.opacity)
             self._write_property("Map", submodel.map)
-
-            for triangle in submodel.triangles:
-                self._writer.write_int(triangle.smooth)
-                self._writer.write_string("\n")
-
-                for vertex in triangle.vertices:
-                    self._writer.write_floats(vertex)
-                    self._writer.write_string("\n")
             
         elif submodel.type == "FreeSpotLight":
             self._write_property("Diffuse", submodel.diffuse_color)
@@ -54,6 +46,9 @@ class T3DOutput:
             self._write_property("HotspotAngle", submodel.hotspot_angle)
 
         elif submodel.type == "Stars":
+            self._write_property("Diffuse", submodel.diffuse_color)
+            self._write_property("SelfIllum", submodel.selfillum)
+
             num_groups = math.ceil(len(submodel.stars) / 3) 
 
             for group_id in range(num_groups):
@@ -64,7 +59,23 @@ class T3DOutput:
                     self._writer.write_floats(star.location)
                     self._writer.write_floats([star.bin_color, 0])
                     self._writer.write_string("\n")
+                
+                self._writer.write_string("\n")
 
+        self._write_property("MaxDistance", submodel.max_distance)
+        self._write_property("MinDistance", submodel.min_distance)
+        self._write_property("Transform", submodel.transform)
+
+        if submodel.type == "Mesh":
+            for triangle in submodel.triangles:
+                self._writer.write_int(triangle.smooth)
+                self._writer.write_string("\n")
+
+                for vertex in triangle.vertices:
+                    self._writer.write_floats(vertex)
+                    self._writer.write_string("\n")
+
+                self._writer.write_string("\n")
 
     def _write_property(self, key, value):
         self._writer.write_string(f"{key}:")
@@ -74,7 +85,7 @@ class T3DOutput:
             self._writer.write_floats(value)
 
         elif key_lower in "transform":
-            self._writer.write_string("\t")
+            self._writer.write_string("\n\t")
             self._writer.write_floats(value[:4])
             self._writer.write_string("\n\t")
             self._writer.write_floats(value[4:8])
@@ -96,3 +107,5 @@ class T3DOutput:
 
         else:
             self._writer.write_int(value)
+
+        self._writer.write_string("\n")

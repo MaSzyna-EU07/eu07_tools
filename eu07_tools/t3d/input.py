@@ -9,7 +9,7 @@ def load(file):
 
 class T3DInput:
     def __init__(self, file):
-        self._scanner = TextScanner(file)
+        self._scanner = TextScanner.from_file(file)
         
     def load(self):
         while True:
@@ -33,28 +33,17 @@ class T3DInput:
         submodel.parent_name = parent_name
         __, submodel.anim = self._scanner.read_strings(2)
 
-        self._scanner.read_string()
-        submodel.diffuse_color = self._scanner.read_strings(3)
-
-        self._scanner.read_string()
-        submodel.selfillum = self._scanner.read_float()
-
-        self._scanner.read_string()
-        submodel.max_distance = self._scanner.read_float()
-
-        self._scanner.read_string()
-        submodel.min_distance = self._scanner.read_float()
-
-        self._scanner.read_string()
-        submodel.transform = self._scanner.read_floats(16)
-
         if submodel.type == "Mesh":
+            self._scanner.read_string()
+            submodel.ambient_color = self._scanner.read_floats(3)
 
             self._scanner.read_string()
-            submodel.ambient_color = self._scanner.read_strings(3)
+            submodel.diffuse_color = self._scanner.read_floats(3)
 
             self._scanner.read_string()
-            submodel.specular_color = self._scanner.read_strings(3)
+            submodel.specular_color = self._scanner.read_floats(3)
+
+            submodel.selfillum = self._read_selfillum()
 
             __, wire = self._scanner.read_strings(2)
             submodel.wire = (wire == "true") 
@@ -67,9 +56,12 @@ class T3DInput:
 
             __, submodel.map = self._scanner.read_strings(2)
 
-            self._load_geometry(submodel)
-
         elif submodel.type == "FreeSpotLight":
+            self._scanner.read_string()
+            submodel.diffuse_color = self._scanner.read_floats(3)
+
+            submodel.selfillum = self._read_selfillum()
+
             self._scanner.read_string()
             submodel.near_atten_start = self._scanner.read_float()
             
@@ -92,9 +84,33 @@ class T3DInput:
             submodel.hotspot_angle = self._scanner.read_float()
 
         elif submodel.type == "Stars":
+            self._scanner.read_string()
+            submodel.diffuse_color = self._scanner.read_floats(3)
+
+            submodel.selfillum = self._read_selfillum()
+
+        self._scanner.read_string()
+        submodel.max_distance = self._scanner.read_float()
+
+        self._scanner.read_string()
+        submodel.min_distance = self._scanner.read_float()
+
+        self._scanner.read_string()
+        submodel.transform = self._scanner.read_floats(16)
+
+        if submodel.type in "Stars Mesh":
             self._load_geometry(submodel)
 
         return submodel
+
+    def _read_selfillum(self):
+        __, value = self._scanner.read_strings(2)
+        if value == "false":
+            return 0
+        elif value == "true":
+            return 1
+        else:
+            return value
 
     def _load_geometry(self, submodel):
         self._scanner.read_string()
@@ -113,7 +129,7 @@ class T3DInput:
             unit_size = LAST_UNIT_SIZE if is_last_unit else MAX_UNIT_SIZE
             num_loaded_verts += unit_size
 
-            unit_flag = self._scanner.read_float()
+            unit_flag = self._scanner.read_int()
             vertex_size = 8 if unit_flag == -1 else 5
 
             vertices = [self._scanner.read_floats(vertex_size) for _ in range(unit_size)]
