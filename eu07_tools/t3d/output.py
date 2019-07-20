@@ -48,6 +48,28 @@ class T3DOutput:
         elif submodel.type == "Stars":
             self._write_property("Diffuse", submodel.diffuse_color)
             self._write_property("SelfIllum", submodel.selfillum)
+
+        self._write_property("MaxDistance", submodel.max_distance)
+        self._write_property("MinDistance", submodel.min_distance)
+        self._write_property("Transform", submodel.transform)
+
+        self._dump_geometry(submodel)
+
+
+    def _dump_geometry(self, submodel):
+        if submodel.type == "Mesh":
+            self._write_property("NumVerts", submodel.num_verts)
+            for triangle in submodel.triangles:
+                self._writer.write_int(triangle.smooth)
+                self._writer.write_string("\n")
+
+                for vertex in triangle.vertices:
+                    self._writer.write_floats(vertex)
+                    self._writer.write_string("\n")
+
+                self._writer.write_string("\n")
+
+        elif submodel.type == "Stars":
             self._write_property("NumVerts", len(submodel.stars))
 
             num_groups = math.ceil(len(submodel.stars) / 3) 
@@ -61,22 +83,6 @@ class T3DOutput:
                     self._writer.write_floats([star.bin_color, 0])
                     self._writer.write_string("\n")
                 
-                self._writer.write_string("\n")
-
-        self._write_property("MaxDistance", submodel.max_distance)
-        self._write_property("MinDistance", submodel.min_distance)
-        self._write_property("Transform", submodel.transform)
-
-        if submodel.type == "Mesh":
-            self._write_property("NumVerts", submodel.num_verts)
-            for triangle in submodel.triangles:
-                self._writer.write_int(triangle.smooth)
-                self._writer.write_string("\n")
-
-                for vertex in triangle.vertices:
-                    self._writer.write_floats(vertex)
-                    self._writer.write_string("\n")
-
                 self._writer.write_string("\n")
 
     def _write_property(self, key, value):

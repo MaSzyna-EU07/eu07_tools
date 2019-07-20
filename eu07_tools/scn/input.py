@@ -68,6 +68,8 @@ class IterativeLoader(Iterator):
                 element = load_element()
                 if element:
                     yield element
+            else:
+                raise Warning(f"Leak from scn i/o: {token}")
 
     def _load_atmo(self):
         atmo = eu07_tools.scn.create_element("atmo")
