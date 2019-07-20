@@ -52,8 +52,12 @@ class IterativeLoader(Iterator):
         return cls(file)
 
     def __next__(self):
-        # TODO: Syntax error report
-        return next(self._iterator)
+        try:
+            return next(self._iterator)
+        except StopIteration:
+            return
+        except:
+            raise ValueError(f"Bad syntax in file {self._file.name} in line {self._scanner.current_line_number}")
             
 
     def _load(self):

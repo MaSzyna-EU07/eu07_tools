@@ -40,10 +40,9 @@ class SCNOutput:
         for e in elements:
             dump = self._dumpers.get(e.type)
 
-            print(e, dump.__name__)
             if dump is not None:
                 dump(e)
-                self._writer.write_string("\n")
+                
 
     def _dump_atmo(self, atmo):
         self._writer.write_string("atmo")
@@ -74,7 +73,7 @@ class SCNOutput:
         pass
 
     def _dump_firstinit(self, firstinit):
-        self._writer.write_string("FirstInit\n")
+        self._writer.write_string("\nFirstInit\n\n")
 
     def _dump_include(self, include):
         self._writer.write_string("include")
@@ -114,10 +113,11 @@ class SCNOutput:
         self._writer.write_string(trainset.track_name)
         self._writer.write_float(trainset.offset)
         self._writer.write_float(trainset.velocity)
+        self._writer.write_string("\n")
         self._is_trainset_opened = True
 
     def _dump_endtrainset(self, endtrainset):
-        self._writer.write_string("endtrainset\n")
+        self._writer.write_string("endtrainset\n\n")
         self._is_trainset_opened = False
 
     def _node_dump_header(self, node):
@@ -127,7 +127,6 @@ class SCNOutput:
         self._writer.write_string(node.name)
 
     def _dump_node_dynamic(self, dynamic):
-        # TODO: Might be not good - ensure if parameters are in good order
         self._node_dump_header(dynamic)
         self._writer.write_string("dynamic")
         self._writer.write_string(dynamic.base_path)
@@ -187,7 +186,7 @@ class SCNOutput:
         for vertex_id, vertex in enumerate(lines.vertices):
             self._writer.write_floats(vertex)
 
-            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendline\n" 
+            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendline\n\n" 
             self._writer.write_string(endtag)
 
     def _dump_node_memcell(self, memcell):
@@ -313,7 +312,7 @@ class SCNOutput:
         if track.railprofile != "none":
             self._writer.write_string(f"railprofile {track.railprofile}\n")
         
-        self._writer.write_string("endtrack\n")
+        self._writer.write_string("endtrack\n\n")
 
     def _dump_node_traction(self, traction):
         self._node_dump_header(traction)
@@ -344,7 +343,7 @@ class SCNOutput:
         if traction.parallel_name != "none":
             self._writer.write_string(f"parallel {traction.parallel_name}\n")
 
-        self._writer.write_string("endtraction\n")
+        self._writer.write_string("endtraction\n\n")
 
     def _dump_node_tractionpowersource(self, power_source):
         self._node_dump_header(power_source)
@@ -366,7 +365,7 @@ class SCNOutput:
         if power_source.section:
             self._writer.write_string("section\n")
 
-        self._writer.write_string("end\n")
+        self._writer.write_string("end\n\n")
 
     def _dump_node_triangles(self, triangles):
         self._node_dump_header(triangles)
@@ -392,7 +391,7 @@ class SCNOutput:
                 self._writer.write_floats(triangles.material.specular)
             self._writer.write_string("endmaterial")
         
-        self._writer.write_string(triangles.map + "\n")
+        self._writer.write_string(triangles.map + "\n\n")
 
         num_verts = len(triangles.vertices)
         for vertex_id, vertex in enumerate(triangles.vertices):
