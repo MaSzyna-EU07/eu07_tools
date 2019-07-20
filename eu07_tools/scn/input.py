@@ -37,8 +37,16 @@ class IterativeLoader(Iterator):
 
         self._node_loaders = {
             "dynamic": self._load_node_dynamic,
+            "eventlauncher": self._load_node_eventlauncher,
+            "lines": self._load_node_lines,
+            "line_strip": self._load_node_line_strip,
+            "line_loop": self._load_node_line_loop,
+            "memcell": self._load_node_memcell,
             "model": self._load_node_model,
+            "sound": self._load_node_sound,
             "track": self._load_node_track,
+            "traction": self._load_node_traction,
+            "tractionpowersource": self._load_node_tractionpowersource,
             "triangles": self._load_node_triangles,
             "triangle_strip": self._load_node_triangle_strip,
             "triangle_fan": self._load_node_triangle_fan,
@@ -68,8 +76,6 @@ class IterativeLoader(Iterator):
                 element = load_element()
                 if element:
                     yield element
-            else:
-                raise Warning(f"Leak from scn i/o: {token}")
 
     def _load_atmo(self):
         atmo = eu07_tools.scn.create_element("atmo")
@@ -284,6 +290,8 @@ class IterativeLoader(Iterator):
         *model.location, model.rotation_y = self._scanner.read_floats(4)
         model.path, model.map = self._scanner.read_strings(2)
         # TODO: Lights
+
+        self._scanner.get_strings_before("endmodel")
         
         return model
 
