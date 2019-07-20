@@ -9,8 +9,7 @@ def load(file):
     inp = E3DInput(file)
     return inp.load()
     
-
-
+    
 class E3DInput:
     def __init__(self, file):
         self._chunk_readers = {

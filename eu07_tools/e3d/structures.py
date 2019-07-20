@@ -1,5 +1,9 @@
 from eu07_tools.utils import FactorySequence, Vertex3D, ColorRGBA
 
+def create_model(self):
+    return E3DModel()
+
+
 class E3DModel:
     def __init__(self):
         self.submodels = FactorySequence(E3DSubmodel)
@@ -12,13 +16,13 @@ class E3DModel:
 class E3DSubmodel:
     def __init__(self):
         # TODO: More accurate initial values
-        self.next_id = 0
-        self.first_child_id = 0
-        self.submodel_type_id = 0
-        self.name_id = 0
-        self.anim_id = 0
-        self.first_vertex_id = 0
-        self.material_id = 0
+        self.next_id = -1
+        self.first_child_id = -1
+        self.submodel_type_id = -1
+        self.name_id = -1
+        self.anim_id = -1
+        self.first_vertex_id = -1
+        self.material_id = -1
 
         self.flags = 0
         self.matrix_id = 0
