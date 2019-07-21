@@ -321,9 +321,9 @@ class IterativeLoader(Iterator):
             track.map1 = self._scanner.read_string()
             track.mapping_length = self._scanner.read_float()
             track.map2 = self._scanner.read_string()
-            track.tex_param1 = self._scanner.read_float()
-            track.tex_param2 = self._scanner.read_float()
-            track.tex_param3 = self._scanner.read_float()
+            track.geometry_param1 = self._scanner.read_float()
+            track.geometry_param2 = self._scanner.read_float()
+            track.geometry_param3 = self._scanner.read_float()
 
         track.p1 = self._scanner.read_floats(3)
         track.p1_roll = self._scanner.read_float()

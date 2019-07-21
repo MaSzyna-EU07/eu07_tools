@@ -168,6 +168,10 @@ class NodeTrack(Node):
         self.railprofile = "none"
 
     @property
+    def is_junction(self):
+        return self._subtype in ("switch", "cross", "tributary")
+
+    @property
     def subtype(self):
         return self._subtype
 
