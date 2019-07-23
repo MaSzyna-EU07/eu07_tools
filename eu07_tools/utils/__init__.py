@@ -5,9 +5,9 @@ from .output import BinaryWriter, TextWriter
 
 from pathlib import Path
 
-def find_root(filepath):
+def find_asset_root(filepath):
     root = Path("")
-    filepath = Path(filepath)
+    filepath = Path(filepath).resolve()
 
     for part in filepath.parts:
         # TODO: More dirs?
@@ -15,10 +15,19 @@ def find_root(filepath):
             break
         root /= part
 
+    root = root.resolve()
     root_found = (not root.samefile(filepath))
     if root_found:
-        return root
+        return str(root)
     else:
         raise ValueError(f"Can't find EU07 root for {filepath}")
 
-    
+def shorten_asset_path(filepath):
+    filepath = Path(filepath).resolve()
+    root = Path(find_asset_root(filepath))
+
+    shortpath = filepath.relative_to(root).with_suffix("")
+    if "textures" in shortpath.parts:
+        shortpath = shortpath.relative_to("textures")
+
+    return str(shortpath)
