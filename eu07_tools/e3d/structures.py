@@ -1,6 +1,6 @@
-from eu07_tools.utils import FactorySequence, Vertex3D, ColorRGBA
+from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
 
-def create_model(self):
+def create_model():
     return Model()
 
 
@@ -10,16 +10,33 @@ class Model:
         self.names = FactorySequence(str)
         self.matrices = FactorySequence(list)
         self.vertices = FactorySequence(Vertex3D)
-        self.material_names = FactorySequence(str, initial_list=[""])
+        self.material_names = FactorySequence(str, initial_list=["none"])
 
-class OwnedFactorySequence(FactorySequence):
-    def __init__(self, cls, initial_list=None, owner=None):
-        super().__init__(cls, initial_list)
-        self.owner = owner
+_TYPEID_TO_TYPENAME = {
+    4: "Mesh",
+    256: "Mesh",
+    257: "FreeSpotLight",
+    258: "Stars"
+}
 
-    def new(self, *args):
-        instance = super().new(*args)
-        instance.owner = self.owner
+_ANIMID_TO_ANIMTYPENAME = {
+    -1: "true",
+    0: "false",
+    4: "seconds_jump",
+    5: "minutes_jump",
+    6: "hours_jump",
+    7: "hours24_jump",
+    8: "seconds",
+    9: "minutes",
+    10: "hours",
+    11: "hours24",
+    12: "billboard",
+    13: "wind",
+    14: "sky",
+    256: "ik",
+    257: "ik1",
+    258: "ik2"
+}
 
 class Submodel:
     def __init__(self):
@@ -28,7 +45,7 @@ class Submodel:
 
         self.next_submodel_id = -1
         self.first_child_id = -1
-        self.submodel_type_id = -1
+        self.type_id = 256
         self.name_id = -1
         self.anim_id = -1
         self.first_vertex_id = -1
@@ -80,16 +97,40 @@ class Submodel:
         self._specular_color = specular_color
 
     @property
+    def type(self):
+        return _TYPEID_TO_TYPENAME[self.type_id]
+
+    @property
+    def anim(self):
+        return _ANIMID_TO_ANIMTYPENAME[self.anim_id]
+
+    @property
     def name(self):
         return "none" if self.name_id == -1 else self.owner.names[self.name_id]
 
     @property
-    def material_name(self):
-        return "none" if self.name_id in (-1, 0) else self.owner.material_names[self.material_id]
+    def map(self):
+        return "none" if self.material_id in (0, -1) else self.owner.material_names[self.material_id]
 
     @property
     def transform(self):
-        return None if self.matrix_id == -1 else self.owner.matrices[self.matrix_id]
+        if self.matrix_id == -1:
+            return [
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0
+            ]
+        else: 
+            return self.owner.matrices[self.matrix_id]
+
+    @property
+    def parent(self):
+        for sm in self.owner.submodels:
+            if self in sm.children:
+                return sm
+
+        return None
 
     @property
     def first_child(self):
@@ -100,11 +141,21 @@ class Submodel:
         return None if self.next_submodel_id == -1 else self.owner.submodels[self.next_submodel_id]
 
     @property
+    def vertices(self):
+        return self.owner.vertices[
+            self.first_vertex_id:
+            self.first_vertex_id + self.num_verts
+        ]
+
+    @property
     def children(self):
         current = self.first_child
-        yield current
-        while current.next_submodel is not None:
-            yield current.next_submodel
+        while current is not None:
+            yield current
             current = current.next_submodel
+
+    @property
+    def id(self):
+        return self.owner.submodels.index(self)
 
 

@@ -1,7 +1,6 @@
 import struct
 
-from eu07_tools.utils import BinaryScanner
-from .structures import E3DModel
+import eu07_tools
 from .common import VERTEX_SIZE, CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE
 
 
@@ -20,12 +19,12 @@ class E3DInput:
             "TRA0": self._read_TRA0,
         }
 
-        self._scanner = BinaryScanner(file)
+        self._scanner = eu07_tools.utils.BinaryScanner(file)
 
     def load(self):
         self._scanner.read_bytes(CHUNK_HEADER_SIZE)
 
-        self.model = E3DModel()
+        self.model = eu07_tools.e3d.create_model()
 
         while not self._scanner.is_empty:
             chunk_id, chunk_size = self._read_header()

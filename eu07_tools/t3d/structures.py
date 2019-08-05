@@ -68,7 +68,7 @@ class T3DMeshSubmodel(T3DSubmodel):
         self.wire_size = 1.0
         self.opacity = 100.0
         self.map = "none"
-        self.triangles = TrianglesFactorySequence(T3DTriangle)
+        self.triangles = FactorySequence(T3DTriangle)
 
     @property
     def ambient_color(self):
@@ -89,16 +89,6 @@ class T3DMeshSubmodel(T3DSubmodel):
     @property
     def num_verts(self):
         return len(self.triangles) * 3
-
-
-class TrianglesFactorySequence(FactorySequence):
-    def __init__(self, cls, initial_list=None):
-        super().__init__(cls, initial_list)
-
-    def new(self, vertices, smooth):
-        triangle = self.cls(vertices, smooth)
-        self._items.append(triangle)
-        return triangle
 
 
 class T3DTriangle:

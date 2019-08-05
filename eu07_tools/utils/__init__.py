@@ -1,8 +1,8 @@
-from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB, ColorRGBA, FactorySequence, TypedSequenceWrapper
+from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB, ColorRGBA, FactorySequence, OwnedFactorySequence
 from .asset_searcher import AssetSearcher
 from .input import TextScanner, BinaryScanner
 from .output import BinaryWriter, TextWriter
-from .model_converter import ModelConverter
+from .model_convert import e3d_to_t3d, t3d_to_e3d
 
 from pathlib import Path
 
