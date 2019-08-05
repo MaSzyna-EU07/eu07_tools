@@ -38,7 +38,7 @@ class E3DOutput:
         self._writer.write_int(chunk_size)
 
         for submodel in self._model.submodels:
-            self._writer.write_int(submodel.next_id)
+            self._writer.write_int(submodel.next_submodel_id)
             self._writer.write_int(submodel.first_child_id)
             self._writer.write_int(submodel.submodel_type_id)
             self._writer.write_int(submodel.name_id)
@@ -81,8 +81,9 @@ class E3DOutput:
             chunk_size = self._calc_TEX0_size()
             self._writer.write_int(chunk_size)
 
-            for material in self._model.materials:
-                self._writer.write_string(material)
+            for material_name in self._model.material_names[1:]:
+                self._writer.write_bytes(b"\x00")
+                self._writer.write_string(material_name)
                 self._writer.write_bytes(b"\x00")
 
     def _dump_NAM0(self):
@@ -110,9 +111,9 @@ class E3DOutput:
         return (len(self._model.vertices) * VERTEX_SIZE) + CHUNK_HEADER_SIZE
 
     def _calc_TEX0_size(self):
-        num_null_bytes = len(self._model.materials)
+        num_null_bytes = len(self._model.material_names)
         return sum(
-            (len(m) for m in self._model.materials)
+            (len(m) for m in self._model.material_names)
         ) + num_null_bytes + CHUNK_HEADER_SIZE
 
     def _calc_NAM0_size(self):

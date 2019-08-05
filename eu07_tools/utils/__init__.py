@@ -2,6 +2,7 @@ from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB, Color
 from .asset_searcher import AssetSearcher
 from .input import TextScanner, BinaryScanner
 from .output import BinaryWriter, TextWriter
+from .model_converter import ModelConverter
 
 from pathlib import Path
 
@@ -21,6 +22,7 @@ def find_asset_root(filepath):
         return str(root)
     else:
         raise ValueError(f"Can't find EU07 root for {filepath}")
+
 
 def shorten_asset_path(filepath):
     filepath = Path(filepath).resolve()

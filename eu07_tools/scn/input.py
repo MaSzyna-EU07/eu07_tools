@@ -5,9 +5,9 @@ from eu07_tools.utils.input import TextScanner
 import eu07_tools.scn
 
 def load(file):
-    return IterativeLoader(file)
+    return SCNInput(file)
 
-class IterativeLoader(Iterator):
+class SCNInput(Iterator):
     def __init__(self, file):
         self._scanner = TextScanner.from_file(file)
         self._iterator = self._load()
@@ -96,7 +96,7 @@ class IterativeLoader(Iterator):
 
 
     def _load_camera(self):
-        camera = eu07_tools.scn.create_element("atmo")
+        camera = eu07_tools.scn.create_element("camera")
         camera.location = self._scanner.read_floats(3)
         camera.rotation = self._scanner.read_floats(3)
 
@@ -134,7 +134,7 @@ class IterativeLoader(Iterator):
         return include
 
     def _load_light(self):
-        light = eu07_tools.scn.create_element("include")
+        light = eu07_tools.scn.create_element("light")
         self._scanner.get_strings_before("endlight")
         return None
 

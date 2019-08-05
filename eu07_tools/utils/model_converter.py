@@ -31,13 +31,15 @@ class ModelConverter:
         self._parenting = {}  
 
     def e3d_to_t3d(self, e3d):
+        t3d_submodels = []
+
         for submodel_id, e3d_sm in enumerate(e3d.submodels):
 
-            type_ = self._TYPEID_TO_TYPENAME[e3d_sm.type_id]
+            type_ = self._TYPEID_TO_TYPENAME[e3d_sm.submodel_type_id]
             name = e3d.names[e3d_sm.name_id]
             t3d_sm = eu07_tools.t3d.create_submodel(type_, name)
 
-            
+            self._put_parenting(submodel_id, e3d_sm)
 
             t3d_sm.diffuse_color = e3d_sm.diffuse_color[:3] * 255
             t3d_sm.anim = self._ANIMID_TO_ANIMTYPENAME[e3d_sm.anim_id]
@@ -45,7 +47,7 @@ class ModelConverter:
             t3d_sm.min_distance = e3d_sm.min_distance
             t3d_sm.selfillum = e3d_sm.selfillum
 
-            if e3d_sm.transform_id != -1:
+            if e3d_sm.matrix_id != -1:
                 t3d_sm.transform = e3d.matrices[e3d_sm.matrix_id]
 
             if type_ == "Mesh":
@@ -54,7 +56,7 @@ class ModelConverter:
                 t3d_sm.wire_size = e3d_sm.wire_size
                 t3d_sm.map = e3d.materials[e3d_sm.material_id]
                 
-                vertices = e3d_sm.vertices[
+                vertices = e3d.vertices[
                     e3d_sm.first_vertex_id:
                     e3d_sm.first_vertex_id + e3d_sm.num_verts
                 ]
@@ -81,8 +83,26 @@ class ModelConverter:
                 for vertex in vertices:
                     t3d_sm.stars.new(vertex.location, vertex.mapping.u)
 
-        yield t3d_sm
-
+            t3d_submodels.append(t3d_sm)
         
+        self._set_parenting(t3d_submodels, e3d)
+
+        return t3d_submodels
+
+    def _put_parenting(self, submodel_id, e3d_sm):
+        self._parenting[submodel_id] = []
+        self._parenting[submodel_id].append(e3d_sm.first_child_id)
+
+        for parent_id, child_ids in self._parenting.items():
+            if submodel_id in child_ids:
+                self._parenting[parent_id].append(e3d_sm.next_id)
+
+    def _set_parenting(self, t3d_submodels, e3d):
+        for sm_id, t3d_submodel in enumerate(t3d_submodels):
+            for parent_id, child_ids in self._parenting.items():
+                if sm_id in child_ids:
+                    name_id = e3d.submodels[parent_id].name_id
+                    parent_name = e3d.names[name_id]
+                    t3d_submodel.parent_name = parent_name
 
         

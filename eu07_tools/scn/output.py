@@ -225,6 +225,7 @@ class SCNOutput:
 
     def _dump_node_track(self, track):
         self._node_dump_header(track)
+        self._writer.write_string("track")
         self._writer.write_string(track.subtype)
         self._writer.write_float(track.length)
         self._writer.write_float(track.width)
@@ -239,9 +240,9 @@ class SCNOutput:
             self._writer.write_string(track.map1)
             self._writer.write_float(track.mapping_length)
             self._writer.write_string(track.map2)
-            self._writer.write_float(track.tex_param1)
-            self._writer.write_float(track.tex_param2)
-            self._writer.write_float(track.tex_param3)
+            self._writer.write_float(track.geometry_param1)
+            self._writer.write_float(track.geometry_param2)
+            self._writer.write_float(track.geometry_param3)
             self._writer.write_string("\n")
 
         self._writer.write_floats(track.p1)

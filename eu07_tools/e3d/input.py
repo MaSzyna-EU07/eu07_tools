@@ -50,7 +50,7 @@ class E3DInput:
         for _ in range(NUM_SUBMODELS):
             submodel = self.model.submodels.new()
 
-            submodel.next_id = self._scanner.read_int()
+            submodel.next_submodel_id = self._scanner.read_int()
             submodel.first_child_id = self._scanner.read_int()
             submodel.submodel_type_id = self._scanner.read_int()
             submodel.name_id = self._scanner.read_int()
@@ -98,7 +98,7 @@ class E3DInput:
             self.model.matrices.new(matrix)
 
     def _read_TEX0(self, data_size):
-        self._read_zero_separated_values(data_size, self.model.materials)
+        self._read_zero_separated_values(data_size, self.model.material_names)
 
     def _read_NAM0(self, data_size):
         self._read_zero_separated_values(data_size, self.model.names)

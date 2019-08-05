@@ -1,22 +1,32 @@
 from eu07_tools.utils import FactorySequence, Vertex3D, ColorRGBA
 
 def create_model(self):
-    return E3DModel()
+    return Model()
 
 
-class E3DModel:
+class Model:
     def __init__(self):
-        self.submodels = FactorySequence(E3DSubmodel)
+        self.submodels = OwnedFactorySequence(Submodel, owner=self)
         self.names = FactorySequence(str)
         self.matrices = FactorySequence(list)
         self.vertices = FactorySequence(Vertex3D)
-        self.materials = FactorySequence(str, [""])
+        self.material_names = FactorySequence(str, initial_list=[""])
 
+class OwnedFactorySequence(FactorySequence):
+    def __init__(self, cls, initial_list=None, owner=None):
+        super().__init__(cls, initial_list)
+        self.owner = owner
 
-class E3DSubmodel:
+    def new(self, *args):
+        instance = super().new(*args)
+        instance.owner = self.owner
+
+class Submodel:
     def __init__(self):
         # TODO: More accurate initial values
-        self.next_id = -1
+        self.owner = None
+
+        self.next_submodel_id = -1
         self.first_child_id = -1
         self.submodel_type_id = -1
         self.name_id = -1
@@ -68,3 +78,33 @@ class E3DSubmodel:
     @specular_color.setter
     def specular_color(self, specular_color):
         self._specular_color = specular_color
+
+    @property
+    def name(self):
+        return "none" if self.name_id == -1 else self.owner.names[self.name_id]
+
+    @property
+    def material_name(self):
+        return "none" if self.name_id in (-1, 0) else self.owner.material_names[self.material_id]
+
+    @property
+    def transform(self):
+        return None if self.matrix_id == -1 else self.owner.matrices[self.matrix_id]
+
+    @property
+    def first_child(self):
+        return None if self.first_child_id == -1 else self.owner.submodels[self.first_child_id]
+
+    @property
+    def next_submodel(self):
+        return None if self.next_submodel_id == -1 else self.owner.submodels[self.next_submodel_id]
+
+    @property
+    def children(self):
+        current = self.first_child
+        yield current
+        while current.next_submodel is not None:
+            yield current.next_submodel
+            current = current.next_submodel
+
+

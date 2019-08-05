@@ -115,7 +115,10 @@ class T3DOutput:
         elif key_lower in "type anim map":
             self._writer.write_string(value)
 
-        else:
+        elif key_lower in "farattendecaytype numverts":
             self._writer.write_int(value)
+
+        else:
+            self._writer.write_float(value)
 
         self._writer.write_string("\n")
