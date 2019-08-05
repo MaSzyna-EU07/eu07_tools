@@ -33,3 +33,6 @@ def shorten_asset_path(filepath):
         shortpath = shortpath.relative_to("textures")
 
     return str(shortpath)
+
+def switch_coordinate_system(vector):
+    return [-vector[0], vector[2], vector[1]]

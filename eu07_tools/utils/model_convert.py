@@ -1,4 +1,4 @@
-import eu07_tools.t3d
+import eu07_tools
 
 def e3d_to_t3d(e3d_model):
     for e3d_sm in e3d_model.submodels:
@@ -19,15 +19,15 @@ def e3d_to_t3d(e3d_model):
             t3d_sm.wire_size = e3d_sm.wire_size
             t3d_sm.map = e3d_sm.map
             
-            print(e3d_sm.name, e3d_sm.num_verts)
             num_triangles = e3d_sm.num_verts // 3
             for x in range(num_triangles):
-                t3d_sm.triangles.new(
-                    e3d_sm.vertices[x*3:x*3+3], -1
-                )
+                vertices = e3d_sm.vertices[x*3:x*3+3]
 
-            
-            
+                for vertex in vertices:
+                    vertex.location = eu07_tools.utils.switch_coordinate_system(vertex.location)
+
+                t3d_sm.triangles.new(vertices, -1)
+
         elif e3d_sm.type == "FreeSpotLight":
             t3d_sm.near_atten_start = e3d_sm.near_atten_start
             t3d_sm.near_atten_end = e3d_sm.near_atten_end

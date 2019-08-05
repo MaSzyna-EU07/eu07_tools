@@ -102,7 +102,7 @@ class Submodel:
 
     @property
     def anim(self):
-        return _ANIMID_TO_ANIMTYPENAME[self.anim_id]
+        return _ANIMID_TO_ANIMTYPENAME.get(self.anim_id, "false")
 
     @property
     def name(self):
