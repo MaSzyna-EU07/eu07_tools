@@ -103,16 +103,19 @@ class PathFinder:
         """
         
         rel_path = rel_path.lstrip("\\").lstrip("/")
-        rel_path = rel_path.replace("\\", "/").lower()
+        rel_path = rel_path.replace("\\", "/")
         for lookup in self.lookups:
             full_path = Path(lookup, rel_path)
 
             if self.extensions:
                 for extension in self.extensions:
-                    if full_path.with_suffix(extension).exists():
+                    full_path = full_path.with_suffix(extension)
+                    full_path_lowered = Path(str(full_path).lower())
+                    if full_path.exists() or full_path_lowered.exists():
                         yield str(full_path.with_suffix(extension))
             else:
-                if full_path.exists() or Path(str(full_path).lower()).exists():
+                full_path_lowered = Path(str(full_path).lower())
+                if full_path.exists() or full_path_lowered.exists():
                     yield str(full_path)
 
         return

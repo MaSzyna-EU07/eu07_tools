@@ -15,8 +15,8 @@ def create_submodel(type, name):
     raise ValueError(f"Bad T3D submodel type: {type}")
 
 
-def create_include(path):
-    return T3DInclude(path)
+def create_include(path, parameters):
+    return T3DInclude(path, parameters)
 
 
 class T3DElement(abc.ABC):
@@ -25,9 +25,10 @@ class T3DElement(abc.ABC):
 
 
 class T3DInclude(T3DElement):
-    def __init__(self, path):
+    def __init__(self, path, parameters):
         self.element_type = "include"
         self.path = path
+        self.parameters = list(parameters)
 
 
 class T3DSubmodel(T3DElement):

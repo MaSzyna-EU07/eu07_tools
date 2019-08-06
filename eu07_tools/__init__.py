@@ -1,1 +1,1 @@
-from . import scn, t3d, mat, e3d, utils
+from . import scn, t3d, e3d, utils

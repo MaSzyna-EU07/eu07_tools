@@ -21,8 +21,8 @@ class T3DInput:
                 parent_name = self._scanner.read_string()
                 yield self._load_submodel(parent_name)
             elif token == "include":
-                path, __ = self._scanner.read_strings(2)
-                yield eu07_tools.t3d.create_include(path)
+                path, *parameters = self._scanner.get_strings_before("end")
+                yield eu07_tools.t3d.create_include(path, parameters)
 
     def _load_submodel(self, parent_name):
         type_ = self._read_property()

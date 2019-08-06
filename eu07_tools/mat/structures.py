@@ -1,19 +1,20 @@
 from eu07_tools.utils import VectorXY
+import collections.abc
 
 from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS
 
 
-def create_mat_mapping():
+def create_mapping():
     return MATMapping()
 
 # TODO: Collections.abc subclass
-class MATMapping:
+class MATMapping(collections.abc.MutableMapping):
     def __init__(self):
         self._items = {}
 
     @classmethod
     def from_dict(cls, d):
-        map_ = create_mat_mapping()
+        map_ = create_mapping()
         for k, v in d.items():
             map_[k] = v
 
@@ -34,39 +35,11 @@ class MATMapping:
     def __delitem__(self, key):
         del self._items[key]
 
-    def __contains__(self, item):
-        return item in self._items
-
     def __len__(self):
         return len(self._items)
 
     def __iter__(self):
         return iter(self._items)
-
-    def get(self, key, value):
-        return self._items.get(key, value)
-
-    def update(self, dict2):
-        self._items.update(dict2)
-
-    def clear(self):
-        self._items.clear()
-
-    def pop(self, key, default=None):
-        return self._items.pop(key, default)
-
-    def popitem(self):
-        return self._items.popitem()
-
-    def setdefault(self, key, default_value=None):
-        self._items.setdefault(key, default_value)
-
-    def items(self):
-        return self._items.items()
-
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__} {repr(self._items)}>"
 
 class Texture:
     def __init__(self, value):
