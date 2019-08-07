@@ -5,10 +5,10 @@ from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS
 
 
 def create_mapping():
-    return MATMapping()
+    return Mapping()
 
 # TODO: Collections.abc subclass
-class MATMapping(collections.abc.MutableMapping):
+class Mapping(collections.abc.MutableMapping):
     def __init__(self):
         self._items = {}
 
@@ -19,7 +19,6 @@ class MATMapping(collections.abc.MutableMapping):
             map_[k] = v
 
         return map_
-
 
     def __getitem__(self, key):
         return self._items[key]

@@ -11,6 +11,8 @@ class TextWriter:
         if formatted != "0":
             formatted = formatted.rstrip("0").rstrip(".")
 
+        formatted = "0" if formatted == "-0" else formatted
+
         self._file.write(formatted + self._separator)
 
     def write_floats(self, values):

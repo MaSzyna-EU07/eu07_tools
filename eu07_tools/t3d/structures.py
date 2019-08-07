@@ -4,34 +4,90 @@ from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySe
 
 
 def create_submodel(type, name):
+    """ Create named T3D submodel instance
+    
+    :param type: Typename of submodel - "Mesh", "FreeSpotLight" or "Stars"
+    :type type: str
+    :param name: Name of submodel
+
+    :raises: `ValueError` if invalid type is given
+
+    :return: Submodel instance of given type
+    :rtype: :class:`t3d.Submodel`
+    """
     type_l = type.lower()
     if type_l == "mesh":
-        return T3DMeshSubmodel(name)
+        return MeshSubmodel(name)
     elif type_l == "freespotlight":
-        return T3DFreeSpotLightSubmodel(name)
+        return FreeSpotLightSubmodel(name)
     elif type_l == "stars":
-        return T3DStarsSubmodel(name)
+        return StarsSubmodel(name)
     
     raise ValueError(f"Bad T3D submodel type: {type}")
 
 
 def create_include(path, parameters):
-    return T3DInclude(path, parameters)
+    """ Create instance of T3D Include.
+
+    :param path: Relative path to included file
+    :type path: str
+    :param parameters: Parameters list
+    :type parameters: `List[str]` 
+
+    :returns: Include object
+    :rtype: :class:`t3d.Include`
+    """
+    return Include(path, parameters)
 
 
-class T3DElement(abc.ABC):
+class Element(abc.ABC):
+    """ Base abstract class for T3D elements (includes, submodels)
+
+    :ivar element_type: Type name of element - can be "submodel" or "include"
+    :type element_type: str
+    """
     def __init__(self):
+        """ Constructor method
+        """
         self.element_type = ""
 
 
-class T3DInclude(T3DElement):
-    def __init__(self, path, parameters):
+class Include(Element):
+    """ Class representing include directive in T3D model.
+
+    :ivar path: Relative path to included file
+    :type path: str
+    :ivar parameters: Parameters list
+    :type parameters: `List[str]`  
+    """
+    def __init__(self, path, parameters=None):
         self.element_type = "include"
         self.path = path
-        self.parameters = list(parameters)
+        self.parameters = [] if parameters is None else list(parameters)
 
 
-class T3DSubmodel(T3DElement):
+class Submodel(Element):
+    """ Base class for submodels. Defines common attributes for subclasses.
+
+    :ivar type: Submodel type name - can be "Mesh", "FreeSpotLight", "Stars". This value is read-only.
+    :type type: `str`
+    :ivar name: Name of submodel
+    :type name: `str`
+    :ivar parent_name: Parent name, defaults to "none"
+    :type parent_name: `str`
+    :ivar anim: Animation type, defaults to "false"
+    :type anim: `str`
+    :ivar diffuse_color: RGB diffuse color, values in range <0;255>, defaults to (255, 255, 255)
+    :type diffuse_color: :class:`utils.ColorRGB` 
+    :ivar selfillum: SelfIllum parameter, value in range <0;1.25>, defaults to 0
+    :type selfillum: `float`
+    :ivar max_distance: Maximum rendering distance in meters, defaults to 1000
+    :type max_distance: `float`
+    :ivar max_distance: Minimum rendering distance in meters, defaults to 0
+    :type max_distance: `float`
+    :ivar transform: Transform matrix as list of 16 floats, defaults to identity matrix.
+    :type transform: `List[float]`
+    """
     def __init__(self, name):
         self.element_type = "submodel"
         self.type = ""
@@ -58,8 +114,27 @@ class T3DSubmodel(T3DElement):
         self._diffuse_color = ColorRGB(diffuse_color)
 
 
+class MeshSubmodel(Submodel):
+    """ Mesh submodel class, inherits attributes from :class:`t3d.Submodel` and defines 
+    attributes specific for it's type
 
-class T3DMeshSubmodel(T3DSubmodel):
+    :ivar ambient_color: RGB ambient color, values in range <0;255>, defaults to (255, 255, 255)
+    :type ambient_color: :class:`utils.ColorRGB`
+    :ivar specular_color: RGB specular color, values in range <0;255>, defaults to (255, 255, 255)
+    :type specular_color: :class:`utils.ColorRGB` 
+    :ivar wire: Wireframe display state, defaults to False
+    :type wire: `bool`
+    :ivar wire_size: Wire thickness in wireframe display mode, defaults to 1.0
+    :type wire_size: `float`
+    :ivar opacity: Opacity level, value in range <0;1>, defaults to 1.0
+    :type opacity: `float`
+    :ivar map: Texture path or replacableskin id, defaults to "none"
+    :type map: `str`
+    :ivar triangles: Mutable collection of :class:`t3d.MeshTriangle` objects, by default it's empty
+    :type triangles: :class:`utils.FactorySequence[t3d.MeshTriangle]`
+    :ivar num_verts: Number of vertices in all triangles, defaults to 0. This value is read-only.
+    :type num_verts: `int`
+    """
     def __init__(self, name):
         super().__init__(name)   
         self.type = "Mesh"
@@ -67,9 +142,9 @@ class T3DMeshSubmodel(T3DSubmodel):
         self._specular_color = ColorRGB((255, 255, 255))
         self.wire = False
         self.wire_size = 1.0
-        self.opacity = 100.0
+        self.opacity = 1.0
         self.map = "none"
-        self.triangles = FactorySequence(T3DTriangle)
+        self.triangles = FactorySequence(MeshTriangle)
 
     @property
     def ambient_color(self):
@@ -92,7 +167,12 @@ class T3DMeshSubmodel(T3DSubmodel):
         return len(self.triangles) * 3
 
 
-class T3DTriangle:
+class MeshTriangle:
+    """ Class representing triangle in mesh submodel
+    
+    :ivar vertices: Tuple of 3 vertices
+    :type vertives: `Tuple[utils.Vertex3D]`
+    """
     def __init__(self, vertices, smooth=0):
         self.vertices = tuple(
             Vertex3D(vertex) for vertex in vertices
@@ -103,7 +183,7 @@ class T3DTriangle:
         ) else smooth
 
 
-class T3DFreeSpotLightSubmodel(T3DSubmodel):
+class FreeSpotLightSubmodel(Submodel):
     def __init__(self, name):
         super().__init__(name)
         self.type = "FreeSpotLight"
@@ -116,18 +196,18 @@ class T3DFreeSpotLightSubmodel(T3DSubmodel):
         self.hotspot_angle = 45.0
 
 
-class T3DStarsSubmodel(T3DSubmodel):
+class StarsSubmodel(Submodel):
     def __init__(self, name):
         super().__init__(name)
         self.type = "Stars"
-        self.stars = FactorySequence(T3DStar)
+        self.stars = FactorySequence(StarsLight)
 
     @property
     def num_verts(self):
         return len(self.stars)
 
 
-class T3DStar:
+class StarsLight:
     def __init__(self, location, bin_color):
         self._location = VectorXYZ(location)
         self.bin_color = bin_color
