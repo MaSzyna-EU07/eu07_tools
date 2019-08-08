@@ -172,8 +172,17 @@ class MeshTriangle:
     
     :ivar vertices: Tuple of 3 vertices
     :type vertives: `Tuple[utils.Vertex3D]`
+    :ivar smooth: Smooth mask, -1 if vertices has explicit normal vectors
+    :type smooth: `int`
     """
     def __init__(self, vertices, smooth=0):
+        """ Constructor method
+
+        :param vertices: Iterable of 3 vertices data
+        :type vertices: `Iterable[Iterable[float]]`
+        :param smooth: Smooth mask, -1 if vertices has explicit normal vectors
+        :type smooth: `int`
+        """
         self.vertices = tuple(
             Vertex3D(vertex) for vertex in vertices
         )
@@ -184,6 +193,24 @@ class MeshTriangle:
 
 
 class FreeSpotLightSubmodel(Submodel):
+    """ FreeSpotLight submodel class, inherits attributes from :class:`t3d.Submodel` and defines 
+    attributes specific for it's type
+
+    :ivar near_atten_start: Near attentuation start, defaults to 40.0
+    :type near_atten_start: `float`
+    :ivar near_atten_end: Near attentuation end, defaults to 0.0
+    :type near_atten_end: `float` 
+    :ivar use_near_atten: Near attentuation start usage state, defaults to False
+    :type use_near_atten: `bool`
+    :ivar far_atten_decay_type: Far attentuation decay type. Can be 0, 1, 2, defaults to 1
+    :type far_atten_decay_type: `int`
+    :ivar far_decay_radius: Far decay radius, defaults to 45.0
+    :type far_decay_radius: `float`
+    :ivar falloff_angle: Faloff angle, defaults to 45.0
+    :type falloff_angle: `float`
+    :ivar hotspot_angle: Hotspot angle, defaults to 45.0
+    :type hotspot_angle: `float`
+    """
     def __init__(self, name):
         super().__init__(name)
         self.type = "FreeSpotLight"
@@ -197,6 +224,14 @@ class FreeSpotLightSubmodel(Submodel):
 
 
 class StarsSubmodel(Submodel):
+    """ FreeSpotLight submodel class, inherits attributes from :class:`t3d.Submodel` and defines 
+    attributes specific for it's type
+
+    :ivar stars: Mutable collection of :class:`t3d.StarsLight` objects, by default it's empty
+    :type stars: :class:`utils.FactorySequence[t3d.StarsLight]`
+    :ivar num_verts: Number of light points, defaults to 0. This value is read-only.
+    :type num_verts: `int`
+    """
     def __init__(self, name):
         super().__init__(name)
         self.type = "Stars"
@@ -208,7 +243,23 @@ class StarsSubmodel(Submodel):
 
 
 class StarsLight:
+    """ Class representing light point in stars submodel
+    
+    :ivar location: Location of light point.
+    :type vertives: :class:`utils.VectorXYZ`
+    :ivar bin_color: BGR color of light as integer.
+    :type bin_color: `int`
+    :ivar rgb_color: RGB color of light.
+    :type rgb_color: :class:`utils.ColorRGB`
+    """
     def __init__(self, location, bin_color):
+        """ Constructor method
+    
+        :param location: Location of light point.
+        :type vertives: `Iterable[float]`
+        :param bin_color: BGR color as integer.
+        :type bin_color: `int`
+        """
         self._location = VectorXYZ(location)
         self.bin_color = bin_color
 
@@ -227,3 +278,7 @@ class StarsLight:
             ((self.bin_color >> 8) & 0xff) / 255.0,
             ((self.bin_color >> 16) & 0xff) / 255.0
         ))
+
+    # @rgb_color.setter
+    # def rgb_color(self, rgb_color):
+    #     pass
