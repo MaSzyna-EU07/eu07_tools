@@ -6,21 +6,30 @@ class AssetSearcher:
         self._root = Path(root)
         self._basedir = Path(basedir)
 
-        self.models_finder = PathFinder(
-            [Path(self._root), Path(self._basedir), Path(self._root, "models")],
+        self.models = PathFinder(
+            [
+                Path(self._root), 
+                Path(self._basedir), 
+                Path(self._root, "models")
+            ],
             [".e3d", ".t3d"]
         )
 
-        self.textures_finder = PathFinder(
+        self.textures = PathFinder(
             [
-                Path(self._root), Path(self._basedir), Path(self._root, "textures"),
+                Path(self._root), 
+                Path(self._basedir), 
+                Path(self._root, "textures"),
                 Path(str(self._basedir).replace("models", "textures"))
             ],
             [".mat", ".tga", ".dds", ".png", ".bmp", ".tex"]
         )
 
-        self.includes_finder = PathFinder(
-            [Path(self._root), Path(self._basedir), Path(self._root, "?")],
+        self.includes = PathFinder(
+            [
+                Path(self._root), 
+                Path(self._basedir)
+            ],
             []
         )
 

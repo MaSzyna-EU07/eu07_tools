@@ -279,6 +279,7 @@ class StarsLight:
             ((self.bin_color >> 16) & 0xff) / 255.0
         ))
 
+    # TODO: Setting rgb color should affect bin_color
     # @rgb_color.setter
     # def rgb_color(self, rgb_color):
     #     pass
