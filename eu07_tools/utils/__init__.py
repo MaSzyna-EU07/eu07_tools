@@ -17,7 +17,7 @@ def find_asset_root(filepath):
         root /= part
 
     root = root.resolve()
-    root_found = (not root.samefile(filepath))
+    root_found = root != filepath
     if root_found:
         return str(root)
     else:

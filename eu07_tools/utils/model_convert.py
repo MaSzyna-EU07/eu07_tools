@@ -10,7 +10,16 @@ def e3d_to_t3d(e3d_model):
         t3d_sm.max_distance = e3d_sm.max_distance
         t3d_sm.min_distance = e3d_sm.min_distance
         t3d_sm.selfillum = e3d_sm.selfillum
+
         t3d_sm.transform = e3d_sm.transform
+        mat = t3d_sm.transform
+        # RHS to LHS coordinate conversion
+        mat[1], mat[2] = mat[2], mat[1]
+        mat[13], mat[14] = mat[14], mat[13]
+        mat[4], mat[8] = mat[8], mat[4]
+        mat[5], mat[10] = mat[10], mat[5]
+        mat[6], mat[9] = mat[9], mat[6]
+
         t3d_sm.parent_name = e3d_sm.parent.name if e3d_sm.parent else "none"
         
         if e3d_sm.type == "Mesh":

@@ -8,6 +8,7 @@ class TextWriter:
 
     def write_float(self, value):
         formatted = str(round(value, 5))
+
         if formatted != "0":
             formatted = formatted.rstrip("0").rstrip(".")
 
