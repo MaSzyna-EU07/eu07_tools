@@ -252,16 +252,19 @@ class StarsLight:
     :ivar rgb_color: RGB color of light.
     :type rgb_color: :class:`utils.ColorRGB`
     """
-    def __init__(self, location, bin_color):
+    def __init__(self, location, color):
         """ Constructor method
     
         :param location: Location of light point.
         :type vertives: `Iterable[float]`
-        :param bin_color: BGR color as integer.
-        :type bin_color: `int`
+        :param color: BGR color as integer or RGB color as 3-element sequence.
+        :type bin_color: `Union[int, Sequence[float]]`
         """
         self._location = VectorXYZ(location)
-        self.bin_color = bin_color
+        if isinstance(color, (int, float)):
+            self.bin_color = int(color)
+        else:
+            self.rgb_color = color
 
     @property
     def location(self):
@@ -274,12 +277,13 @@ class StarsLight:
     @property
     def rgb_color(self):
         return ColorRGB((
-            (self.bin_color & 0xff) / 255.0,
-            ((self.bin_color >> 8) & 0xff) / 255.0,
-            ((self.bin_color >> 16) & 0xff) / 255.0
+            (self.bin_color & 0xff),
+            ((self.bin_color >> 8) & 0xff),
+            ((self.bin_color >> 16) & 0xff)
         ))
 
-    # TODO: Setting rgb color should affect bin_color
-    # @rgb_color.setter
-    # def rgb_color(self, rgb_color):
-    #     pass
+    @rgb_color.setter
+    def rgb_color(self, rgb_color):
+        self.bin_color = (
+            (int(rgb_color[0])) | (int(rgb_color[1]) << 8) | (int(rgb_color[2]) << 16)
+        )

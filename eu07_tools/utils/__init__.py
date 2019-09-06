@@ -28,6 +28,7 @@ def shorten_asset_path(filepath):
     filepath = Path(filepath).resolve()
     root = Path(find_asset_root(filepath))
 
+    # TODO: Shorten model path, scenery path etc
     shortpath = filepath.relative_to(root).with_suffix("")
     if "textures" in shortpath.parts:
         shortpath = shortpath.relative_to("textures")
