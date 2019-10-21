@@ -31,7 +31,7 @@ _typename_to_class = {
     "node:triangles": nodes.NodeTriangles,
 }
 
-def create_element(typename, name=""):
+def create_element(typename, name="none"):
     cls = _typename_to_class.get(typename.lower())
     if not cls:
         raise ValueError("Unknown SCN element type name")
