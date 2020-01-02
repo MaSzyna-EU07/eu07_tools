@@ -109,9 +109,9 @@ class T3DInput:
         elif propname in ("selfillum",):
             token = self._scanner.read_string()
             if token == "false":
-                value = 0
+                value = 0.0
             elif token == "true":
-                value = 1
+                value = 2.0
             else:
                 value = float(token)
 
