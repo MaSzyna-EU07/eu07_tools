@@ -19,7 +19,10 @@ class T3DInput:
                 return
             elif token == "parent":
                 parent_name = self._scanner.read_string()
-                yield self._load_submodel(parent_name)
+                try:
+                    yield self._load_submodel(parent_name)
+                except ValueError as e:
+                    raise ValueError(f"Bad T3D syntax in line: {self._scanner.line_number}")
             elif token == "include":
                 path, *parameters = self._scanner.get_strings_before("end")
                 yield eu07_tools.t3d.create_include(path, parameters)
