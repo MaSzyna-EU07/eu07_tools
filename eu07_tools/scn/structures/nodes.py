@@ -81,6 +81,20 @@ class NodeMemcell(Node):
         self._location = VectorXYZ(location)
 
 
+class MemcellValues:
+    def __init__(self, values):
+        self._values = values
+
+    def __getitem__(self, index):
+        item = self._values[index]
+        if item != "*" and index != 0:
+            return float(item) 
+        return item
+
+    def __setitem__(self, index, value):
+        self._values[index] = str(value)
+
+
 class NodeModel(Node):
     def __init__(self, name):
         super().__init__(name)

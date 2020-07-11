@@ -5,9 +5,12 @@ class TextScanner:
 
     def __init__(self, file):
         self._tokenizer = Tokenizer()
-        self._accessor = TokensAccessor(self._tokenizer.tokenize_file(file)) 
+        self._accessor = TokensAccessor(self._tokenizer.tokenize_file(file))
+        self._back_tokens = []
 
     def read_string(self):
+        if self._back_tokens:
+            return self._back_tokens.pop(0)
         return self._accessor.get_token()
 
     def read_float(self):
@@ -25,8 +28,26 @@ class TextScanner:
     def read_ints(self, amount):
         return [self.read_int() for _ in range(amount)]
 
-    def get_strings_before(self, endmark):
-        return list(self._accessor.get_tokens_before(endmark))
+    def read_strings_before(self, endmark):
+        tokens = []
+        
+        while True:
+            token = self.read_string()
+
+            if (token == endmark or token == ""):
+                return tokens
+
+            tokens.append(token)
+
+
+    def read_ints_before(self, endmark):
+        return [int(x) for x in read_strings_before(endmark)]
+
+    def read_floats_before(self, endmark):
+        return [float(x) for x in read_floats_before(endmark)]
+
+    def put_back(self, token):
+        self._back_tokens.append(str(token))
 
     @property
     def line_number(self):
@@ -51,15 +72,6 @@ class TokensAccessor:
 
     def get_tokens(self, amount):
         return (self.get_token() for _ in range(amount))
-
-    def get_tokens_before(self, endmark):
-        for token in self._tokens_iterator:
-            if token == endmark:
-                break
-
-            yield token
-
-        return iter([])
     
     def __iter__(self):
         return self._tokens_iterator

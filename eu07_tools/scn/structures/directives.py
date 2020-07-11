@@ -62,15 +62,6 @@ class Description:
         self.type = "description"
 
 
-class Event:
-    def __init__(self, name):
-        self.name = "name"
-        self.type = "event"
-        self.subtype = "multiple"
-        self.delay = 0
-        self.node_name = "none"
-
-
 class FirstInit:
     def __init__(self):
         self.type = "firstinit"

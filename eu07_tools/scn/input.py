@@ -34,7 +34,6 @@ class SCNInput(Iterator):
             "endtrainset": self._load_endtrainset,
         }
 
-
         self._node_loaders = {
             "dynamic": self._load_node_dynamic,
             "eventlauncher": self._load_node_eventlauncher,
@@ -50,6 +49,29 @@ class SCNInput(Iterator):
             "triangles": self._load_node_triangles,
             "triangle_strip": self._load_node_triangle_strip,
             "triangle_fan": self._load_node_triangle_fan,
+        }
+
+        self._event_loaders = {
+            "addvalues": self._load_event_addvalues,
+            "copyvalues": self._load_event_copyvalues,
+            "getvalues": self._load_event_getvalues,
+            "logvalues": self._load_event_logvalues,
+            "putvalues": self._load_event_putvalues,
+            "updatevalues": self._load_event_updatevalues,
+            "animation": self._load_event_animation,
+            "lights": self._load_event_lights,
+            "trackvel": self._load_event_trackvel,
+            "visible": self._load_event_visible,
+            "voltage": self._load_event_voltage,
+            "whois": self._load_event_whois,
+            "friction": self._load_event_friction,
+            "multiple": self._load_event_multiple,
+            "switch": self._load_event_switch,
+            "sound": self._load_event_sound,
+            "disable": self._load_event_disable,
+            "dynvel": self._load_event_dynvel,
+            "message": self._load_event_message,
+            "texture": self._load_event_texture,
         }
 
         self._is_trainset_open = False
@@ -73,9 +95,13 @@ class SCNInput(Iterator):
             load_element = self._element_loaders.get(token)
 
             if load_element:
-                element = load_element()
+                try:
+                    element = load_element()
+                except ValueError as e:
+                    raise Warning(f"Bad SCN syntax in line: {self._scanner.line_number}")
                 if element:
                     yield element
+
 
     def _load_atmo(self):
         atmo = eu07_tools.scn.create_element("atmo")
@@ -110,17 +136,17 @@ class SCNInput(Iterator):
 
     def _load_config(self):
         config = eu07_tools.scn.create_element("config")
-        config.content = " ".join(self._scanner.get_strings_before("endconfig"))
+        config.content = " ".join(self._scanner.read_strings_before("endconfig"))
         return config
 
     def _load_description(self):
         description = eu07_tools.scn.create_element("description")
-        self._scanner.get_strings_before("enddescription")
+        self._scanner.read_strings_before("enddescription")
         return None
 
     def _load_event(self):
         event = eu07_tools.scn.create_element("event")
-        self._scanner.get_strings_before("endevent")
+        self._scanner.read_strings_before("endevent")
         return None
 
     def _load_firstinit(self):
@@ -128,14 +154,14 @@ class SCNInput(Iterator):
 
     def _load_include(self):
         include = eu07_tools.scn.create_element("include")
-        include.path, *parameters = self._scanner.get_strings_before("end")
+        include.path, *parameters = self._scanner.read_strings_before("end")
         include.parameters = parameters
 
         return include
 
     def _load_light(self):
         light = eu07_tools.scn.create_element("light")
-        self._scanner.get_strings_before("endlight")
+        self._scanner.read_strings_before("endlight")
         return None
 
     def _load_lua(self):
@@ -162,7 +188,7 @@ class SCNInput(Iterator):
         return sky
 
     def _load_test(self):
-        self._scanner.get_strings_before("endtest")
+        self._scanner.read_strings_before("endtest")
         return None
 
     def _load_time(self):
@@ -238,7 +264,7 @@ class SCNInput(Iterator):
         launcher.delta_time = self._scanner.read_float()
         launcher.first_event_name, launcher.second_event_name = self._scanner.read_strings(2)
 
-        if launcher.second_event_name != "condition":
+        if launcher.second_event_name == "condition":
             launcher.memcell_name = self._scanner.read_strings(2)
             launcher.check_mask = self._scanner.read_int()
         
@@ -278,8 +304,7 @@ class SCNInput(Iterator):
     def _load_node_memcell(self, name):
         memcell = eu07_tools.scn.create_element("node:memcell", name)
         memcell.location = self._scanner.read_floats(3)
-        memcell.values[0] = self._scanner.read_string()
-        memcell.values[1:] = self._scanner.read_floats(3)
+        memcell.values = self._scanner.read_strings(3)
         memcell.track_name = self._scanner.read_string()
         self._scanner.read_string()
 
@@ -291,7 +316,7 @@ class SCNInput(Iterator):
         model.path, model.map = self._scanner.read_strings(2)
         # TODO: Lights
 
-        self._scanner.get_strings_before("endmodel")
+        self._scanner.read_strings_before("endmodel")
         
         return model
 
@@ -420,7 +445,7 @@ class SCNInput(Iterator):
         power_source.fast_fuse_repetition = self._scanner.read_int()
         power_source.slow_fuse_timeout = self._scanner.read_float()
 
-        optional = [x.lower() for x in self._scanner.get_strings_before("end")]
+        optional = [x.lower() for x in self._scanner.read_strings_before("end")]
 
         power_source.recuperation = ("recuperation" in optional)
         power_source.section = ("section" in optional)
@@ -473,4 +498,259 @@ class SCNInput(Iterator):
         
         return triangles
 
+
+    def _load_event(self):
+        name, subtype = self._scanner.read_strings(2)
+        delay = self._scanner.read_float()
+
+        load_event = self._event_loaders.get(subtype)
+
+        if load_event:
+            event = load_event(name)
+            event.delay = delay
+
+            token = self._scanner.read_string()
+            if (token == "randomdelay"):
+                event.randomdelay = self._scanner.read_float()
+                self._scanner.read_string()
+
+            return event
+
+
+    def _events_load_conditions(self, conditions):
+        token = self._scanner.read_string()
+
+        if (token == "trackoccupied"):
+            conditions.use_trackoccupied = True
+
+        if (token == "trackfree"):
+            conditions.use_trackfree = True
+
+        if (token == "propability"):
+            conditions.use_propability = True
+
+        if (token == "memcompare"):
+            conditions.use_memcompare = True
+            conditions.memcompare_values = self._scanner.read_strings(3)
+
+
+    def _load_event_addvalues(self, name):
+        addvalues = eu07_tools.scn.create_element("event:addvalues", name)
+
+        addvalues.memcell_name = self._scanner.read_string()
+        addvalues.values = self._scanner.read_strings(3)
+
+        token = self._scanner.read_string()
+
+        if (token == "condition"):
+            self._events_load_conditions(addvalues.conditions)
+
+        return addvalues
+
+
+    def _load_event_copyvalues(self, name):
+        copyvalues = eu07_tools.scn.create_element("event:copyvalues", name)
+
+        copyvalues.target_memcell_name = self._scanner.read_string()
+        copyvalues.source_memcell_name = self._scanner.read_string()
+        token = self._scanner.read_string()
+        if token not in "endevent randomdelay":
+            copyvalues.mask = int(token)
+        else:
+            self._scanner.put_back(token)
+
+        return copyvalues
+
     
+    def _load_event_getvalues(self, name):
+        getvalues = eu07_tools.scn.create_element("event:getvalues", name)
+
+        getvalues.memcell_name = self._scanner.read_string()
+
+        return getvalues
+
+
+    def _load_event_logvalues(self, name):
+        logvalues = eu07_tools.scn.create_element("event:logvalues", name)
+
+        logvalues.memcell_name = self._scanner.read_string()
+
+        return logvalues
+
+
+    def _load_event_putvalues(self, name):
+        putvalues = eu07_tools.scn.create_element("event:putvalues", name)
+
+        return putvalues
+
+
+    def _load_event_updatevalues(self, name):
+        updatevalues = eu07_tools.scn.create_element("event:updatevalues", name)
+
+        updatevalues.memcell_name = self._scanner.read_string()
+        updatevalues.values = self._scanner.read_strings(3)
+
+        token = self._scanner.read_string()
+
+        if (token == "condition"):
+            self._events_load_conditions(updatevalues.conditions)
+        else:
+            self._scanner.put_back(token)
+
+        return updatevalues
+       
+
+    def _load_event_animation(self, name):
+        animation = eu07_tools.scn.create_element("event:animation", name)
+
+        animation.model_name, animation.anim_type, animation.submodel_name = self._scanner.read_strings(3)
+        *animation.vector, animation.delay = self._scanner.read_floats(4)
+
+        return animation
+    
+
+    def _load_event_lights(self, name):
+        lights = eu07_tools.scn.create_element("event:lights", name)
+
+        lights.model_name = self._scanner.read_string()
+        while True:
+            token = self._scanner.read_string()
+            if (token in "endevent randomdelay"):
+                self._scanner.put_back(token)
+                break
+
+            lights.light_states.append(float(token))
+
+        return lights
+
+    
+    def _load_event_trackvel(self, name):
+        trackvel = eu07_tools.scn.create_element("event:trackvel", name)
+
+        trackvel.track_name = self._scanner.read_string()
+        trackvel.velocity = self._scanner.read_float()
+
+        return trackvel
+
+
+    def _load_event_visible(self, name):
+        visible = eu07_tools.scn.create_element("event:visible", name)
+
+        visible.node_name = self._scanner.read_string()
+        visible.visibility = self._scanner.read_int() 
+
+        return visible
+
+
+    def _load_event_voltage(self, name):
+        voltage = eu07_tools.scn.create_element("event:voltage", name)
+
+        voltage.powersource_name = self._scanner.read_string()
+        voltage.voltage = self._scanner.read_float() 
+
+        return voltage
+
+    
+    def _load_event_whois(self, name):
+        whois = eu07_tools.scn.create_element("event:whois", name)
+
+        whois.memcell_name = self._scanner.read_string()
+        whois.mask = self._scanner.read_int() 
+
+        return whois
+
+
+    def _load_event_friction(self, name):
+        friction = eu07_tools.scn.create_element("event:friction", name)
+
+        friction.track_name = self._scanner.read_string()
+        friction.friction = self._scanner.read_float() 
+
+        return friction
+
+
+    def _load_event_multiple(self, name):
+        multiple = eu07_tools.scn.create_element("event:multiple", name)
+
+        while True:
+            token = self._scanner.read_string()
+            if token not in "condition else randomdelay endevent":
+                break
+            multiple.events_names.append(token)
+            
+        if (token == "else"):
+            while True:
+                token = self._scanner.read_string()
+                if token not in "condition randomdelay endevent":
+                    break
+                multiple.else_events_names.append(token)
+                
+        if token == "condition":
+            self._events_load_conditions(multiple.conditions)
+
+        return multiple
+
+    
+    def _load_event_switch(self, name):
+        switch = eu07_tools.scn.create_element("event:switch", name)
+
+        switch.switch_name = self._scanner.read_string()
+        switch.state = self._scanner.read_int()
+
+        # TODO: Naprawic tego potwora jakos
+        token = self._scanner.read_string()
+        if token not in "endevent randomdelay":
+            switch.move_rate = self._scanner.read_float()
+            token = self._scanner.read_string()
+            if token not in "endevent randomdelay":
+                switch.move_rate_delay = self._scanner.read_float()
+            else:
+                self._scanner.put_back(token)
+        else:
+            self._scanner.put_back(token)
+
+        return switch
+
+    
+    def _load_event_sound(self, name):
+        sound = eu07_tools.scn.create_element("event:sound", name)
+
+        sound.sound_name = self._scanner.read_string()
+        sound.play_status = self._scanner.read_string()
+
+        token = self._scanner.read_string()
+        if (token in "endevent randomdelay"):
+            self._scanner.put_back(token)
+        else:
+            sound.radio_channel = int(token)
+
+        return sound
+
+
+    def _load_event_disable(self, name):
+        disable = eu07_tools.scn.create_element("event:disable", name)
+        self._scanner.read_string()
+        return disable
+
+
+    def _load_event_dynvel(self, name):
+        dynvel = eu07_tools.scn.create_element("event:dynvel", name)
+        self._scanner.read_string()
+        return dynvel
+
+
+    def _load_event_message(self, name):
+        message = eu07_tools.scn.create_element("event:message", name)
+        self._scanner.read_string()
+        return message
+
+
+    def _load_event_texture(self, name):
+        texture = eu07_tools.scn.create_element("event:texture", name)
+
+        texture.models_names = self._scanner.read_string().split("|")
+        texture.replacableskin_index = self._scanner.read_int()
+        texture.material_name = self._scanner.read_string()
+        texture.params_memcell_name = self._scanner.read_string()
+
+        return texture
