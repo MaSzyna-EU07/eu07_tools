@@ -22,6 +22,7 @@ class SCNOutput:
             "time": self._dump_time,
             "trainset": self._dump_trainset,
             "endtrainset": self._dump_endtrainset,
+            
             "node:dynamic": self._dump_node_dynamic,
             "node:eventlauncher": self._dump_node_eventlauncher,
             "node:lines": self._dump_node_lines,
@@ -32,6 +33,27 @@ class SCNOutput:
             "node:traction": self._dump_node_traction,
             "node:tractionpowersource": self._dump_node_tractionpowersource,
             "node:triangles": self._dump_node_triangles,
+            
+            "event:addvalues": self._dump_event_addvalues,
+            "event:copyvalues": self._dump_event_copyvalues,
+            "event:getvalues": self._dump_event_getvalues,
+            "event:logvalues": self._dump_event_logvalues,
+            "event:putvalues": self._dump_event_putvalues,
+            "event:updatevalues": self._dump_event_updatevalues,
+            "event:animation": self._dump_event_animation,
+            "event:lights": self._dump_event_lights,
+            "event:trackvel": self._dump_event_trackvel,
+            "event:visible": self._dump_event_visible,
+            "event:voltage": self._dump_event_voltage,
+            "event:whois": self._dump_event_whois,
+            "event:friction": self._dump_event_friction,
+            "event:multiple": self._dump_event_multiple,
+            "event:switch": self._dump_event_switch,
+            "event:sound": self._dump_event_sound,
+            "event:disable": self._dump_event_disable,
+            "event:dynvel": self._dump_event_dynvel,
+            "event:message": self._dump_event_message,
+            "event:texture": self._dump_event_texture,
         }
 
         self._is_trainset_opened = False
@@ -400,5 +422,169 @@ class SCNOutput:
             self._writer.write_string(endtag)
 
 
+    def _event_dump_header(self, event):
+        self._writer.write_string("event")
+        self._writer.write_string(event.name)
+        self._writer.write_string(event.type.split(":")[1])
+        self._writer.write_float(event.delay)
 
-    
+    def _event_dump_ending(self, event):
+        if event.random_delay != 0:
+            self._writer.write_string("randomdelay")
+            self._writer.write_float(event.random_delay)
+
+        self._writer.write_string("endevent\n")
+
+    def _event_dump_conditions(self, event):
+        self._writer.write_string("condition")
+
+        condition = event.condition
+
+        if conditions.use_trackfree:
+            self._writer.write_string("trackfree")
+
+        if conditions.use_trackfree:
+            self._writer.write_string("trackoccupied")
+
+        if conditions.use_propability:
+            self._writer.write_string("propability")
+
+        if conditions.use_memcompare:
+            self._writer.write_string("memcompare")
+            self._writer.write_strings(condition.memcompare_values)
+
+    def _dump_event_addvalues(self, addvalues):
+        self._event_dump_header(addvalues)
+        self._writer.write_string(addvalues.memcell_name)
+        self._writer.write_strings(values)
+        self._event_dump_conditions(addvalues)
+        self._event_dump_ending(addvalues)
+
+    def _dump_event_copyvalues(self, copyvalues):
+        self._event_dump_header(copyvalues)
+        self._writer.write_string(copyvalues.target_memcell_name)
+        self._writer.write_string(copyvalues.source_memcell_name)
+        if (copyvalues.mask != 0):
+            self._writer.write_int(copyvalues.mask)
+        self._event_dump_ending(copyvalues)
+
+    def _dump_event_getvalues(self, getvalues):
+        self._event_dump_header(getvalues)
+        self._writer.write_string(getvalues.memcell_name)
+        self._event_dump_ending(getvalues)
+
+    def _dump_event_logvalues(self, getvalues):
+        self._event_dump_header(logvalues)
+        self._writer.write_string(logvalues.memcell_name)
+        self._event_dump_ending(logvalues)
+
+    def _dump_event_putvalues(self, putvalues):
+        self._event_dump_header(putvalues)
+        self._writer.write_string("none")
+        self._writer.write_floats(putvalues.location)
+        self._writer.write_strings(putvalues.values)
+        self._event_dump_ending(putvalues)
+
+    def _dump_event_updatevalues(self, updatevalues):
+        self._event_dump_header(updatevalues)
+        self._writer.write_string(updatevalues.memcell_name)
+        self._writer.write_strings(values)
+        self._event_dump_conditions(updatevalues)
+        self._event_dump_ending(updatevalues)
+
+    def _dump_event_animation(self, animation):
+        self._event_dump_header(animation)
+        self._writer.write_string(animation.model_name)
+        self._writer.write_string(animation.anim_type)
+        self._writer.write_string(animation.submodel_name)
+        self._writer.write_floats(animation.vector)
+        self._writer.write_float(animation.speed)
+        self._event_dump_ending(animation)
+
+    def _dump_event_lights(self, lights):
+        self._event_dump_header(lights)
+        self._writer.write_string(lights.model_name)
+        self._writer.write_ints(lights.light_states)
+        self._event_dump_ending(lights)
+
+    def _dump_event_trackvel(self, trackvel):
+        self._event_dump_header(trackvel)
+        self._writer.write_string(trackvel.track_name)
+        self._writer.write_float(trackvel.speed)
+        self._event_dump_ending(trackvel)
+
+    def _dump_event_visible(self, visible):
+        self._event_dump_header(visible)
+        self._writer.write_string(visible.node_name)
+        self._writer.write_int(visible.visibility)
+        self._event_dump_ending(visible)
+
+    def _dump_event_voltage(self, voltage):
+        self._event_dump_header(voltage)
+        self._writer.write_string(voltage.powersource_name)
+        self._writer.write_float(voltage.voltage)
+        self._event_dump_ending(voltage)
+
+    def _dump_event_whois(self, whois):
+        self._event_dump_header(whois)
+        self._writer.write_string(whois.memcell_name)
+        self._writer.write_int(whois.mask)
+        self._event_dump_ending(whois)
+
+    def _dump_event_friction(self, friction):
+        self._event_dump_header(friction)
+        self._writer.write_string(friction.track_name)
+        self._writer.write_float(friction.friction)
+        self._event_dump_ending(friction)
+
+    def _dump_event_multiple(self, multiple):
+        self._event_dump_header(multiple)
+        self._writer.write_string(multiple.memcell_name)
+        self._writer.write_strings(multiple.events_names)
+
+        if multiple.else_events_names:
+            self._writer.write_string("else")
+            self._writer.write_strings(multiple.else_events_names)
+
+        self._event_dump_conditions(multiple)
+        self._event_dump_ending(multiple)
+
+    def _dump_event_switch(self, switch):
+        self._event_dump_header(switch)
+        self._writer.write_string(switch.switch_name)
+        self._writer.write_int(switch.state)
+
+        if switch.move_rate != -1:
+            self._writer.write_float(switch.move_rate)
+
+            if (switch.move_rate_delay != -1):
+                self._writer.write_float(switch.move_rate_delay)
+
+        self._event_dump_ending(switch)
+
+    def _dump_event_sound(self, sound):
+        self._event_dump_header(sound)
+        self._writer.write_string(sound.sound_name)
+        self._writer.write_int(sound.play_status)
+
+        if sound.radio_channel > 0:
+            self._writer.write_int(sound.radio_channel)
+
+        self._event_dump_ending(sound)
+
+    def _dump_event_disable(self, disable):
+        pass
+
+    def _dump_event_dynvel(self, dynvel):
+        pass
+
+    def _dump_event_message(self, message):
+        pass
+
+    def _dump_event_texture(self, texture):
+        self._event_dump_header(texture)
+        self._writer.write_string("|".join(texture.models_names))
+        self._writer.write_int(texture.replacableskin_index)
+        self._writer.write_string(texture.material_name)
+        self._writer.write_string(texture.params_memcell_name)
+        self._event_dump_ending(texture)

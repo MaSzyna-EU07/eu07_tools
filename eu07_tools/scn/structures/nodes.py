@@ -69,7 +69,7 @@ class NodeMemcell(Node):
     def __init__(self, name):
         super().__init__(name)
         self._location = VectorXYZ((0, 0, 0))
-        self.values = ["none", 0, 0]
+        self.values = ["", "0", "0"]
         self.track_name = "none"
 
     @property
@@ -88,11 +88,14 @@ class MemcellValues:
     def __getitem__(self, index):
         item = self._values[index]
         if item != "*" and index != 0:
-            return float(item) 
+            return float(item)
         return item
 
     def __setitem__(self, index, value):
         self._values[index] = str(value)
+
+    def __iter__(self):
+        return iter(values)
 
 
 class NodeModel(Node):

@@ -8,6 +8,7 @@ class Event:
         self.type = "event"
         self.subtype = ""
         self.delay = 0
+        self.random_delay = 0
 
 
 class EventAddvalues(Event):
@@ -17,7 +18,6 @@ class EventAddvalues(Event):
         self.memcell_name = "none"
         self._values = MemcellValues(("*", "*", "*"))
         self.conditions = Conditions()
-        self.random_delay = 0
 
     @property
     def values(self, values):
@@ -26,6 +26,7 @@ class EventAddvalues(Event):
     @values.setter
     def values(self, values):
         self._values = MemcellValues(values)
+
 
 class EventCopyvalues(Event):
     def __init__(self, name):
@@ -54,6 +55,24 @@ class EventPutvalues(Event):
     def __init__(self, name):
         super().__init__(name)
         self.type = "event:putvalues"
+        self._location = VectorXYZ((0, 0, 0))
+        self._values = MemcellValues("none", "*", "*")
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, location):
+        self._location = VectorXYZ(location)
+
+    @property
+    def values(self, values):
+        return values
+
+    @values.setter
+    def values(self, values):
+        self._values = MemcellValues(values)
 
 
 class EventUpdatevalues(Event):
@@ -61,9 +80,8 @@ class EventUpdatevalues(Event):
         super().__init__(name)
         self.type = "event:updatevalues"
         self.memcell_name = "none"
-        self.values = MemcellValues(("*", 0, 0))
+        self.values = MemcellValues(("*", "*", "*"))
         self.conditions = Conditions()
-        self.random_delay = 0
 
     @property
     def values(self, values):
@@ -149,7 +167,6 @@ class EventMultiple(Event):
         self.events_names = []
         self.else_events_names = []
         self.conditions = Conditions()
-        self.random_delay = 0
 
 
 class EventSwitch(Event):
@@ -205,7 +222,7 @@ class Conditions:
         self.use_trackoccupied = False
         self.use_propability = False
         self.use_memcompare = False
-        self.memcompare_values = MemcellValues(("*", 0, 0))
+        self.memcompare_values = MemcellValues(("*", "*", "*"))
 
     @property
     def memcompare_values(self, values):

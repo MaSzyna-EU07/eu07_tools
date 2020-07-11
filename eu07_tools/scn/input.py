@@ -56,7 +56,7 @@ class SCNInput(Iterator):
             "copyvalues": self._load_event_copyvalues,
             "getvalues": self._load_event_getvalues,
             "logvalues": self._load_event_logvalues,
-            "putvalues": self._load_event_putvalues,
+            #"putvalues": self._load_event_putvalues,
             "updatevalues": self._load_event_updatevalues,
             "animation": self._load_event_animation,
             "lights": self._load_event_lights,
@@ -511,7 +511,7 @@ class SCNInput(Iterator):
 
             token = self._scanner.read_string()
             if (token == "randomdelay"):
-                event.randomdelay = self._scanner.read_float()
+                event.random_delay = self._scanner.read_float()
                 self._scanner.read_string()
 
             return event
@@ -580,7 +580,9 @@ class SCNInput(Iterator):
 
     def _load_event_putvalues(self, name):
         putvalues = eu07_tools.scn.create_element("event:putvalues", name)
-
+        self._scanner.read_string() # "none"
+        putvalues.location = self._scanner.read_floats(3)
+        putvalues.values = self._scanner.read_strings(3)
         return putvalues
 
 
