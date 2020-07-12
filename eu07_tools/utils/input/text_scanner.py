@@ -53,6 +53,11 @@ class TextScanner:
     def line_number(self):
         return self._tokenizer.line_no
 
+    @property
+    def filename(self):
+        return self._tokenizer.filename
+
+
 
 # Ugly legacy code written long time ago, might be refactored later,
 # it must work because all inputs rely on this tokenizer
@@ -99,7 +104,6 @@ class Tokenizer:
     def __init__(self, return_comments=False, separators=_DEFAULT_SEPARATORS):
         self.line_no = 0
 
-        self._file = None
         self._stream_size = 0
         self._readed_stream_size = 0
 
@@ -133,6 +137,10 @@ class Tokenizer:
     @property
     def progress(self):
         return round((self._readed_stream_size / self._stream_size) * 100, ndigits=2)
+
+    @property
+    def filename(self):
+        return self._stream.name
                 
     # internal:
     def _get_tokens_generator(self):

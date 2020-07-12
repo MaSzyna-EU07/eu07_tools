@@ -20,6 +20,10 @@ class TextWriter:
         for v in values:
             self.write_float(v)
 
+    def write_ints(self, values):
+        for v in values:
+            self.write_int(v)
+
     def write_string(self, value):
         separator = "" if value.endswith("\n") else self._separator 
         self._file.write(value + separator)

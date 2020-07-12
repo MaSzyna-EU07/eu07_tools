@@ -20,8 +20,8 @@ class EventAddvalues(Event):
         self.conditions = Conditions()
 
     @property
-    def values(self, values):
-        return values
+    def values(self):
+        return self._values
 
     @values.setter
     def values(self, values):
@@ -67,7 +67,7 @@ class EventPutvalues(Event):
         self._location = VectorXYZ(location)
 
     @property
-    def values(self, values):
+    def values(self):
         return values
 
     @values.setter
@@ -80,12 +80,12 @@ class EventUpdatevalues(Event):
         super().__init__(name)
         self.type = "event:updatevalues"
         self.memcell_name = "none"
-        self.values = MemcellValues(("*", "*", "*"))
+        self._values = MemcellValues(("*", "*", "*"))
         self.conditions = Conditions()
 
     @property
-    def values(self, values):
-        return values
+    def values(self):
+        return self._values
 
     @values.setter
     def values(self, values):
@@ -225,10 +225,10 @@ class Conditions:
         self.memcompare_values = MemcellValues(("*", "*", "*"))
 
     @property
-    def memcompare_values(self, values):
-        return values
+    def memcompare_values(self):
+        return self._memcompare_values
 
     @memcompare_values.setter
     def memcompare_values(self, values):
-        self._values = MemcellValues(values)
+        self._memcompare_values = MemcellValues(values)
 

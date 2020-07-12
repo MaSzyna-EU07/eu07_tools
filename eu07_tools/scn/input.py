@@ -98,7 +98,7 @@ class SCNInput(Iterator):
                 try:
                     element = load_element()
                 except ValueError as e:
-                    raise Warning(f"Bad SCN syntax in line: {self._scanner.line_number}")
+                    raise Warning(f"Bad SCN syntax in file: {self._scanner.filename} in line: {self._scanner.line_number}")
                 if element:
                     yield element
 
@@ -265,8 +265,8 @@ class SCNInput(Iterator):
         launcher.first_event_name, launcher.second_event_name = self._scanner.read_strings(2)
 
         if launcher.second_event_name == "condition":
-            launcher.memcell_name = self._scanner.read_strings(2)
-            launcher.check_mask = self._scanner.read_int()
+            launcher.memcell_name = self._scanner.read_string()
+            launcher.memcompare_values = self._scanner.read_strings(3)
         
         self._scanner.read_string() # endtag
 

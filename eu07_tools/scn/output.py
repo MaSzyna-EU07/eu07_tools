@@ -177,7 +177,6 @@ class SCNOutput:
         self._node_dump_header(launcher)
         self._writer.write_string("eventlauncher")
         self._writer.write_floats(launcher.location)
-        self._writer.write_float(launcher.rotation)
         self._writer.write_string(launcher.key)
         self._writer.write_float(launcher.delta_time)
         self._writer.write_string(launcher.first_event_name)
@@ -185,7 +184,7 @@ class SCNOutput:
 
         if launcher.second_event_name == "condition":
             self._writer.write_string(launcher.memcell_name)
-            self._writer.write_int(launcher.check_mask)
+            self._writer.write_strings(launcher.memcompare_values)
 
         self._writer.write_string("end\n")
 
@@ -202,8 +201,8 @@ class SCNOutput:
         self._writer.write_floats(lines.color)
         self._writer.write_float(lines.thickness)
 
-        num_verts = len(lines.vertices)
-        for vertex_id, vertex in enumerate(lines.vertices):
+        num_verts = len(lines.points)
+        for vertex_id, vertex in enumerate(lines.points):
             self._writer.write_floats(vertex)
 
             endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendline\n\n" 
@@ -372,7 +371,7 @@ class SCNOutput:
         self._writer.write_floats(power_source.location)
         self._writer.write_string("\n")
         self._writer.write_float(power_source.nominal_voltage)
-        self._writer.write_floats(power_source.voltage_frequency)
+        self._writer.write_float(power_source.voltage_frequency)
         self._writer.write_float(power_source.internal_resistance)
         self._writer.write_float(power_source.max_output_current)
         self._writer.write_string("\n")
@@ -438,7 +437,7 @@ class SCNOutput:
     def _event_dump_conditions(self, event):
         self._writer.write_string("condition")
 
-        condition = event.condition
+        conditions = event.conditions
 
         if conditions.use_trackfree:
             self._writer.write_string("trackfree")
@@ -451,12 +450,12 @@ class SCNOutput:
 
         if conditions.use_memcompare:
             self._writer.write_string("memcompare")
-            self._writer.write_strings(condition.memcompare_values)
+            self._writer.write_strings(conditions.memcompare_values)
 
     def _dump_event_addvalues(self, addvalues):
         self._event_dump_header(addvalues)
         self._writer.write_string(addvalues.memcell_name)
-        self._writer.write_strings(values)
+        self._writer.write_strings(addvalues.values)
         self._event_dump_conditions(addvalues)
         self._event_dump_ending(addvalues)
 
@@ -473,7 +472,7 @@ class SCNOutput:
         self._writer.write_string(getvalues.memcell_name)
         self._event_dump_ending(getvalues)
 
-    def _dump_event_logvalues(self, getvalues):
+    def _dump_event_logvalues(self, logvalues):
         self._event_dump_header(logvalues)
         self._writer.write_string(logvalues.memcell_name)
         self._event_dump_ending(logvalues)
@@ -488,7 +487,7 @@ class SCNOutput:
     def _dump_event_updatevalues(self, updatevalues):
         self._event_dump_header(updatevalues)
         self._writer.write_string(updatevalues.memcell_name)
-        self._writer.write_strings(values)
+        self._writer.write_strings(updatevalues.values)
         self._event_dump_conditions(updatevalues)
         self._event_dump_ending(updatevalues)
 

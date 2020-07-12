@@ -36,7 +36,15 @@ class NodeEventlauncher(Node):
         self.first_event_name = "none"
         self.second_event_name = "none"
         self.memcell_name = "none"
-        self.check_mask = 0
+        self._memcompare_values = MemcellValues(("*", "*", "*"))
+
+        @property
+        def memcompare_values(self):
+            return self._memcompare_values
+
+        @memcompare_values.setter
+        def memcompare_values(self, values):
+            self._memcompare_values = MemcellValues(values)
 
     @property
     def location(self):
@@ -95,7 +103,7 @@ class MemcellValues:
         self._values[index] = str(value)
 
     def __iter__(self):
-        return iter(values)
+        return iter(self._values)
 
 
 class NodeModel(Node):
