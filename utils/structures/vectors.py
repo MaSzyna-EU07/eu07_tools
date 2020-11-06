@@ -32,7 +32,7 @@ class BaseVector:
     def __mul__(self, other) -> BaseVector:
         return self._math_helper(operator.mul, other)
 
-    def __div__(self, other) -> BaseVector:
+    def __truediv__(self, other) -> BaseVector:
         return self._math_helper(operator.truediv, other)
 
     def __iadd__(self, other):
