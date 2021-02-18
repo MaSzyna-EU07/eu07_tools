@@ -52,7 +52,7 @@ def e3d_to_t3d(e3d_model):
         
         yield t3d_sm
 
-def t3d_to_e3d(self):
+def t3d_to_e3d(t3d_model):
     pass
 
 

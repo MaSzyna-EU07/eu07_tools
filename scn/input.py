@@ -340,6 +340,8 @@ class SCNInput(Iterator):
         track.quality_flag = self._scanner.read_int()
         track.damage_flag = self._scanner.read_int()
         track.environment = self._scanner.read_string().lower()
+        if (track.environment == "mountain"): 
+            track.environment = "mountains"
         track.is_visible = (self._scanner.read_string().lower() == "vis")
 
         if track.is_visible:
