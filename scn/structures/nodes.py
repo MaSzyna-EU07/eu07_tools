@@ -191,6 +191,7 @@ class NodeTrack(Node):
         self.vradius = 0
         self.trackbed = "none"
         self.railprofile = "none"
+        self.friction_memcell_name = "none"
 
     @property
     def is_junction(self):
