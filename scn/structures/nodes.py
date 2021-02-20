@@ -157,9 +157,7 @@ class NodeTrack(Node):
         self.map1 = "none"
         self.map2 = "none"
         self.mapping_length = 4
-        self.geometry_param1 = 0
-        self.geometry_param2 = 0
-        self.geometry_param3 = 0
+        self.geometry_params = [0, 0, 0]
         self._p1 = VectorXYZ((0, 0, 0))
         self.p1_roll = 0
         self._cv1 = VectorXYZ((0, 0, 0))

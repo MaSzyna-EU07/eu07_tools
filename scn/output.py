@@ -261,9 +261,7 @@ class SCNOutput:
             self._writer.write_string(track.map1)
             self._writer.write_float(track.mapping_length)
             self._writer.write_string(track.map2)
-            self._writer.write_float(track.geometry_param1)
-            self._writer.write_float(track.geometry_param2)
-            self._writer.write_float(track.geometry_param3)
+            self._writer.write_floats(track.geometry_params)
             self._writer.write_string("\n")
 
         self._writer.write_floats(track.p1)
