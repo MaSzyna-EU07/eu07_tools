@@ -57,6 +57,9 @@ class BaseVector:
         values = ", ".join(str(v) for v in self._values)
         return f"<{self.__class__.__name__}({values})>"
 
+    def swizzled(self):
+        return [-self._values[0], self._values[2], self._values[1]]
+
 
 class VectorXYZ(BaseVector):
     @property
