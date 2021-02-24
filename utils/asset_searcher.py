@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 class AssetSearcher:
-    def __init__(self, root, basedir):
+    def __init__(self, root, basedir=""):
         self._root = Path(root)
         self._basedir = Path(basedir)
 
@@ -114,6 +114,9 @@ class PathFinder:
         rel_path = rel_path.lstrip("\\").lstrip("/")
         rel_path = rel_path.replace("\\", "/")
         for lookup in self.lookups:
+            if lookup == "":
+                continue
+
             full_path = Path(lookup, rel_path)
 
             if self.extensions:
