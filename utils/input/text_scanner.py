@@ -1,10 +1,10 @@
 class TextScanner:
     @classmethod
-    def from_file(cls, file):
-        return cls(file)
+    def from_file(cls, file, parameters=None):
+        return cls(file, parameters)
 
-    def __init__(self, file):
-        self._tokenizer = Tokenizer()
+    def __init__(self, file, parameters=[]):
+        self._tokenizer = Tokenizer(parameters=parameters)
         self._accessor = TokensAccessor(self._tokenizer.tokenize_file(file))
         self._back_tokens = []
 
@@ -101,8 +101,9 @@ class Tokenizer:
             self.return_ = return_
             self.keep_delimiters = keep_delimiters
 
-    def __init__(self, return_comments=False, separators=_DEFAULT_SEPARATORS):
+    def __init__(self, return_comments=False, separators=_DEFAULT_SEPARATORS, parameters=None):
         self.line_no = 0
+        self._parameters = parameters
 
         self._stream_size = 0
         self._readed_stream_size = 0
@@ -158,6 +159,8 @@ class Tokenizer:
             yield from self._handle_delimited_tokens(delimiter_match.group(0), string)
         else:
             string = string.rstrip("\n")
+            for i, parameter in enumerate(self._parameters):
+                string = string.replace(f"(p{i+1}", str(parameter))
             for token in re.split(self._re_separators, string):
 
                 if token != "":
