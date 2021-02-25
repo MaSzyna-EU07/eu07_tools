@@ -159,8 +159,6 @@ class Tokenizer:
             yield from self._handle_delimited_tokens(delimiter_match.group(0), string)
         else:
             string = string.rstrip("\n")
-            for i, parameter in enumerate(self._parameters):
-                string = string.replace(f"(p{i+1}", str(parameter))
             for token in re.split(self._re_separators, string):
 
                 if token != "":
