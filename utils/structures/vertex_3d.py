@@ -8,6 +8,9 @@ class Vertex3D(collections.abc.Sequence):
         values = list(values)
         num_values = len(values)
 
+        self.use_normal = (num_values > 5)
+        self.use_tangent = (num_values > 8)
+
         if num_values in (5, 8, 12):
             self._location = VectorXYZ(values[:3])
             self._normal = (
@@ -56,23 +59,16 @@ class Vertex3D(collections.abc.Sequence):
     def tangent(self, tangent):
         self._tangent = VectorXYZW(tangent)
 
-    @property
-    def has_normal(self):
-        return self._normal != VectorXYZ((0.0, 0.0, 0.0))
-
-    @property
-    def has_tangent(self):
-        return self._tangent != VectorXYZW((0.0, 0.0, 0.0, 0.0))
-
     def __len__(self):
-        return 8 if self.has_normal else 5
+        return 8 if self.use_normal else 5
 
     def __getitem__(self, index):
         return list(self)[index]
 
     def __iter__(self):
-        normal = self._normal if self.has_normal else []
-        return iter((*self._location, *normal, *self._mapping))
+        normal = self._normal if self.use_normal else []
+        tangent = self._tangent if self.use_tangent else []
+        return iter((*self._location, *normal, *self._mapping, *tangent))
 
     def __str__(self):
         return " ".join(str(v) for v in iter(self))

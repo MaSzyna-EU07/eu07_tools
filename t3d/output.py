@@ -58,16 +58,29 @@ class T3DOutput:
 
     def _dump_geometry(self, submodel):
         if submodel.type == "Mesh":
-            self._write_property("NumVerts", submodel.num_verts)
-            for triangle in submodel.triangles:
-                self._writer.write_int(triangle.smooth)
-                self._writer.write_string("\n")
+            if submodel.use_indices:
 
-                for vertex in triangle.vertices:
-                    self._writer.write_floats(vertex)
+                self._write_property("NumIndices", submodel.num_indices)
+                for i in range(submodel.num_indices // 3):
+                    self._writer.write_floats(submodel.indices[i:i+3])
                     self._writer.write_string("\n")
 
                 self._writer.write_string("\n")
+                self._write_property("NumVerts", submodel.num_verts)
+                for vertex in submodel.vertices:
+                    self._writer.write_floats(vertex)
+                    self._writer.write_string("\n")
+            else:
+                self._write_property("NumVerts", submodel.num_verts)
+                for triangle in submodel.triangles:
+                    self._writer.write_int(triangle.smooth)
+                    self._writer.write_string("\n")
+
+                    for vertex in triangle.vertices:
+                        self._writer.write_floats(vertex)
+                        self._writer.write_string("\n")
+
+                    self._writer.write_string("\n")
 
         elif submodel.type == "Stars":
             self._write_property("NumVerts", len(submodel.stars))

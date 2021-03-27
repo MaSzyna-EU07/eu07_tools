@@ -73,6 +73,7 @@ class T3DInput:
     def _load_geometry(self, submodel):
         token = self._scanner.read_string().lower()
         if "numindices" in token:
+            submodel.use_indices = True
             num_indices = self._scanner.read_float()
 
             for i in range(num_indices):
@@ -80,7 +81,7 @@ class T3DInput:
 
             num_verts = self._read_property()
             for i in range(num_verts):
-                submodel.vertices.new(self._scanner.read_floats(12))
+                vertex = submodel.vertices.new(self._scanner.read_floats(12))
 
         else:
             num_total_verts = self._read_property()

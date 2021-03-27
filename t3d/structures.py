@@ -146,6 +146,8 @@ class MeshSubmodel(Submodel):
         self.map = "none"
 
         # primary storage method: vertices + indices
+        self.use_indices = False
+
         self.vertices = FactorySequence(Vertex3D)
         self.indices = []
         # alternative storage: triangles
@@ -203,7 +205,7 @@ class MeshTriangle:
         )
 
         self.smooth = -1 if any(
-            vertex.has_normal for vertex in self.vertices
+            vertex.use_normal for vertex in self.vertices
         ) else smooth
 
 
