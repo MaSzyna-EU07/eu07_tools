@@ -74,7 +74,7 @@ class T3DInput:
         token = self._scanner.read_string().lower()
         if "numindices" in token:
             submodel.use_indices = True
-            num_indices = self._scanner.read_float()
+            num_indices = self._scanner.read_int()
 
             for i in range(num_indices):
                 submodel.indices.append(self._scanner.read_int())
