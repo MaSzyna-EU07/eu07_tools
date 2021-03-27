@@ -83,8 +83,8 @@ class T3DInput:
             for i in range(num_verts):
                 vertex = submodel.vertices.new(self._scanner.read_floats(12))
 
-        else:
-            num_total_verts = self._read_property()
+        elif "numverts" in token:
+            num_total_verts = self._scanner.read_int()
 
             num_loaded_verts = 0
             MAX_UNIT_SIZE = 3
