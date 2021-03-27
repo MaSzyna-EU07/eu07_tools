@@ -9,7 +9,7 @@ class TextWriter:
     def write_float(self, value):
         formatted = str(round(value, 5))
 
-        if formatted != "0":
+        if "." in formatted:
             formatted = formatted.rstrip("0").rstrip(".")
 
         formatted = "0" if formatted == "-0" else formatted
