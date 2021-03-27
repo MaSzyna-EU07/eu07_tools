@@ -14,10 +14,13 @@ class Vertex3D(collections.abc.Sequence):
         if num_values in (5, 8, 12):
             self._location = VectorXYZ(values[:3])
             self._normal = (
-                VectorXYZ(values[3:6]) if num_values == 8 
+                VectorXYZ(values[3:6]) if self.use_normal
                 else VectorXYZ((0.0, 0.0, 0.0))
             )
-            self._mapping = VectorUV(values[-2:])
+            self._mapping = (
+                VectorUV(values[6:8]) if self.use_normal
+                else VectorUV(values[3:])
+            )
             self._tangent = (
                 VectorXYZW(values[-4:]) if num_values == 12
                 else VectorXYZW((0, 0, 0, 0))

@@ -62,7 +62,7 @@ class T3DOutput:
 
                 self._write_property("NumIndices", submodel.num_indices)
                 for i in range(submodel.num_indices // 3):
-                    self._writer.write_floats(submodel.indices[i:i+3])
+                    self._writer.write_floats(submodel.indices[i*3:i*3+3])
                     self._writer.write_string("\n")
 
                 self._writer.write_string("\n")
