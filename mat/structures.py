@@ -7,7 +7,6 @@ from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS
 def create_mapping():
     return Mapping()
 
-# TODO: Collections.abc subclass
 class Mapping(collections.abc.MutableMapping):
     def __init__(self):
         self._items = {}

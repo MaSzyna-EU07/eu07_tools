@@ -71,31 +71,44 @@ class T3DInput:
         return submodel
 
     def _load_geometry(self, submodel):
-        num_total_verts = self._read_property()
-        
-        num_loaded_verts = 0
-        MAX_UNIT_SIZE = 3
+        token = self._scanner.read_string().lower()
+        if "numindices" in token:
+            num_indices = self._scanner.read_float()
 
-        if num_total_verts % MAX_UNIT_SIZE == 0:
-            LAST_UNIT_SIZE = MAX_UNIT_SIZE
+            for i in range(num_indices):
+                submodel.indices.append(self._scanner.read_int())
+
+            num_verts = self._read_property()
+            for i in range(num_verts):
+                submodel.vertices.new(self._scanner.read_floats(12))
+
         else:
-            LAST_UNIT_SIZE = num_total_verts % MAX_UNIT_SIZE
+            num_total_verts = self._read_property()
 
-        while num_loaded_verts < num_total_verts:
-            is_last_unit = (num_loaded_verts + MAX_UNIT_SIZE >= num_total_verts)
-            unit_size = LAST_UNIT_SIZE if is_last_unit else MAX_UNIT_SIZE
-            num_loaded_verts += unit_size
+            num_loaded_verts = 0
+            MAX_UNIT_SIZE = 3
 
-            unit_flag = self._scanner.read_int()
+            if num_total_verts % MAX_UNIT_SIZE == 0:
+                LAST_UNIT_SIZE = MAX_UNIT_SIZE
+            else:
+                LAST_UNIT_SIZE = num_total_verts % MAX_UNIT_SIZE
 
-            vertex_size = 8 if unit_flag == -1 else 5
-            vertices = [self._scanner.read_floats(vertex_size) for _ in range(unit_size)]
+            while num_loaded_verts < num_total_verts:
+                is_last_unit = (num_loaded_verts + MAX_UNIT_SIZE >= num_total_verts)
+                unit_size = LAST_UNIT_SIZE if is_last_unit else MAX_UNIT_SIZE
+                num_loaded_verts += unit_size
 
-            if submodel.type == "Mesh":
-                submodel.triangles.new(vertices, unit_flag)
-            elif submodel.type == "Stars":
-                for vertex in vertices:
-                    submodel.stars.new(vertex[:3], vertex[3])
+                unit_flag = self._scanner.read_int()
+
+                vertex_size = 8 if unit_flag == -1 else 5
+                vertices = [self._scanner.read_floats(vertex_size) for _ in range(unit_size)]
+
+                if submodel.type == "Mesh":
+                    submodel.triangles.new(vertices, unit_flag)
+                elif submodel.type == "Stars":
+                    for vertex in vertices:
+                        submodel.stars.new(vertex[:3], vertex[3])
+
 
     def _read_property(self):
         propname = self._scanner.read_string().lower().rstrip(":")

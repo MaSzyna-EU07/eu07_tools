@@ -144,7 +144,14 @@ class MeshSubmodel(Submodel):
         self.wire_size = 1.0
         self.opacity = 1.0
         self.map = "none"
+
+        # primary storage method: vertices + indices
+        self.vertices = FactorySequence(Vertex3D)
+        self.indices = []
+        # alternative storage: triangles
         self.triangles = FactorySequence(MeshTriangle)
+
+
 
     @property
     def ambient_color(self):
@@ -164,7 +171,15 @@ class MeshSubmodel(Submodel):
 
     @property
     def num_verts(self):
-        return len(self.triangles) * 3
+        if len(self.triangles) > 0:
+            return len(self.triangles) * 3
+
+        return len(self.vertices)
+
+    @property
+    def num_indices(self):
+        return len(self.indices)
+
 
 
 class MeshTriangle:

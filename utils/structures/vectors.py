@@ -87,6 +87,16 @@ class VectorXYZ(BaseVector):
         self._values[2] = z
 
 
+class VectorXYZW(VectorXYZ):
+    @property
+    def w(self):
+        return self._values[3]
+
+    @w.setter
+    def w(self, w):
+        self._values[3] = w
+
+
 class VectorXY(BaseVector):
     @property
     def x(self):
