@@ -12,7 +12,7 @@ def _load_mapping(scanner):
     map_ = create_mapping()
 
     while True:
-        token = scanner.get_token()
+        token = scanner.read_string()
         key = token.rstrip(":")
         value = None
         
@@ -25,21 +25,21 @@ def _load_mapping(scanner):
 
 
         elif "texture" in key:
-            token = scanner.get_token()
+            token = scanner.read_string()
 
             if token == "[":
-                value = list(scanner.get_tokens_before("]"))
+                value = list(scanner.read_strings_before("]"))
             else:
                 value = token
 
         elif key in NESTED_MAPPING_KEYS:
             value = _load_mapping(scanner)
         elif key in NUMERIC_KEYS:
-            value = float(scanner.get_token())
+            value = scanner.read_float()
         elif key == "size":
-            value = [float(x) for x in scanner.get_tokens(2)]
+            value = [float(x) for x in scanner.read_floats(2)]
         else:
-            value = scanner.get_token()
+            value = scanner.read_string()
 
         map_[key] = value
 

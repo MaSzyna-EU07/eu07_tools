@@ -12,7 +12,7 @@ class MATOutput:
     def dump_mapping():
         self._write_if_exists("texture_diffuse")
         self._write_if_exists("texture0")
-        self._write_if_exists("texture_normal")
+        self._write_if_exists("texture_normalmap")
         self._write_if_exists("texture1")
 
         self._write_if_exists("shader")
