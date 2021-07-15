@@ -6,3 +6,7 @@ NESTED_MAPPING_KEYS = {
 NUMERIC_KEYS = {
     "selfillum", "opacity"
 }
+
+STRING_KEYS = {
+    "shader",
+}
