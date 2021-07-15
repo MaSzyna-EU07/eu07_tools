@@ -6,6 +6,12 @@ from .model_convert import e3d_to_t3d, t3d_to_e3d
 
 from pathlib import Path
 
+class Value:
+    def __init__(self, value):
+        # moze byc parametr w stringu
+        # i moze byc konkret wartosc
+        pass
+
 def find_asset_root(filepath):
     root = Path("")
     filepath = Path(filepath).resolve()
