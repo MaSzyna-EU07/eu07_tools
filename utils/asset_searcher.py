@@ -117,17 +117,18 @@ class PathFinder:
             if lookup == "":
                 continue
 
-            full_path = Path(lookup, rel_path)
+            full_path = self._lower_filename(Path(lookup, rel_path))
 
             if self.extensions:
                 for extension in self.extensions:
                     full_path = full_path.with_suffix(extension)
-                    full_path_lowered = Path(str(full_path).lower())
-                    if full_path.exists() or full_path_lowered.exists():
+                    if full_path.exists():
                         yield str(full_path.with_suffix(extension))
             else:
-                full_path_lowered = Path(str(full_path).lower())
-                if full_path.exists() or full_path_lowered.exists():
+                if full_path.exists():
                     yield str(full_path)
 
         return
+
+    def _lower_filename(self, path):
+        return Path(path.parent, path.name.lower())

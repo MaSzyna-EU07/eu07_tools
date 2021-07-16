@@ -12,6 +12,12 @@ class Value:
         # i moze byc konkret wartosc
         pass
 
+
+def lower_filepath_name(filepath):
+    filepath = Path(filepath)
+    return Path(filepath.parent, filepath.name.lower())
+
+
 def find_asset_root(filepath):
     root = Path("")
     filepath = Path(filepath).resolve()
