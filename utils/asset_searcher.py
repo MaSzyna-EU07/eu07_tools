@@ -25,9 +25,9 @@ class AssetSearcher:
             [".mat", ".tga", ".dds", ".png", ".bmp", ".tex"]
         )
 
-        self.includes = PathFinder(
+        self.scenes = PathFinder(
             [
-                Path(self._root), 
+                Path(self._root, "scenery"),
                 Path(self._basedir)
             ],
             []
