@@ -27,6 +27,11 @@ def _load_mapping(scanner):
         elif "texture" in key:
             token = scanner.read_string()
 
+            if key == "texture1":
+                key = "texture_diffuse"
+            elif key == "texture2":
+                key = "texture_normalmap"
+
             if token == "[":
                 value = list(scanner.read_strings_before("]"))
             else:
