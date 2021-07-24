@@ -52,7 +52,7 @@ class PathFinder:
         """ Restore default finder state """
         self.extensions = self._original_extensions
 
-    def add_extension(self, extension):
+    def add_extension(self, extension, priority=0):
         """ 
         Add new extension to extensions list 
 
@@ -60,6 +60,7 @@ class PathFinder:
         :type extension: `str`
         """
         self.extensions.append(extension)
+        self.set_extension_priority(extension, priority)
 
     def remove_extension(self, extension):
         """ 
