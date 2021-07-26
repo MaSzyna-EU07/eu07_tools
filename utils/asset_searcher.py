@@ -111,7 +111,7 @@ class PathFinder:
         :returns: iterator of paths
         :rtype: `Iterator[str]`
         """
-        
+
         rel_path = rel_path.lstrip("\\").lstrip("/")
         rel_path = rel_path.replace("\\", "/")
         for lookup in self.lookups:

@@ -15,7 +15,7 @@ class Value:
 
 def lower_filepath_name(filepath):
     filepath = Path(filepath)
-    return Path(filepath.parent, filepath.name.lower())
+    return str(Path(filepath.parent, filepath.name.lower()))
 
 
 def find_asset_root(filepath):
