@@ -33,7 +33,7 @@ def e3d_to_t3d(e3d_model):
                 vertices = e3d_sm.vertices[x*3:x*3+3]
 
                 for vertex in vertices:
-                    vertex.location = eu07_tools.utils.switch_coordinate_system(vertex.location)
+                    vertex.location = eu07_tools.utils.swizzle_coords(vertex.location)
 
                 t3d_sm.triangles.new(vertices, -1)
 

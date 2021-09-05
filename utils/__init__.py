@@ -47,5 +47,5 @@ def shorten_asset_path(filepath):
 
     return str(shortpath)
 
-def switch_coordinate_system(vector):
+def swizzle_coords(vector):
     return [-vector[0], vector[2], vector[1]]
