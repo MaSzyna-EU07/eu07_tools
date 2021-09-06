@@ -1,2 +1,2 @@
-from .text_scanner import TextScanner
+from .text_scanner import TextScanner, Tokenizer
 from .binary_scanner import BinaryScanner
