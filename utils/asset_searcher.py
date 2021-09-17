@@ -33,6 +33,13 @@ class AssetSearcher:
             []
         )
 
+        self.sounds = PathFinder(
+            [
+                Path(self._root, "sounds")
+            ],
+            [".ogg", ".wav"]
+        )
+
 
 class PathFinder:
     """

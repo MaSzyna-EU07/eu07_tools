@@ -44,6 +44,8 @@ def shorten_asset_path(filepath):
     shortpath = filepath.relative_to(root).with_suffix("")
     if "textures" in shortpath.parts:
         shortpath = shortpath.relative_to("textures")
+    if "sounds" in shortpath.parts:
+        shortpath = shortpath.relative_to("sounds")
 
     return str(shortpath)
 

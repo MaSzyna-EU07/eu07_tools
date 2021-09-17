@@ -242,7 +242,7 @@ class SCNOutput:
         self._writer.write_string("sound")
         self._writer.write_floats(sound.location)
         self._writer.write_string(sound.path)
-        self._writer.write_string("endsound")
+        self._writer.write_string("endsound\n")
 
     def _dump_node_track(self, track):
         self._node_dump_header(track)
