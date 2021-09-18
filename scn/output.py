@@ -213,7 +213,7 @@ class SCNOutput:
         self._writer.write_string("memcell")
         self._writer.write_floats(memcell.location)
         self._writer.write_string(memcell.values[0])
-        self._writer.write_floats(memcell.values[1:])
+        self._writer.write_strings(memcell.values[1:])
         self._writer.write_string(memcell.track_name)
         self._writer.write_string("endmemcell\n")
 

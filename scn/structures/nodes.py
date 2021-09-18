@@ -76,6 +76,7 @@ class NodeLines(Node):
 class NodeMemcell(Node):
     def __init__(self, name):
         super().__init__(name)
+        self.type = "node:memcell"
         self._location = VectorXYZ((0, 0, 0))
         self.values = ["", "0", "0"]
         self.track_name = "none"
