@@ -2,7 +2,7 @@ from eu07_tools.utils import TextWriter
 
 def dump(elements, file):
     SCNOutput(file).dump_from_iterable(elements)
-            
+
 
 class SCNOutput:
     def __init__(self, file):
@@ -59,12 +59,14 @@ class SCNOutput:
         self._is_trainset_opened = False
 
     def dump_from_iterable(self, elements):
-        for e in elements:
-            dump = self._dumpers.get(e.type)
+        for element in elements:
+            self.dump_element(element)
 
-            if dump is not None:
-                dump(e)
-                
+    def dump_element(self, element):
+        dumper = self._dumpers.get(element.type)
+
+        if dumper is not None:
+            dumper(element)
 
     def _dump_atmo(self, atmo):
         self._writer.write_string("atmo")
@@ -221,19 +223,26 @@ class SCNOutput:
         self._node_dump_header(model)
         self._writer.write_string("model")
         self._writer.write_floats(model.location)
-        self._writer.write_float(model.rotation_y)
+        self._writer.write_float(model.rotation.y)
         self._writer.write_string(model.path)
         self._writer.write_string(model.map)
 
+        use_angles = model.rotation.x != 0 and model.rotation.z != 0
+        if use_angles:
+            self._writer.write_string("angles")
+            self._writer.write_floats(model.rotation)
+
         if model.light_states:
             self._writer.write_string("lights")
-            if model.light_states:
-                self._writer.write_floats(model.light_states)
+            self._writer.write_floats(model.light_states)
 
             if model.light_colors:
                 self._writer.write_string("lightcolors")
                 for color in model.light_colors:
                     self._writer.write_string(color)
+
+            if model.notransition:
+                self._writer.write_string("notransition")
 
         self._writer.write_string("endmodel\n")
 
@@ -461,7 +470,7 @@ class SCNOutput:
         self._event_dump_header(copyvalues)
         self._writer.write_string(copyvalues.target_memcell_name)
         self._writer.write_string(copyvalues.source_memcell_name)
-        if (copyvalues.mask != 0):
+        if copyvalues.mask != 0:
             self._writer.write_int(copyvalues.mask)
         self._event_dump_ending(copyvalues)
 

@@ -39,12 +39,14 @@ class TextScanner:
 
             tokens.append(token)
 
+        return tokens
+
 
     def read_ints_before(self, endmark):
-        return [int(x) for x in read_strings_before(endmark)]
+        return [int(x) for x in self.read_strings_before(endmark)]
 
     def read_floats_before(self, endmark):
-        return [float(x) for x in read_floats_before(endmark)]
+        return [float(x) for x in self.read_strings_before(endmark)]
 
     def put_back(self, token):
         self._back_tokens.append(str(token))

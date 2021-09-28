@@ -112,11 +112,12 @@ class NodeModel(Node):
         super().__init__(name)
         self.type = "node:model"
         self._location = VectorXYZ((0, 0, 0))
-        self.rotation_y = 0
+        self._rotation = VectorXYZ((0, 0, 0))
         self.path = ""
         self.map = ""
         self.light_states = []
         self.light_colors = []
+        self.notransition = False
 
     @property
     def location(self):
@@ -125,6 +126,14 @@ class NodeModel(Node):
     @location.setter
     def location(self, location):
         self._location = VectorXYZ(location)
+
+    @property
+    def rotation(self):
+        return self._rotation
+
+    @rotation.setter
+    def rotation(self, rotation):
+        self._rotation = VectorXYZ(rotation)
 
 class NodeSound(Node):
     def __init__(self, name):

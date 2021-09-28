@@ -1,3 +1,3 @@
-from .input import load
-from .output import dump
+from .input import load, SCNInput
+from .output import dump, SCNOutput
 from .structures import create_element

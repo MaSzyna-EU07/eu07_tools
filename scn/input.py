@@ -312,12 +312,53 @@ class SCNInput(Iterator):
 
     def _load_node_model(self, name):
         model = eu07_tools.scn.create_element("node:model", name)
-        *model.location, model.rotation_y = self._scanner.read_floats(4)
+        *model.location, model.rotation.y = self._scanner.read_floats(4)
         model.path, model.map = self._scanner.read_strings(2)
-        # TODO: Lights
 
-        self._scanner.read_strings_before("endmodel")
-        
+
+        additional_tokens = self._scanner.read_strings_before("endmodel")
+
+        if "notransition" in additional_tokens:
+            model.notransition = True
+
+        try:
+            angles_index = additional_tokens.index("angles")
+            model.rotation = [float(token) for token in additional_tokens[angles_index + 1: angles_index + 4]]
+        except ValueError:
+            pass
+
+        try:
+            lights_index = additional_tokens.index("lights")
+            counter = 0
+            while True:
+                token = additional_tokens[lights_index + counter]
+
+                try:
+                    model.light_states.append(float(token))
+                except ValueError:
+                    break
+
+                counter += 1
+
+        except ValueError:
+            pass
+
+        try:
+            lightcolors_index = additional_tokens.index("lightcolors")
+            counter = 0
+            while True:
+                token = additional_tokens[lightcolors_index + counter]
+
+                try:
+                    model.light_colors.append(float(token))
+                except ValueError:
+                    break
+
+                counter += 1
+
+        except ValueError:
+            pass
+
         return model
 
     def _load_node_sound(self, name):
