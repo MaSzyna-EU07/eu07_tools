@@ -91,7 +91,7 @@ class SCNOutput:
         self._writer.write_string("endcamera\n")
 
     def _dump_config(self, config):
-        self._writer.write_string(f"config {config.content} endconfig\n")
+        self._writer.write_string(f"config\n{config.content}\nendconfig\n\n")
 
     def _dump_event(self, event):
         pass
