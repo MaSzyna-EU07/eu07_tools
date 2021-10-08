@@ -3,19 +3,21 @@ import math
 from eu07_tools.utils import TextWriter
 
 def dump(elements, file):
-    T3DOutput(file).dump(elements)
+    T3DOutput(file).dump_from_iterable(elements)
 
 class T3DOutput:
     def __init__(self, file):
         self._writer = TextWriter(file)
 
-    def dump(self, elements):
-        for e in elements:
-            if e.element_type == "include":
-                self._writer.write_string(f"include {e.path} end\n")
-            elif e.element_type == "submodel":
-                self._dump_submodel(e)
-                
+    def dump_from_iterable(self, elements):
+        for element in elements:
+            self.dump_element(element)
+
+    def dump_element(self, element):
+        if element.element_type == "include":
+            self._writer.write_string(f"include {element.path} end\n")
+        elif element.element_type == "submodel":
+            self._dump_submodel(element)
 
     def _dump_submodel(self, submodel):
         self._writer.write_string(f"//{'-' * 81}\n")

@@ -63,6 +63,8 @@ class SCNOutput:
             self.dump_element(element)
 
     def dump_element(self, element):
+        if element is None: return
+
         dumper = self._dumpers.get(element.type)
 
         if dumper is not None:

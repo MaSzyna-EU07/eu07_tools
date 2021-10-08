@@ -1,7 +1,7 @@
 import warnings
 
-from .input import load
-from .output import dump
+from .input import load, T3DInput
+from .output import dump, T3DOutput
 from .structures import (
     create_include, create_submodel,
     Element, Include,
