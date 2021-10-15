@@ -60,6 +60,10 @@ class BaseVector:
     def swizzled(self):
         return [-self._values[0], self._values[2], self._values[1]]
 
+    # todo: make it not inherited by colors
+    @property
+    def magnitude(self):
+        return math.sqrt(sum(value ** value for value in self._values))
 
 class VectorXYZ(BaseVector):
     @property
