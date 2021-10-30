@@ -1,41 +1,40 @@
 from pathlib import Path
 
-
 class AssetSearcher:
     def __init__(self, root, basedir=""):
-        self._root = Path(root)
-        self._basedir = Path(basedir)
+        self.root = Path(root)
+        self.basedir = Path(basedir)
 
         self.models = PathFinder(
             [
-                Path(self._root), 
-                Path(self._basedir), 
-                Path(self._root, "models")
+                Path(self.root),
+                Path(self.basedir),
+                Path(self.root, "models")
             ],
             [".e3d", ".t3d"]
         )
 
         self.textures = PathFinder(
             [
-                Path(self._root), 
-                Path(self._basedir), 
-                Path(self._root, "textures"),
-                Path(str(self._basedir).replace("models", "textures"))
+                Path(self.root),
+                Path(self.basedir),
+                Path(self.root, "textures"),
+                Path(str(self.basedir).replace("models", "textures"))
             ],
             [".mat", ".tga", ".dds", ".png", ".bmp", ".tex"]
         )
 
         self.scenes = PathFinder(
             [
-                Path(self._root, "scenery"),
-                Path(self._basedir)
+                Path(self.root, "scenery"),
+                Path(self.basedir)
             ],
             []
         )
 
         self.sounds = PathFinder(
             [
-                Path(self._root, "sounds")
+                Path(self.root, "sounds")
             ],
             [".ogg", ".wav"]
         )
