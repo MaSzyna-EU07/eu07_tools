@@ -133,6 +133,13 @@ class Submodel:
         return None
 
     @property
+    def parent_name(self):
+        if self.parent:
+            return self.parent.name
+
+        return "none"
+
+    @property
     def first_child(self):
         return None if self.first_child_id == -1 else self.owner.submodels[self.first_child_id]
 
