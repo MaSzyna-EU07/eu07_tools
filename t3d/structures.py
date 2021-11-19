@@ -153,8 +153,6 @@ class MeshSubmodel(Submodel):
         # alternative storage: triangles
         self.triangles = FactorySequence(MeshTriangle)
 
-
-
     @property
     def ambient_color(self):
         return self._ambient_color
@@ -182,6 +180,12 @@ class MeshSubmodel(Submodel):
     def num_indices(self):
         return len(self.indices)
 
+    @property
+    def has_geometry(self):
+        if self.use_indices:
+            return len(self.vertices) == 0
+
+        return len(self.triangles) == 0
 
 
 class MeshTriangle:
