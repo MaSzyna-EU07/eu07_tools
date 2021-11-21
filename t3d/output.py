@@ -136,7 +136,7 @@ class T3DOutput:
         elif key_lower in "selfillum":
             if value == 2.0:
                 self._writer.write_string("true")
-            elif value == 0:
+            elif value == -1:
                 self._writer.write_string("false")
             else:
                 self._writer.write_float(value)

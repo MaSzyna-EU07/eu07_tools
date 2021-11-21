@@ -95,7 +95,7 @@ class Submodel(Element):
         self.parent_name = "none"
         self.anim = "false"
         self._diffuse_color = ColorRGB((255, 255, 255))
-        self.selfillum = 0
+        self.selfillum = -1
         self.max_distance = 1000
         self.min_distance = 0
         self.transform = [

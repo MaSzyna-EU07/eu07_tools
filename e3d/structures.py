@@ -55,7 +55,7 @@ class Submodel:
         self.matrix_id = 0
         self.num_verts = 0
         self.visibility_light_treshold = 0
-        self.selfillum = 0
+        self.selfillum = -1
         self._ambient_color = ColorRGBA((1, 1, 1, 1))
         self._diffuse_color = ColorRGBA((1, 1, 1, 1))
         self._specular_color = ColorRGBA((1, 1, 1, 1))
