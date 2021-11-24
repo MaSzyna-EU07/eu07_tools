@@ -86,7 +86,7 @@ class Submodel:
 
     @diffuse_color.setter
     def diffuse_color(self, diffuse_color):
-        self._diffuse_color = diffuse_color
+        self._diffuse_color = ColorRGBA(diffuse_color)
 
     @property
     def specular_color(self):
@@ -94,7 +94,7 @@ class Submodel:
 
     @specular_color.setter
     def specular_color(self, specular_color):
-        self._specular_color = specular_color
+        self._specular_color = ColorRGBA(specular_color)
 
     @property
     def type(self):

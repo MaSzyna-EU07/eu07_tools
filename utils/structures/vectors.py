@@ -18,6 +18,11 @@ class BaseVector:
         return iter(self._values)
 
     def __getitem__(self, index: int) -> float:
+        if isinstance(index, slice):
+            start, stop, step = index.indices(self.__len__())
+
+            return self.__class__(self._values[start:stop:step])
+
         return self._values[index]
 
     def __setitem__(self, index: int, item: float):
