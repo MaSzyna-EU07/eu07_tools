@@ -171,10 +171,10 @@ class MeshSubmodel(Submodel):
 
     @property
     def num_verts(self):
-        if len(self.triangles) > 0:
-            return len(self.triangles) * 3
+        if self.use_indices:
+            return len(self.vertices)
 
-        return len(self.vertices)
+        return len(self.triangles) * 3
 
     @property
     def num_indices(self):
@@ -182,10 +182,7 @@ class MeshSubmodel(Submodel):
 
     @property
     def has_geometry(self):
-        if self.use_indices:
-            return len(self.vertices) == 0
-
-        return len(self.triangles) == 0
+        return self.num_verts != 0
 
 
 class MeshTriangle:

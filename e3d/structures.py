@@ -110,7 +110,12 @@ class Submodel:
 
     @property
     def map(self):
-        return "none" if self.material_id in (0, -1) else self.owner.material_names[self.material_id]
+        if self.material_id < 0:
+            return str(self.material_id)
+        elif self.material_id == 0:
+            return "none"
+        else:
+            return self.owner.material_names[self.material_id]
 
     @property
     def transform(self):
@@ -164,5 +169,9 @@ class Submodel:
     @property
     def id(self):
         return self.owner.submodels.index(self)
+
+    @property
+    def has_geometry(self):
+        return self.num_verts > 0
 
 
