@@ -113,8 +113,8 @@ class NodeModel(Node):
         self.type = "node:model"
         self._location = VectorXYZ((0, 0, 0))
         self._rotation = VectorXYZ((0, 0, 0))
-        self.path = ""
-        self.map = ""
+        self.path = "none.t3d"
+        self.map = "none"
         self.light_states = []
         self.light_colors = []
         self.notransition = False
