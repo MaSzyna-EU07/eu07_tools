@@ -229,7 +229,7 @@ class SCNOutput:
         self._writer.write_string(model.path)
         self._writer.write_string(model.map)
 
-        use_angles = model.rotation.x != 0 and model.rotation.z != 0
+        use_angles = model.rotation.x != 0 or model.rotation.z != 0
         if use_angles:
             self._writer.write_string("angles")
             self._writer.write_floats(model.rotation)
