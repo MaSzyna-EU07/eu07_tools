@@ -62,6 +62,14 @@ class Vertex3D(collections.abc.Sequence):
     def tangent(self, tangent):
         self._tangent = VectorXYZW(tangent)
 
+    def __eq__(self, other):
+        return (
+            self.location == other.location and
+            (self.use_normal and other.use_normal and self.normal == other.normal) and
+            self.mapping == other.mapping and
+            (self.use_tangent and other.use_tangent and self.tangent == other.tangent)
+        )
+
     def __len__(self):
         return 8 if self.use_normal else 5
 
