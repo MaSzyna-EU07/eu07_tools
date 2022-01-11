@@ -45,7 +45,7 @@ class BaseVector:
         return self
 
     def __eq__(self, other) -> bool:
-        return list(self) == list(other)
+        return self._values == other._values
 
     def __neg__(self):
         return self._math_helper(operator.mul, -1)

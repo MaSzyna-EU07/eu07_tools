@@ -68,7 +68,7 @@ class EventPutvalues(Event):
 
     @property
     def values(self):
-        return values
+        return self._values
 
     @values.setter
     def values(self, values):

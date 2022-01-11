@@ -181,6 +181,7 @@ class SCNOutput:
         self._node_dump_header(launcher)
         self._writer.write_string("eventlauncher")
         self._writer.write_floats(launcher.location)
+        self._writer.write_float(launcher.radius)
         self._writer.write_string(launcher.key)
         self._writer.write_float(launcher.delta_time)
         self._writer.write_string(launcher.first_event_name)
@@ -444,22 +445,28 @@ class SCNOutput:
         self._writer.write_string("endevent\n")
 
     def _event_dump_conditions(self, event):
-        self._writer.write_string("condition")
+        buffer = []
 
         conditions = event.conditions
 
         if conditions.use_trackfree:
-            self._writer.write_string("trackfree")
+            buffer.append("trackfree")
 
         if conditions.use_trackfree:
-            self._writer.write_string("trackoccupied")
+            buffer.append("trackoccupied")
 
         if conditions.use_propability:
-            self._writer.write_string("propability")
+            buffer.append("propability")
 
         if conditions.use_memcompare:
-            self._writer.write_string("memcompare")
-            self._writer.write_strings(conditions.memcompare_values)
+            buffer.append("memcompare")
+            buffer.extend(conditions.memcompare_values)
+
+        if buffer:
+            self._writer.write_string("condition")
+
+            for entry in buffer:
+                self._writer.write_string(entry)
 
     def _dump_event_addvalues(self, addvalues):
         self._event_dump_header(addvalues)

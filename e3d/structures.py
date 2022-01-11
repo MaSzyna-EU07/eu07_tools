@@ -1,4 +1,5 @@
 from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
+from eu07_tools.t3d import MeshTriangle
 
 def create_model():
     return Model()
@@ -71,6 +72,12 @@ class Submodel:
         self.cos_falloff_angle = 0
         self.cos_hotspot_angle = 0
         self.cos_view_angle = 0
+
+    def get_triangles_iter(self):
+        vertices = self.vertices
+        for triangle_index in range(self.num_verts // 3):
+            triangle_verts = vertices[triangle_index * 3: triangle_index * 3 + 3]
+            yield MeshTriangle(triangle_verts, smooth=-1)
 
     @property
     def ambient_color(self):
