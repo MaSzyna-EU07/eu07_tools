@@ -51,7 +51,7 @@ class E3DInput:
 
             submodel.next_submodel_id = self._scanner.read_int()
             submodel.first_child_id = self._scanner.read_int()
-            submodel.submodel_type_id = self._scanner.read_int()
+            submodel.type_id = self._scanner.read_int()
             submodel.name_id = self._scanner.read_int()
             submodel.anim_id = self._scanner.read_int()
             submodel.flags = self._scanner.read_int()
