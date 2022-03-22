@@ -17,6 +17,9 @@ class BinaryScanner:
         bytes_ = self._file.read(4)
         return struct.unpack("i", bytes_)[0]
 
+    def read_bool(self):
+        return bool(self.read_float())
+
     def read_float(self):
         bytes_ = self._file.read(4)
         return struct.unpack("f", bytes_)[0]
