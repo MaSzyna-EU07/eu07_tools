@@ -138,6 +138,11 @@ class T3DInput:
         elif propname in ("parent", "name", "map", "anim", "type"):
             value = self._scanner.read_string()
 
+        elif propname == "opacity":
+            value = self._scanner.read_float()
+            if value > 1:
+                value = value / 100
+
         else:
             value = self._scanner.read_float()
 
