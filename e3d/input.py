@@ -17,6 +17,7 @@ class E3DInput:
             "TEX0": self._read_TEX0,
             "NAM0": self._read_NAM0,
             "TRA0": self._read_TRA0,
+            "IDX0": self._read_IDX0,
         }
 
         self._scanner = eu07_tools.utils.BinaryScanner(file)
@@ -41,7 +42,6 @@ class E3DInput:
         chunk_size = self._scanner.read_int()
 
         return chunk_id, chunk_size
-
 
     def _read_SUB0(self, data_size):
         NUM_SUBMODELS = data_size // SUBMODEL_SIZE
@@ -76,10 +76,14 @@ class E3DInput:
             submodel.cos_falloff_angle = self._scanner.read_float()
             submodel.cos_hotspot_angle = self._scanner.read_float()
             submodel.cos_view_angle = self._scanner.read_float()
+            submodel.num_indices = self._scanner.read_int()
+            submodel.first_vertex_id = self._scanner.read_int()
 
             # skip pad bytes
-            self._scanner.read_bytes(100)
-            
+            self._scanner.read_bytes(92)
+
+    def _read_IDX0(self, data_size):
+        pass
 
     def _read_VNT0(self, data_size):
         num_verts = data_size // VERTEX_SIZE
@@ -87,7 +91,6 @@ class E3DInput:
         for _ in range(num_verts):
             vertex = [self._scanner.read_float() for _ in range(8)]
             self.model.vertices.new(vertex)
-                
 
     def _read_TRA0(self, data_size):
         num_matrices = data_size // MATRIX_SIZE

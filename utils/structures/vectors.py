@@ -63,12 +63,51 @@ class BaseVector:
         return f"<{self.__class__.__name__}({values})>"
 
     def swizzled(self):
-        return [-self._values[0], self._values[2], self._values[1]]
+        return VectorXYZ((-self._values[0], self._values[2], self._values[1]))
 
-    # todo: make it not inherited by colors
     @property
     def magnitude(self):
-        return math.sqrt(sum(value ** value for value in self._values))
+        return math.sqrt(sum(value ** 2 for value in self._values))
+
+    @property
+    def length(self):
+        return self.magnitude
+
+    @property
+    def length_squared(self):
+        return self.magnitude ** 2
+
+    @property
+    def normalized(self):
+        if self.magnitude == 0:
+            return self
+
+        return self / self.magnitude
+
+    def normalize(self):
+        self._values = list(self.normalized)
+
+    def cross(self, other):
+        # todo: superclass is dependent on subclass, change it
+        return VectorXYZ((
+            self[1] * other[2] - self[2] * other[1],
+            self[2] * other[0] - self[0] * other[2],
+            self[0] * other[1] - self[1] * other[0]
+        ))
+
+    def dot(self, other):
+        return sum(map(operator.mul, self, other))
+
+    def is_negative(self, other):
+        return self.dot(other) < -0.99
+
+    def compare_equality(self, other, threshold=0.00001):
+        vec = self - other
+        return all(abs(x) < threshold for x in vec)
+
+    def zero(self):
+        self._values = [0 for value in self._values]
+
 
 class VectorXYZ(BaseVector):
     @property

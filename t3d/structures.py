@@ -1,6 +1,7 @@
 import abc
 
 from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
+from eu07_tools.utils.structures.mesh_geometry import MeshTriangle
 
 
 def create_submodel(type, name):
@@ -183,31 +184,6 @@ class MeshSubmodel(Submodel):
     @property
     def has_geometry(self):
         return self.num_verts != 0
-
-
-class MeshTriangle:
-    """ Class representing triangle in mesh submodel
-    
-    :ivar vertices: Tuple of 3 vertices
-    :type vertives: `Tuple[utils.Vertex3D]`
-    :ivar smooth: Smooth mask, -1 if vertices has explicit normal vectors
-    :type smooth: `int`
-    """
-    def __init__(self, vertices, smooth=0):
-        """ Constructor method
-
-        :param vertices: Iterable of 3 vertices data
-        :type vertices: `Iterable[Iterable[float]]`
-        :param smooth: Smooth mask, -1 if vertices has explicit normal vectors
-        :type smooth: `int`
-        """
-        self.vertices = tuple(
-            Vertex3D(vertex) for vertex in vertices
-        )
-
-        self.smooth = -1 if any(
-            vertex.use_normal for vertex in self.vertices
-        ) else smooth
 
 
 class FreeSpotLightSubmodel(Submodel):

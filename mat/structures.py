@@ -47,11 +47,6 @@ class Texture:
     def value(self):
         return self._value
 
-    @property
-    def path(self):
-        if self.value_type == "TEXTURE_PATH":
-            return self.value.split(":")[0]
-
     @value.setter
     def value(self, value):
         self.value_type = (

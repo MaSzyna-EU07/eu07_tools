@@ -1,5 +1,6 @@
 from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
-from eu07_tools.t3d import MeshTriangle
+from eu07_tools.utils.structures.mesh_geometry import MeshTriangle
+
 
 def create_model():
     return Model()
@@ -50,11 +51,13 @@ class Submodel:
         self.name_id = -1
         self.anim_id = -1
         self.first_vertex_id = -1
+        self.first_index_id = 0
         self.material_id = -1
+        self.matrix_id = 0
 
         self.flags = 0
-        self.matrix_id = 0
         self.num_verts = 0
+        self.num_indices = 0
         self.visibility_light_treshold = 0
         self.selfillum = -1
         self._ambient_color = ColorRGBA((1, 1, 1, 1))
@@ -74,10 +77,12 @@ class Submodel:
         self.cos_view_angle = 0
 
     def get_triangles_iter(self):
-        vertices = self.vertices
-        for triangle_index in range(self.num_verts // 3):
-            triangle_verts = vertices[triangle_index * 3: triangle_index * 3 + 3]
-            yield MeshTriangle(triangle_verts, smooth=-1)
+        if self.has_geometry:
+            vertices = self.vertices
+            for triangle_index in range(len(vertices) // 3):
+                triangle_verts = vertices[triangle_index * 3: triangle_index * 3 + 3]
+                yield MeshTriangle(triangle_verts, smooth=-1)
+
 
     @property
     def ambient_color(self):
@@ -161,10 +166,23 @@ class Submodel:
 
     @property
     def vertices(self):
-        return self.owner.vertices[
-            self.first_vertex_id:
-            self.first_vertex_id + self.num_verts
-        ]
+        if self.has_legacy_geometry:
+            return self.owner.vertices[
+                self.first_vertex_id:
+                self.first_vertex_id + self.num_verts
+            ]
+
+        return []
+
+    @property
+    def indices(self):
+        if self.has_indexed_geometry:
+            return self.owner.indices[
+                self.first_index_id:
+                self.first_index_id + self.num_indices
+            ]
+
+        return []
 
     @property
     def children(self):
@@ -179,6 +197,18 @@ class Submodel:
 
     @property
     def has_geometry(self):
+        return self.has_legacy_geometry or self.has_indexed_geometry
+
+    @property
+    def has_indexed_geometry(self):
+        return self.num_indices > 0
+
+    @property
+    def has_legacy_geometry(self):
         return self.num_verts > 0
+
+
+
+
 
 
