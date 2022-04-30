@@ -16,6 +16,7 @@ class MeshGeometry:
 
         self.type = MeshGeometry.Type.TRIANGLES
 
+    # TODO: if-typed code should be polymorphic
     def as_triangles(self):
         new_geo = MeshGeometry()
         new_geo.type = MeshGeometry.Type.TRIANGLES
@@ -77,6 +78,13 @@ class MeshGeometry:
 
         elif self.type == MeshGeometry.Type.ORDERED:
             pass
+
+    def calc_smooth_groups_normals(self):
+        if self.type != MeshGeometry.Type.TRIANGLES:
+            raise Exception("Can't calculate smooth groups normals for indexed or ordered geometry!")
+
+        calc = SmoothGroupsNormalCalculator()
+        calc.run(self)
 
 
 class MeshTriangle:
@@ -151,15 +159,15 @@ class VertexStorageSectored:
         return sector
 
 
-class GeometryProcessor:
-    def process_legacy_t3d(self, input_triangles):
+class SmoothGroupsNormalCalculator:
+    def run(self, geometry):
         self.verts_storage = VertexStorageSectored()
         self.tris_normals = []
         self.smooth_groups = []
         triangles = []
 
         # Pushing vertices to lookup-optimized storage and calculating triangle normals
-        for triangle_index, triangle in enumerate(input_triangles):
+        for triangle_index, triangle in enumerate(geometry):
             if triangle.is_degenerate:
                 continue
 
@@ -173,74 +181,40 @@ class GeometryProcessor:
                 self.verts_storage.push(vertex)
 
         # Calculating per-face vertex normals
-        per_face_vertex_normals = []
         self.precalculated_normals = {}
         for triangle_index, triangle in enumerate(triangles):
+
+            triangle.smooth = -1
             triangle_normal = self.tris_normals[triangle_index]
 
             for local_vert_index, vertex in enumerate(triangle.vertices):
                 vertex_index = triangle_index * 3 + local_vert_index
 
                 try:
-                    per_face_vertex_normals.append(self.precalculated_normals[vertex_index])
+                    vertex.normal = self.precalculated_normals[vertex_index]
                 except KeyError:
                     if triangle.smooth == -1:
-                        normal = vertex.normal
-                        normal = normal.normalized if normal.length_squared > 0 else normal
+                       if vertex.normal.length_squared > 0:
+                           vertex.normal.normalize()
 
                     elif triangle.smooth == 0:
-                        normal = triangle_normal
+                        vertex.normal = triangle_normal
 
                     else:
-                        normal, shared_indices = self._calc_smooth_group_normal(
+                        vertex.normal, shared_indices = self._calc_smooth_group_normal(
                             vertex, self.tris_normals[triangle_index], triangle.smooth
                         )
 
-                        normal = normal.normalized if normal.length_squared > 0 else triangle_normal
+                        if vertex.normal.length_squared > 0:
+                            vertex.normal.normalize()
+                        else:
+                            vertex.normal = triangle_normal
 
                         for shared_index in shared_indices:
-                            self.precalculated_normals[shared_index] = normal
+                            self.precalculated_normals[shared_index] = vertex.normal
 
-                    per_face_vertex_normals.append(normal)
-                    self.precalculated_normals[vertex_index] = normal
+                    self.precalculated_normals[vertex_index] = vertex.normal
 
-        # Removing duplicated vertices & indexing
-        unique_verts_storage = VertexStorageSectored()
-        unique_per_face_vertex_normals = []
-        unique_per_face_uvs = []
-        indexed_geometry = []
-        num_indices = 0
-        original_indices_map = {}
-
-
-        for triangle_index, triangle in enumerate(triangles):
-
-            for local_vert_index, vertex in enumerate(triangle.vertices):
-                global_vert_index = triangle_index * 3 + local_vert_index
-
-                try:
-                    vertex_index = unique_verts_storage.find(vertex)
-                except KeyError:
-                    vertex_index = unique_verts_storage.push(vertex)
-                    original_indices_map[vertex_index] = global_vert_index
-                else:
-                    found_vert_triangle_index = original_indices_map[vertex_index] // 3
-
-                    normal1 = self.tris_normals[found_vert_triangle_index]
-                    normal2 = self.tris_normals[triangle_index]
-
-                    if normal1.is_negative(normal2):
-                        vertex_index = unique_verts_storage.push(vertex)
-                        original_indices_map[vertex_index] = global_vert_index
-
-                indexed_geometry.append(vertex_index)
-                unique_per_face_vertex_normals.append(per_face_vertex_normals[global_vert_index])
-                unique_per_face_uvs.append(vertex.mapping)
-                num_indices += 1
-
-        locations = [vertex.location for vertex in unique_verts_storage]
-
-        return num_indices, indexed_geometry, locations, unique_per_face_vertex_normals, unique_per_face_uvs, self.smooth_groups
 
     def _calc_smooth_group_normal(self, vertex, initial_normal, smooth_group):
         sector = self.verts_storage.get_sector(vertex.location)
@@ -261,6 +235,3 @@ class GeometryProcessor:
                     shared_indices.add(sc_vertex_index)
 
         return normal.normalized, shared_indices
-
-    def process_e3d(self, triangles_e3d):
-        return self.process_legacy_t3d(triangles_e3d)
