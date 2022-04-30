@@ -1,7 +1,7 @@
 import abc
 
 from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
-from eu07_tools.utils.structures.mesh_geometry import MeshTriangle
+from eu07_tools.utils.structures.mesh_geometry import MeshTriangle, MeshGeometry
 
 
 def create_submodel(type, name):
@@ -146,13 +146,7 @@ class MeshSubmodel(Submodel):
         self.opacity = 1.0
         self.map = "none"
 
-        # primary storage method: vertices + indices
-        self.use_indices = False
-
-        self.vertices = FactorySequence(Vertex3D)
-        self.indices = []
-        # alternative storage: triangles
-        self.triangles = FactorySequence(MeshTriangle)
+        self.geometry = None
 
     @property
     def ambient_color(self):

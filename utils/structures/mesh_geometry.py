@@ -1,6 +1,6 @@
 import enum
 
-from eu07_tools.utils import Vertex3D
+from eu07_tools.utils import Vertex3D, FactorySequence
 
 
 class MeshGeometry:
@@ -10,21 +10,45 @@ class MeshGeometry:
         INDEXED = 2
 
     def __init__(self):
-        self.vertices = []
+        self.vertices = FactorySequence(Vertex3D)
         self.indices = []
-        self.triangles = []
+        self.triangles = FactorySequence(MeshTriangle)
 
         self.type = MeshGeometry.Type.TRIANGLES
 
+    @classmethod
+    def init_triangles(cls):
+        instance = cls()
+        instance.type = MeshGeometry.Type.TRIANGLES
+        return instance
+
+    @classmethod
+    def init_ordered(cls):
+        instance = cls()
+        instance.type = MeshGeometry.Type.ORDERED
+        return instance
+
+    @classmethod
+    def init_indexed(cls):
+        instance = cls()
+        instance.type = MeshGeometry.Type.INDEXED
+        return instance
+
+    @property
+    def is_triangles(self):
+        return self.type == MeshGeometry.Type.TRIANGLES
+
+    @property
+    def is_ordered(self):
+        return self.type == MeshGeometry.Type.ORDERED
+
+    @property
+    def is_indexed(self):
+        return self.type == MeshGeometry.Type.INDEXED
+
     # TODO: if-typed code should be polymorphic
-    def as_triangles(self):
-        new_geo = MeshGeometry()
-        new_geo.type = MeshGeometry.Type.TRIANGLES
-
-        if self.type == MeshGeometry.Type.TRIANGLES:
-            return self
-
-        elif self.type == MeshGeometry.Type.ORDERED:
+    def to_triangles(self):
+        if self.is_ordered:
 
             triangle_vertices = []
 
@@ -32,27 +56,25 @@ class MeshGeometry:
                 triangle_vertices.append(vertex)
                 if (vertex_idx + 1) % 3 == 0:
                     triangle = MeshTriangle(triangle_vertices, smooth=-1)
-                    new_geo.triangles.append(triangle)
+                    self.triangles.append(triangle)
 
-        elif self.type == MeshGeometry.Type.INDEXED:
+        elif self.is_indexed:
 
             num_indices = len(self.indices)
             for i in range(num_indices // 3):
                 indices = self.indices[i * 3:i * 3 + 3]
                 triangle_vertices = [self.vertices[idx] for idx in indices]
                 triangle = MeshTriangle(triangle_vertices, smooth=-1)
-                new_geo.triangles.append(triangle)
+                self.triangles.append(triangle)
 
-        return new_geo
+        self.indices.clear()
+        self.vertices.clear()
 
-    def as_ordered(self):
-        new_geo = MeshGeometry()
-        new_geo.type = MeshGeometry.Type.ORDERED
+        self.type = MeshGeometry.Type.TRIANGLES
 
-        if self.type == MeshGeometry.Type.ORDERED:
-            return self
 
-        elif self.type == MeshGeometry.Type.TRIANGLES:
+    def to_ordered(self):
+        if self.is_triangles:
             new_geo = MeshGeometry()
             new_geo.type = MeshGeometry.Type.ORDERED
 
@@ -60,27 +82,28 @@ class MeshGeometry:
                 for vertex in triangle:
                     new_geo.vertices.append(vertex)
 
-        elif self.type == MeshGeometry.Type.INDEXED:
+        elif self.is_indexed:
             for vertex_index in self.indices:
-                new_geo.vertices.append(self.vertices[vertex_index])
+                self.vertices.append(self.vertices[vertex_index])
 
-        return new_geo
+        self.triangles.clear()
+        self.indices.clear()
 
-    def as_indexed(self):
-        new_geo = MeshGeometry()
-        new_geo.type = MeshGeometry.Type.INDEXED
+        self.type = MeshGeometry.Type.ORDERED
 
-        if self.type == MeshGeometry.Type.INDEXED:
-            return self
+    def to_indexed(self):
+        raise NotImplementedError("Indexing geometry isn't implemented yet")
 
-        elif self.type == MeshGeometry.Type.TRIANGLES:
+        if self.is_triangles:
             pass
 
-        elif self.type == MeshGeometry.Type.ORDERED:
+        elif self.is_ordered:
             pass
+
+        self.type = MeshGeometry.Type.INDEXED
 
     def calc_smooth_groups_normals(self):
-        if self.type != MeshGeometry.Type.TRIANGLES:
+        if self.is_triangles:
             raise Exception("Can't calculate smooth groups normals for indexed or ordered geometry!")
 
         calc = SmoothGroupsNormalCalculator()
@@ -121,7 +144,6 @@ class VertexStorageSectored:
     def __init__(self):
         self._vertices_sectors = {}
         self.vertices = []
-        self.original_indices = []
         self.num_verts = 0
 
     def push(self, vertex):
@@ -183,8 +205,6 @@ class SmoothGroupsNormalCalculator:
         # Calculating per-face vertex normals
         self.precalculated_normals = {}
         for triangle_index, triangle in enumerate(triangles):
-
-            triangle.smooth = -1
             triangle_normal = self.tris_normals[triangle_index]
 
             for local_vert_index, vertex in enumerate(triangle.vertices):
@@ -214,6 +234,8 @@ class SmoothGroupsNormalCalculator:
                             self.precalculated_normals[shared_index] = vertex.normal
 
                     self.precalculated_normals[vertex_index] = vertex.normal
+
+            triangle.smooth = -1
 
 
     def _calc_smooth_group_normal(self, vertex, initial_normal, smooth_group):
