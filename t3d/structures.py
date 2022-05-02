@@ -146,7 +146,7 @@ class MeshSubmodel(Submodel):
         self.opacity = 1.0
         self.map = "none"
 
-        self.geometry = None
+        self.geometry = MeshGeometry()
 
     @property
     def ambient_color(self):
@@ -163,21 +163,6 @@ class MeshSubmodel(Submodel):
     @specular_color.setter
     def specular_color(self, specular_color):
         self._specular_color = ColorRGB(specular_color)
-
-    @property
-    def num_verts(self):
-        if self.use_indices:
-            return len(self.vertices)
-
-        return len(self.triangles) * 3
-
-    @property
-    def num_indices(self):
-        return len(self.indices)
-
-    @property
-    def has_geometry(self):
-        return self.num_verts != 0
 
 
 class FreeSpotLightSubmodel(Submodel):

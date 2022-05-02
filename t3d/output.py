@@ -60,10 +60,10 @@ class T3DOutput:
 
     def _dump_geometry(self, submodel):
         if submodel.type == "Mesh":
-            if submodel.geometry is None:
+            if submodel.geometry.is_empty:
                 self._write_property("NumVerts", 0)
 
-            if submodel.geometry.is_indexed:
+            elif submodel.geometry.is_indexed:
                 num_indices = len(submodel.geometry.indices)
 
                 self._write_property("NumIndices", num_indices)
@@ -76,7 +76,7 @@ class T3DOutput:
                 for vertex in submodel.geometry.vertices:
                     self._writer.write_floats(vertex)
                     self._writer.write_string("\n")
-            else:
+            elif submodel.geometry.is_triangles:
                 self._write_property("NumVerts", len(submodel.geometry.vertices))
                 for triangle in submodel.geometry.triangles:
                     self._writer.write_int(triangle.smooth)
@@ -87,6 +87,9 @@ class T3DOutput:
                         self._writer.write_string("\n")
 
                     self._writer.write_string("\n")
+
+            else:
+                raise ValueError(f"Bad T3D geometry type: {submodel.geometry.type}")
 
         elif submodel.type == "Stars":
             self._write_property("NumVerts", len(submodel.stars))

@@ -46,6 +46,15 @@ class MeshGeometry:
     def is_indexed(self):
         return self.type == MeshGeometry.Type.INDEXED
 
+    @property
+    def is_empty(self):
+        if self.is_triangles:
+            return len(self.triangles) == 0
+        elif self.is_indexed:
+            return len(self.indices) + len(self.vertices) == 0
+        elif self.is_ordered:
+            return len(self.vertices) == 0
+
     # TODO: if-typed code should be polymorphic
     def to_triangles(self):
         if self.is_ordered:
@@ -91,20 +100,11 @@ class MeshGeometry:
 
         self.type = MeshGeometry.Type.ORDERED
 
-    def to_indexed(self):
-        raise NotImplementedError("Indexing geometry isn't implemented yet")
-
-        if self.is_triangles:
-            pass
-
-        elif self.is_ordered:
-            pass
-
-        self.type = MeshGeometry.Type.INDEXED
+# TODO: Implement indexing
 
     def calc_smooth_groups_normals(self):
         if self.is_triangles:
-            raise Exception("Can't calculate smooth groups normals for indexed or ordered geometry!")
+            raise ValueError("Can't calculate smooth groups normals for indexed or ordered geometry!")
 
         calc = SmoothGroupsNormalCalculator()
         calc.run(self)
@@ -189,7 +189,7 @@ class SmoothGroupsNormalCalculator:
         triangles = []
 
         # Pushing vertices to lookup-optimized storage and calculating triangle normals
-        for triangle_index, triangle in enumerate(geometry):
+        for triangle_index, triangle in enumerate(geometry.triangles):
             if triangle.is_degenerate:
                 continue
 

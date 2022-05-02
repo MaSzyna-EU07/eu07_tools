@@ -79,7 +79,7 @@ class T3DInput:
             geo = submodel.geometry = MeshGeometry()
 
         if "numindices" in token:
-            geo.to_indexed()
+            geo.type = MeshGeometry.Type.INDEXED
             num_indices = self._scanner.read_int()
 
             for i in range(num_indices):

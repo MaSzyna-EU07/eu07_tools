@@ -10,8 +10,17 @@ class FactorySequence(collections.abc.Sequence):
         self._items.append(instance)
         return instance
 
+    def append(self, new):
+        if isinstance(new, self.factory):
+            self._items.append(new)
+        else:
+            raise ValueError(f"Can't append to FactorySequence: types does not match (expected {self.factory}, got {type(new)}")
+
     def remove(self, instance):
         self._items.remove(instance)
+
+    def clear(self):
+        self._items.clear()
 
     def __getitem__(self, index):
         return self._items[index]
@@ -31,4 +40,5 @@ class OwnedFactorySequence(FactorySequence):
         instance = super().new(*args)
         instance.owner = self.owner
         return instance
+
 
