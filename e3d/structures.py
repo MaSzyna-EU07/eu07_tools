@@ -1,5 +1,5 @@
 from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
-from eu07_tools.utils.structures.mesh_geometry import MeshTriangle
+from eu07_tools.utils.structures.mesh_geometry import MeshTriangle, MeshGeometry
 
 
 def create_model():
@@ -12,33 +12,10 @@ class Model:
         self.names = FactorySequence(str)
         self.matrices = FactorySequence(list)
         self.vertices = FactorySequence(Vertex3D)
+        self.indices = FactorySequence(int)
         self.material_names = FactorySequence(str, initial_list=["none"])
 
-_TYPEID_TO_TYPENAME = {
-    4: "Mesh",
-    256: "Mesh",
-    257: "FreeSpotLight",
-    258: "Stars"
-}
 
-_ANIMID_TO_ANIMTYPENAME = {
-    -1: "true",
-    0: "false",
-    4: "seconds_jump",
-    5: "minutes_jump",
-    6: "hours_jump",
-    7: "hours24_jump",
-    8: "seconds",
-    9: "minutes",
-    10: "hours",
-    11: "hours24",
-    12: "billboard",
-    13: "wind",
-    14: "sky",
-    256: "ik",
-    257: "ik1",
-    258: "ik2"
-}
 
 class Submodel:
     def __init__(self):
@@ -75,14 +52,6 @@ class Submodel:
         self.cos_falloff_angle = 0
         self.cos_hotspot_angle = 0
         self.cos_view_angle = 0
-
-    def get_triangles_iter(self):
-        if self.has_geometry:
-            vertices = self.vertices
-            for triangle_index in range(len(vertices) // 3):
-                triangle_verts = vertices[triangle_index * 3: triangle_index * 3 + 3]
-                yield MeshTriangle(triangle_verts, smooth=-1)
-
 
     @property
     def ambient_color(self):
@@ -165,26 +134,6 @@ class Submodel:
         return None if self.next_submodel_id == -1 else self.owner.submodels[self.next_submodel_id]
 
     @property
-    def vertices(self):
-        if self.has_legacy_geometry:
-            return self.owner.vertices[
-                self.first_vertex_id:
-                self.first_vertex_id + self.num_verts
-            ]
-
-        return []
-
-    @property
-    def indices(self):
-        if self.has_indexed_geometry:
-            return self.owner.indices[
-                self.first_index_id:
-                self.first_index_id + self.num_indices
-            ]
-
-        return []
-
-    @property
     def children(self):
         current = self.first_child
         while current is not None:
@@ -195,18 +144,32 @@ class Submodel:
     def id(self):
         return self.owner.submodels.index(self)
 
-    @property
-    def has_geometry(self):
-        return self.has_legacy_geometry or self.has_indexed_geometry
+    def get_indices(self):
+        return self.owner.indices[self.first_index_id: self.first_index_id + self.num_indices]
+
+    def get_vertices(self):
+        return self.owner.vertices[self.first_vertex_id: self.first_vertex_id + self.num_verts]
+
+    def get_geometry(self):
+        geo = MeshGeometry()
+
+        if self.num_indices > 0:
+            geo.type = MeshGeometry.Type.INDEXED
+            geo.vertices = self.get_vertices()
+            geo.indices = self.get_indices()
+
+        else:
+            geo.type = MeshGeometry.Type.ORDERED
+
+            geo.vertices = self.get_vertices()
+
+        return geo
 
     @property
-    def has_indexed_geometry(self):
-        return self.num_indices > 0
-
-    @property
-    def has_legacy_geometry(self):
-        return self.num_verts > 0
-
+    def geometry(self):
+        #TODO: This is here for compatibility with eu07_bl_tools get builder.
+        #E3D Should be converted to T3D to avoid it.
+        return self.get_geometry()
 
 
 

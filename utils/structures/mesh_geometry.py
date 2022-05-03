@@ -11,7 +11,7 @@ class MeshGeometry:
 
     def __init__(self):
         self.vertices = FactorySequence(Vertex3D)
-        self.indices = []
+        self.indices = FactorySequence(int)
         self.triangles = FactorySequence(MeshTriangle)
 
         self.type = MeshGeometry.Type.TRIANGLES
@@ -61,7 +61,7 @@ class MeshGeometry:
 
             triangle_vertices = []
 
-            for vertex_idx, vertex in self.vertices:
+            for vertex_idx, vertex in enumerate(self.vertices):
                 triangle_vertices.append(vertex)
                 if (vertex_idx + 1) % 3 == 0:
                     triangle = MeshTriangle(triangle_vertices, smooth=-1)
