@@ -1,5 +1,6 @@
 from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
 from eu07_tools.utils.structures.mesh_geometry import MeshTriangle, MeshGeometry
+from .common import TYPEID_TO_TYPENAME, ANIMID_TO_ANIMTYPENAME
 
 
 def create_model():
@@ -79,11 +80,11 @@ class Submodel:
 
     @property
     def type(self):
-        return _TYPEID_TO_TYPENAME[self.type_id]
+        return TYPEID_TO_TYPENAME[self.type_id]
 
     @property
     def anim(self):
-        return _ANIMID_TO_ANIMTYPENAME.get(self.anim_id, "false")
+        return ANIMID_TO_ANIMTYPENAME.get(self.anim_id, "false")
 
     @property
     def name(self):
