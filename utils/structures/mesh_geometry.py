@@ -58,14 +58,12 @@ class MeshGeometry:
     # TODO: if-typed code should be polymorphic
     def to_triangles(self):
         if self.is_ordered:
+            num_triangles = len(self.vertices) // 3
 
-            triangle_vertices = []
-
-            for vertex_idx, vertex in enumerate(self.vertices):
-                triangle_vertices.append(vertex)
-                if (vertex_idx + 1) % 3 == 0:
-                    triangle = MeshTriangle(triangle_vertices, smooth=-1)
-                    self.triangles.append(triangle)
+            for triangle_idx in range(num_triangles):
+                tri_verts = self.vertices[triangle_idx * 3: triangle_idx * 3 + 3]
+                triangle = MeshTriangle(tri_verts, smooth=-1)
+                self.triangles.append(triangle)
 
         elif self.is_indexed:
 

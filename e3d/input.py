@@ -77,7 +77,7 @@ class E3DInput:
             submodel.cos_hotspot_angle = self._scanner.read_float()
             submodel.cos_view_angle = self._scanner.read_float()
             submodel.num_indices = self._scanner.read_int()
-            submodel.first_vertex_id = self._scanner.read_int()
+            submodel.first_index_id = self._scanner.read_int()
 
             # skip pad bytes
             self._scanner.read_bytes(92)

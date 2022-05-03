@@ -146,10 +146,16 @@ class Submodel:
         return self.owner.submodels.index(self)
 
     def get_indices(self):
-        return self.owner.indices[self.first_index_id: self.first_index_id + self.num_indices]
+        return self.owner.indices[
+           self.first_index_id:
+           self.first_index_id + self.num_indices
+        ]
 
     def get_vertices(self):
-        return self.owner.vertices[self.first_vertex_id: self.first_vertex_id + self.num_verts]
+        return self.owner.vertices[
+           self.first_vertex_id:
+           self.first_vertex_id + self.num_verts
+        ]
 
     def get_geometry(self):
         geo = MeshGeometry()
