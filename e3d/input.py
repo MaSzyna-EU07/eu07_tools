@@ -1,7 +1,11 @@
 import struct
 
 import eu07_tools
-from .common import VERTEX_SIZE, CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE
+from .common import (
+    CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE,
+    VNT1_VERTEX_SIZE, VNT2_VERTEX_SIZE, VNT0_VERTEX_SIZE, FLOAT_SIZE,
+    IDX1_INDEX_SIZE, IDX2_INDEX_SIZE, IDX4_INDEX_SIZE
+)
 
 
 def load(file):
@@ -14,10 +18,14 @@ class E3DInput:
         self._chunk_readers = {
             "SUB0": self._read_SUB0,
             "VNT0": self._read_VNT0,
+            "VNT1": self._read_VNT1,
+            "VNT2": self._read_VNT2,
             "TEX0": self._read_TEX0,
             "NAM0": self._read_NAM0,
             "TRA0": self._read_TRA0,
-            "IDX0": self._read_IDX0,
+            "IDX1": self._read_IDX1,
+            "IDX2": self._read_IDX2,
+            "IDX4": self._read_IDX4,
         }
 
         self._scanner = eu07_tools.utils.BinaryScanner(file)
@@ -29,6 +37,7 @@ class E3DInput:
 
         while not self._scanner.is_empty:
             chunk_id, chunk_size = self._read_header()
+            print(chunk_id)
 
             chunk_read = self._chunk_readers.get(chunk_id)
 
@@ -82,14 +91,36 @@ class E3DInput:
             # skip pad bytes
             self._scanner.read_bytes(92)
 
-    def _read_IDX0(self, data_size):
-        pass
+    def _read_IDX1(self, data_size):
+        self._read_IDXx(data_size, IDX1_INDEX_SIZE)
+
+    def _read_IDX2(self, data_size):
+        self._read_IDXx(data_size, IDX2_INDEX_SIZE)
+
+    def _read_IDX4(self, data_size):
+        self._read_IDXx(data_size, IDX4_INDEX_SIZE)
+
+    def _read_IDXx(self, data_size, index_size):
+        num_indices = data_size // index_size
+        for _ in range(num_indices):
+            self.model.indices.new(self._scanner.read_int())
 
     def _read_VNT0(self, data_size):
-        num_verts = data_size // VERTEX_SIZE
+        self._read_VNTx(data_size, VNT0_VERTEX_SIZE)
+
+    def _read_VNT1(self, data_size):
+        self._read_VNTx(data_size, VNT1_VERTEX_SIZE)
+
+    def _read_VNT2(self, data_size):
+        self._read_VNTx(data_size, VNT2_VERTEX_SIZE)
+
+    def _read_VNTx(self, data_size, vertex_size):
+        num_verts = data_size // vertex_size
+
+        num_floats = vertex_size // FLOAT_SIZE
 
         for _ in range(num_verts):
-            vertex = [self._scanner.read_float() for _ in range(8)]
+            vertex = [self._scanner.read_float() for _ in range(num_floats)]
             self.model.vertices.new(vertex)
 
     def _read_TRA0(self, data_size):
