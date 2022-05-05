@@ -19,6 +19,9 @@ class VertexStorageSectored:
         sector = self.get_sector(vertex.location)
         for vertex_index, vertex_candidate in sector.items():
             if vertex_candidate.location.compare_equality(vertex.location):
+                if vertex.use_normal and vertex_candidate.use_normal:
+                    if vertex.normal.is_negative(vertex_candidate.normal):
+                        break
                 return vertex_index
 
         raise KeyError(f"{vertex} not exists in given sector {sector}")
