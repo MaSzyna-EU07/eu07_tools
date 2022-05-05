@@ -1,6 +1,6 @@
 from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
-from eu07_tools.utils.structures.mesh_geometry import MeshTriangle, MeshGeometry
 from .common import TYPEID_TO_TYPENAME, ANIMID_TO_ANIMTYPENAME
+from eu07_tools.utils.geometry import Geometry
 
 
 def create_model():
@@ -158,16 +158,15 @@ class Submodel:
         ]
 
     def get_geometry(self):
-        geo = MeshGeometry()
+        geo = Geometry()
 
         if self.num_indices > 0:
-            geo.type = MeshGeometry.Type.INDEXED
+            geo.to_indexed()
             geo.vertices = self.get_vertices()
             geo.indices = self.get_indices()
 
         else:
-            geo.type = MeshGeometry.Type.ORDERED
-
+            geo.to_ordered()
             geo.vertices = self.get_vertices()
 
         return geo

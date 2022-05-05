@@ -8,4 +8,3 @@ from .structures import (
     Submodel, MeshSubmodel, FreeSpotLightSubmodel, StarsSubmodel,
     StarsLight
 )
-from ..utils.structures.mesh_geometry import MeshTriangle

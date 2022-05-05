@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 import eu07_tools.t3d
 from eu07_tools.utils import TextScanner
-from eu07_tools.utils.structures.mesh_geometry import MeshGeometry
+from eu07_tools.utils.geometry import Geometry
 
 
 
@@ -77,10 +77,11 @@ class T3DInput:
         # TODO: Too much if-type, get rid of this
 
         if submodel.type == "Mesh":
-            geo = submodel.geometry = MeshGeometry()
+            geo = submodel.geometry
 
         if "numindices" in token:
-            geo.type = MeshGeometry.Type.INDEXED
+            geo.to_indexed()
+
             num_indices = self._scanner.read_int()
 
             for i in range(num_indices):

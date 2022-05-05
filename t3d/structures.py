@@ -1,7 +1,7 @@
 import abc
 
 from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
-from eu07_tools.utils.structures.mesh_geometry import MeshTriangle, MeshGeometry
+from eu07_tools.utils.geometry import Geometry
 
 
 def create_submodel(type, name):
@@ -146,7 +146,7 @@ class MeshSubmodel(Submodel):
         self.opacity = 1.0
         self.map = "none"
 
-        self.geometry = MeshGeometry()
+        self.geometry = Geometry()
 
     @property
     def ambient_color(self):
