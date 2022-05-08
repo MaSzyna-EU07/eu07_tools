@@ -1,22 +1,31 @@
 import struct
 
 import eu07_tools
-from .common import VERTEX_SIZE, CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE
+from .common import (
+    CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE,
+    VNT1_VERTEX_SIZE, VNT2_VERTEX_SIZE, VNT0_VERTEX_SIZE, FLOAT_SIZE,
+    IDX1_INDEX_SIZE, IDX2_INDEX_SIZE, IDX4_INDEX_SIZE
+)
 
 
 def load(file):
     inp = E3DInput(file)
     return inp.load()
-    
-    
+
+
 class E3DInput:
     def __init__(self, file):
         self._chunk_readers = {
             "SUB0": self._read_SUB0,
             "VNT0": self._read_VNT0,
+            "VNT1": self._read_VNT1,
+            "VNT2": self._read_VNT2,
             "TEX0": self._read_TEX0,
             "NAM0": self._read_NAM0,
             "TRA0": self._read_TRA0,
+            "IDX1": self._read_IDX1,
+            "IDX2": self._read_IDX2,
+            "IDX4": self._read_IDX4,
         }
 
         self._scanner = eu07_tools.utils.BinaryScanner(file)
@@ -28,12 +37,13 @@ class E3DInput:
 
         while not self._scanner.is_empty:
             chunk_id, chunk_size = self._read_header()
+            print(chunk_id)
 
             chunk_read = self._chunk_readers.get(chunk_id)
 
             data_size = chunk_size - CHUNK_HEADER_SIZE
             chunk_read(data_size)
-    
+
         return self.model
 
     def _read_header(self):
@@ -41,7 +51,6 @@ class E3DInput:
         chunk_size = self._scanner.read_int()
 
         return chunk_id, chunk_size
-
 
     def _read_SUB0(self, data_size):
         NUM_SUBMODELS = data_size // SUBMODEL_SIZE
@@ -62,8 +71,8 @@ class E3DInput:
             submodel.visibility_light_treshold = self._scanner.read_float()
             submodel.selfillum = self._scanner.read_float()
             submodel.ambient_color = self._scanner.read_floats(4)
-            submodel.diffuse_color = self._scanner.read_floats(4) 
-            submodel.specular_color = self._scanner.read_floats(4) 
+            submodel.diffuse_color = self._scanner.read_floats(4)
+            submodel.specular_color = self._scanner.read_floats(4)
             submodel.emission_color = self._scanner.read_floats(4)
             submodel.wire_size = self._scanner.read_float()
             submodel.max_distance = self._scanner.read_float()
@@ -76,18 +85,43 @@ class E3DInput:
             submodel.cos_falloff_angle = self._scanner.read_float()
             submodel.cos_hotspot_angle = self._scanner.read_float()
             submodel.cos_view_angle = self._scanner.read_float()
+            submodel.num_indices = self._scanner.read_int()
+            submodel.first_index_id = self._scanner.read_int()
 
             # skip pad bytes
-            self._scanner.read_bytes(100)
-            
+            self._scanner.read_bytes(92)
+
+    def _read_IDX1(self, data_size):
+        self._read_IDXx(data_size, IDX1_INDEX_SIZE)
+
+    def _read_IDX2(self, data_size):
+        self._read_IDXx(data_size, IDX2_INDEX_SIZE)
+
+    def _read_IDX4(self, data_size):
+        self._read_IDXx(data_size, IDX4_INDEX_SIZE)
+
+    def _read_IDXx(self, data_size, index_size):
+        num_indices = data_size // index_size
+        for _ in range(num_indices):
+            self.model.indices.new(self._scanner.read_int())
 
     def _read_VNT0(self, data_size):
-        num_verts = data_size // VERTEX_SIZE
+        self._read_VNTx(data_size, VNT0_VERTEX_SIZE)
+
+    def _read_VNT1(self, data_size):
+        self._read_VNTx(data_size, VNT1_VERTEX_SIZE)
+
+    def _read_VNT2(self, data_size):
+        self._read_VNTx(data_size, VNT2_VERTEX_SIZE)
+
+    def _read_VNTx(self, data_size, vertex_size):
+        num_verts = data_size // vertex_size
+
+        num_floats = vertex_size // FLOAT_SIZE
 
         for _ in range(num_verts):
-            vertex = [self._scanner.read_float() for _ in range(8)]
+            vertex = [self._scanner.read_float() for _ in range(num_floats)]
             self.model.vertices.new(vertex)
-                
 
     def _read_TRA0(self, data_size):
         num_matrices = data_size // MATRIX_SIZE
@@ -108,6 +142,3 @@ class E3DInput:
 
         for value in values:
             collection.new(value)
-
-
-

@@ -6,5 +6,5 @@ from .structures import (
     create_include, create_submodel,
     Element, Include,
     Submodel, MeshSubmodel, FreeSpotLightSubmodel, StarsSubmodel,
-    MeshTriangle, StarsLight
+    StarsLight
 )

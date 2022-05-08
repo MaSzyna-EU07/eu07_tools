@@ -28,14 +28,7 @@ def e3d_to_t3d(e3d_model):
             t3d_sm.wire_size = e3d_sm.wire_size
             t3d_sm.map = e3d_sm.map
             
-            num_triangles = e3d_sm.num_verts // 3
-            for x in range(num_triangles):
-                vertices = e3d_sm.vertices[x*3:x*3+3]
-
-                for vertex in vertices:
-                    vertex.location = eu07_tools.utils.swizzle_coords(vertex.location)
-
-                t3d_sm.triangles.new(vertices, -1)
+            t3d_sm.geometry = e3d_sm.get_geometry().to_triangles()
 
         elif e3d_sm.type == "FreeSpotLight":
             t3d_sm.near_atten_start = e3d_sm.near_atten_start
@@ -49,7 +42,6 @@ def e3d_to_t3d(e3d_model):
             for vertex in e3d_sm.vertices:
                 t3d_sm.stars.new(vertex.location, vertex.mapping.u)
 
-        
         yield t3d_sm
 
 def t3d_to_e3d(t3d_model):

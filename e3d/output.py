@@ -1,6 +1,6 @@
 from eu07_tools.utils import BinaryWriter
 
-from .common import SUBMODEL_SIZE, VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE
+from .common import SUBMODEL_SIZE, VNT0_VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE
 
 def dump(model, file):
     E3DOutput(model, file).run()
@@ -108,7 +108,7 @@ class E3DOutput:
         return (len(self._model.submodels) * SUBMODEL_SIZE) + CHUNK_HEADER_SIZE
 
     def _calc_VNT0_size(self):
-        return (len(self._model.vertices) * VERTEX_SIZE) + CHUNK_HEADER_SIZE
+        return (len(self._model.vertices) * VNT0_VERTEX_SIZE) + CHUNK_HEADER_SIZE
 
     def _calc_TEX0_size(self):
         num_null_bytes = len(self._model.material_names)

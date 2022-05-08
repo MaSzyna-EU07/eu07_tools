@@ -1,5 +1,7 @@
 from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
-from eu07_tools.t3d import MeshTriangle
+from .common import TYPEID_TO_TYPENAME, ANIMID_TO_ANIMTYPENAME
+from eu07_tools.utils.geometry import Geometry
+
 
 def create_model():
     return Model()
@@ -11,33 +13,10 @@ class Model:
         self.names = FactorySequence(str)
         self.matrices = FactorySequence(list)
         self.vertices = FactorySequence(Vertex3D)
+        self.indices = FactorySequence(int)
         self.material_names = FactorySequence(str, initial_list=["none"])
 
-_TYPEID_TO_TYPENAME = {
-    4: "Mesh",
-    256: "Mesh",
-    257: "FreeSpotLight",
-    258: "Stars"
-}
 
-_ANIMID_TO_ANIMTYPENAME = {
-    -1: "true",
-    0: "false",
-    4: "seconds_jump",
-    5: "minutes_jump",
-    6: "hours_jump",
-    7: "hours24_jump",
-    8: "seconds",
-    9: "minutes",
-    10: "hours",
-    11: "hours24",
-    12: "billboard",
-    13: "wind",
-    14: "sky",
-    256: "ik",
-    257: "ik1",
-    258: "ik2"
-}
 
 class Submodel:
     def __init__(self):
@@ -50,11 +29,13 @@ class Submodel:
         self.name_id = -1
         self.anim_id = -1
         self.first_vertex_id = -1
+        self.first_index_id = 0
         self.material_id = -1
+        self.matrix_id = 0
 
         self.flags = 0
-        self.matrix_id = 0
         self.num_verts = 0
+        self.num_indices = 0
         self.visibility_light_treshold = 0
         self.selfillum = -1
         self._ambient_color = ColorRGBA((1, 1, 1, 1))
@@ -72,12 +53,6 @@ class Submodel:
         self.cos_falloff_angle = 0
         self.cos_hotspot_angle = 0
         self.cos_view_angle = 0
-
-    def get_triangles_iter(self):
-        vertices = self.vertices
-        for triangle_index in range(self.num_verts // 3):
-            triangle_verts = vertices[triangle_index * 3: triangle_index * 3 + 3]
-            yield MeshTriangle(triangle_verts, smooth=-1)
 
     @property
     def ambient_color(self):
@@ -105,11 +80,11 @@ class Submodel:
 
     @property
     def type(self):
-        return _TYPEID_TO_TYPENAME[self.type_id]
+        return TYPEID_TO_TYPENAME[self.type_id]
 
     @property
     def anim(self):
-        return _ANIMID_TO_ANIMTYPENAME.get(self.anim_id, "false")
+        return ANIMID_TO_ANIMTYPENAME.get(self.anim_id, "false")
 
     @property
     def name(self):
@@ -160,13 +135,6 @@ class Submodel:
         return None if self.next_submodel_id == -1 else self.owner.submodels[self.next_submodel_id]
 
     @property
-    def vertices(self):
-        return self.owner.vertices[
-            self.first_vertex_id:
-            self.first_vertex_id + self.num_verts
-        ]
-
-    @property
     def children(self):
         current = self.first_child
         while current is not None:
@@ -177,8 +145,39 @@ class Submodel:
     def id(self):
         return self.owner.submodels.index(self)
 
+    def get_indices(self):
+        return self.owner.indices[
+           self.first_index_id:
+           self.first_index_id + self.num_indices
+        ]
+
+    def get_vertices(self):
+        return self.owner.vertices[
+           self.first_vertex_id:
+           self.first_vertex_id + self.num_verts
+        ]
+
+    def get_geometry(self):
+        geo = Geometry()
+
+        if self.num_indices > 0:
+            geo.to_indexed()
+            geo.vertices = self.get_vertices()
+            geo.indices = self.get_indices()
+
+        else:
+            geo.to_ordered()
+            geo.vertices = self.get_vertices()
+
+        return geo
+
     @property
-    def has_geometry(self):
-        return self.num_verts > 0
+    def geometry(self):
+        #TODO: This is here for compatibility with eu07_bl_tools get builder.
+        #E3D Should be converted to T3D to avoid it.
+        return self.get_geometry()
+
+
+
 
 

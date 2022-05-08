@@ -1,6 +1,7 @@
 import abc
 
 from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
+from eu07_tools.utils.geometry import Geometry
 
 
 def create_submodel(type, name):
@@ -145,13 +146,7 @@ class MeshSubmodel(Submodel):
         self.opacity = 1.0
         self.map = "none"
 
-        # primary storage method: vertices + indices
-        self.use_indices = False
-
-        self.vertices = FactorySequence(Vertex3D)
-        self.indices = []
-        # alternative storage: triangles
-        self.triangles = FactorySequence(MeshTriangle)
+        self.geometry = Geometry()
 
     @property
     def ambient_color(self):
@@ -168,46 +163,6 @@ class MeshSubmodel(Submodel):
     @specular_color.setter
     def specular_color(self, specular_color):
         self._specular_color = ColorRGB(specular_color)
-
-    @property
-    def num_verts(self):
-        if self.use_indices:
-            return len(self.vertices)
-
-        return len(self.triangles) * 3
-
-    @property
-    def num_indices(self):
-        return len(self.indices)
-
-    @property
-    def has_geometry(self):
-        return self.num_verts != 0
-
-
-class MeshTriangle:
-    """ Class representing triangle in mesh submodel
-    
-    :ivar vertices: Tuple of 3 vertices
-    :type vertives: `Tuple[utils.Vertex3D]`
-    :ivar smooth: Smooth mask, -1 if vertices has explicit normal vectors
-    :type smooth: `int`
-    """
-    def __init__(self, vertices, smooth=0):
-        """ Constructor method
-
-        :param vertices: Iterable of 3 vertices data
-        :type vertices: `Iterable[Iterable[float]]`
-        :param smooth: Smooth mask, -1 if vertices has explicit normal vectors
-        :type smooth: `int`
-        """
-        self.vertices = tuple(
-            Vertex3D(vertex) for vertex in vertices
-        )
-
-        self.smooth = -1 if any(
-            vertex.use_normal for vertex in self.vertices
-        ) else smooth
 
 
 class FreeSpotLightSubmodel(Submodel):

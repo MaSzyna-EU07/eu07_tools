@@ -4,7 +4,8 @@ import collections
 import operator
 import math
 
-class BaseVector:
+
+class BaseCollection:
     def __init__(self, values: Iterable[float]):
         self._values = list(values)
 
@@ -32,7 +33,7 @@ class BaseVector:
         return self._math_helper(operator.add, other)
 
     def __sub__(self, other) -> BaseVector:
-       return self._math_helper(operator.sub, other)
+        return self._math_helper(operator.sub, other)
 
     def __mul__(self, other) -> BaseVector:
         return self._math_helper(operator.mul, other)
@@ -49,12 +50,12 @@ class BaseVector:
 
     def __neg__(self):
         return self._math_helper(operator.mul, -1)
-        
+
     def _math_helper(self, operator, other):
         if isinstance(other, (int, float)):
-            return VectorXYZ((operator(v, other) for v in self._values))
+            return self.__class__((operator(v, other) for v in self._values))
         else:
-            return VectorXYZ(
+            return self.__class__(
                 (operator(v1, v2) for v1, v2 in zip(self._values, other))
             )
 
@@ -62,13 +63,43 @@ class BaseVector:
         values = ", ".join(str(v) for v in self._values)
         return f"<{self.__class__.__name__}({values})>"
 
-    def swizzled(self):
-        return [-self._values[0], self._values[2], self._values[1]]
 
-    # todo: make it not inherited by colors
+class BaseVector(BaseCollection):
     @property
     def magnitude(self):
-        return math.sqrt(sum(value ** value for value in self._values))
+        return math.sqrt(sum(value ** 2 for value in self._values))
+
+    @property
+    def length(self):
+        return self.magnitude
+
+    @property
+    def length_squared(self):
+        return self.magnitude ** 2
+
+    @property
+    def normalized(self):
+        if self.magnitude == 0:
+            return self
+
+        return self / self.magnitude
+
+    def normalize(self):
+        self._values = list(self.normalized)
+
+    def dot(self, other):
+        return sum(map(operator.mul, self, other))
+
+    def is_negative(self, other):
+        return self.dot(other) < -0.99
+
+    def compare_equality(self, other, threshold=0.00001):
+        vec = self - other
+        return all(abs(x) < threshold for x in vec)
+
+    def zero(self):
+        self._values = [0 for value in self._values]
+
 
 class VectorXYZ(BaseVector):
     @property
@@ -94,6 +125,17 @@ class VectorXYZ(BaseVector):
     @z.setter
     def z(self, z):
         self._values[2] = z
+
+    def swizzled(self):
+        return VectorXYZ((-self._values[0], self._values[2], self._values[1]))
+
+    def cross(self, other):
+        #TODO: Move up, make it possible to execute on 4 and 2dim vectors
+        return self.__class__((
+            self[1] * other[2] - self[2] * other[1],
+            self[2] * other[0] - self[0] * other[2],
+            self[0] * other[1] - self[1] * other[0]
+        ))
 
 
 class VectorXYZW(VectorXYZ):
@@ -142,7 +184,7 @@ class VectorUV(BaseVector):
         self._values[1] = v
 
 
-class ColorRGB(BaseVector):
+class ColorRGB(BaseCollection):
     @property
     def r(self):
         return self._values[0]

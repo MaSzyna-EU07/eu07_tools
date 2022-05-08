@@ -60,21 +60,25 @@ class T3DOutput:
 
     def _dump_geometry(self, submodel):
         if submodel.type == "Mesh":
-            if submodel.use_indices:
+            if submodel.geometry.is_empty:
+                self._write_property("NumVerts", 0)
 
-                self._write_property("NumIndices", submodel.num_indices)
-                for i in range(submodel.num_indices // 3):
-                    self._writer.write_floats(submodel.indices[i*3:i*3+3])
+            elif submodel.geometry.is_indexed:
+                num_indices = len(submodel.geometry.indices)
+
+                self._write_property("NumIndices", num_indices)
+                for i in range(num_indices // 3):
+                    self._writer.write_floats(submodel.geometry.indices[i*3:i*3+3])
                     self._writer.write_string("\n")
 
                 self._writer.write_string("\n")
-                self._write_property("NumVerts", submodel.num_verts)
-                for vertex in submodel.vertices:
+                self._write_property("NumVerts", len(submodel.geometry.vertices))
+                for vertex in submodel.geometry.vertices:
                     self._writer.write_floats(vertex)
                     self._writer.write_string("\n")
-            else:
-                self._write_property("NumVerts", submodel.num_verts)
-                for triangle in submodel.triangles:
+            elif submodel.geometry.is_triangles:
+                self._write_property("NumVerts", len(submodel.geometry.vertices))
+                for triangle in submodel.geometry.triangles:
                     self._writer.write_int(triangle.smooth)
                     self._writer.write_string("\n")
 
@@ -83,6 +87,9 @@ class T3DOutput:
                         self._writer.write_string("\n")
 
                     self._writer.write_string("\n")
+
+            else:
+                raise ValueError(f"Bad T3D geometry type: {submodel.geometry.type}")
 
         elif submodel.type == "Stars":
             self._write_property("NumVerts", len(submodel.stars))

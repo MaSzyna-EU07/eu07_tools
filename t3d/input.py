@@ -1,6 +1,8 @@
 from collections.abc import Iterator
 import eu07_tools.t3d
 from eu07_tools.utils import TextScanner
+from eu07_tools.utils.geometry import Geometry
+
 
 
 def load(file):
@@ -72,16 +74,22 @@ class T3DInput:
 
     def _load_geometry(self, submodel):
         token = self._scanner.read_string().lower()
+        # TODO: Too much if-type, get rid of this
+
+        if submodel.type == "Mesh":
+            geo = submodel.geometry
+
         if "numindices" in token:
-            submodel.use_indices = True
+            geo.to_indexed()
+
             num_indices = self._scanner.read_int()
 
             for i in range(num_indices):
-                submodel.indices.append(self._scanner.read_int())
+                geo.indices.append(self._scanner.read_int())
 
             num_verts = self._read_property()
             for i in range(num_verts):
-                vertex = submodel.vertices.new(self._scanner.read_floats(12))
+                vertex = geo.vertices.new(self._scanner.read_floats(12))
 
         elif "numverts" in token:
             num_total_verts = self._scanner.read_int()
@@ -105,7 +113,7 @@ class T3DInput:
                 vertices = [self._scanner.read_floats(vertex_size) for _ in range(unit_size)]
 
                 if submodel.type == "Mesh":
-                    submodel.triangles.new(vertices, unit_flag)
+                    geo.triangles.new(vertices, unit_flag)
                 elif submodel.type == "Stars":
                     for vertex in vertices:
                         submodel.stars.new(vertex[:3], vertex[3])
@@ -148,6 +156,6 @@ class T3DInput:
 
         return value
 
-    
 
-            
+
+
