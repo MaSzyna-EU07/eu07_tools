@@ -103,7 +103,7 @@ class E3DInput:
     def _read_IDXx(self, data_size, index_size):
         num_indices = data_size // index_size
         for _ in range(num_indices):
-            self.model.indices.new(self._scanner.read_int())
+            self.model.indices.new(self._scanner.read_int(index_size))
 
     def _read_VNT0(self, data_size):
         self._read_VNTx(data_size, VNT0_VERTEX_SIZE)
