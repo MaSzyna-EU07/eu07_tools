@@ -129,10 +129,7 @@ class T3DOutput:
             self._writer.write_string("true" if value else "false")
 
         elif key_lower in "parent name":
-            if " " in value:
-                self._writer.write_string(f"\"{value}\"")
-            else:
-                self._writer.write_string(value)
+            self._writer.write_string(value, is_enquotable=True)
 
         elif key_lower in "type anim map":
             self._writer.write_string(value)

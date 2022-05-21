@@ -17,6 +17,11 @@ def lower_filepath_name(filepath):
     filepath = Path(filepath)
     return str(Path(filepath.parent, filepath.name.lower()))
 
+def enquote_if_whitespace(name):
+    if " " in name:
+        name = f"\"{name}\""
+
+    return name
 
 def find_asset_root(filepath):
     root = Path("")

@@ -104,7 +104,7 @@ class SCNOutput:
     def _dump_include(self, include):
         self._writer.write_string("include")
         self._writer.write_string(include.path)
-        self._writer.write_strings(include.parameters)
+        self._writer.write_strings(include.parameters, is_enquotable=True)
         self._writer.write_string("end\n")
 
     def _dump_lua(self, lua):
@@ -136,7 +136,7 @@ class SCNOutput:
     def _dump_trainset(self, trainset):
         self._writer.write_string("trainset")
         self._writer.write_string(trainset.timetable_path)
-        self._writer.write_string(trainset.track_name)
+        self._writer.write_string(trainset.track_name, is_enquotable=True)
         self._writer.write_float(trainset.offset)
         self._writer.write_float(trainset.velocity)
         self._writer.write_string("\n")
@@ -150,7 +150,7 @@ class SCNOutput:
         self._writer.write_string("node")
         self._writer.write_float(node.max_distance)
         self._writer.write_float(node.min_distance)
-        self._writer.write_string(node.name)
+        self._writer.write_string(node.name, is_enquotable=True)
 
     def _dump_node_dynamic(self, dynamic):
         self._node_dump_header(dynamic)
@@ -160,7 +160,7 @@ class SCNOutput:
         self._writer.write_string(dynamic.mmd_path)
 
         if not self._is_trainset_opened:
-            self._writer.write_string(dynamic.track_name)
+            self._writer.write_string(dynamic.track_name, is_enquotable=True)
 
         self._writer.write_float(dynamic.offset)
         self._writer.write_string(dynamic.driver_type)
@@ -184,11 +184,11 @@ class SCNOutput:
         self._writer.write_float(launcher.radius)
         self._writer.write_string(launcher.key)
         self._writer.write_float(launcher.delta_time)
-        self._writer.write_string(launcher.first_event_name)
-        self._writer.write_string(launcher.second_event_name)
+        self._writer.write_string(launcher.first_event_name, is_enquotable=True)
+        self._writer.write_string(launcher.second_event_name, is_enquotable=True)
 
         if launcher.second_event_name == "condition":
-            self._writer.write_string(launcher.memcell_name)
+            self._writer.write_string(launcher.memcell_name, is_enquotable=True)
             self._writer.write_strings(launcher.memcompare_values)
 
         self._writer.write_string("end\n")
@@ -217,9 +217,9 @@ class SCNOutput:
         self._node_dump_header(memcell)
         self._writer.write_string("memcell")
         self._writer.write_floats(memcell.location)
-        self._writer.write_string(memcell.values[0])
+        self._writer.write_string(memcell.values[0], is_enquotable=True)
         self._writer.write_strings(memcell.values[1:])
-        self._writer.write_string(memcell.track_name)
+        self._writer.write_string(memcell.track_name, is_enquotable=True)
         self._writer.write_string("endmemcell\n")
 
     def _dump_node_model(self, model):
@@ -304,19 +304,33 @@ class SCNOutput:
             self._writer.write_string("\n")
 
         if track.event0 != "none":
-            self._writer.write_string(f"event0 {track.event0}\n")
+            self._writer.write_string("event0")
+            self._writer.write_string(track.event0, is_enquotable=True)
+            self._writer.write_string("\n")
         if track.event1 != "none":
-            self._writer.write_string(f"event1 {track.event1}\n")
+            self._writer.write_string("event1")
+            self._writer.write_string(track.event1, is_enquotable=True)
+            self._writer.write_string("\n")
         if track.event2 != "none":
-            self._writer.write_string(f"event2 {track.event2}\n")
+            self._writer.write_string("event2")
+            self._writer.write_string(track.event2, is_enquotable=True)
+            self._writer.write_string("\n")
         if track.eventall0 != "none":
-            self._writer.write_string(f"eventall0 {track.eventall0}\n")
+            self._writer.write_string("eventall0")
+            self._writer.write_string(track.eventall0, is_enquotable=True)
+            self._writer.write_string("\n")
         if track.eventall1 != "none":
-            self._writer.write_string(f"eventall1 {track.eventall1}\n")
+            self._writer.write_string("eventall1")
+            self._writer.write_string(track.eventall1, is_enquotable=True)
+            self._writer.write_string("\n")
         if track.eventall2 != "none":
-            self._writer.write_string(f"eventall2 {track.eventall2}\n")
+            self._writer.write_string("eventall2")
+            self._writer.write_string(track.eventall2, is_enquotable=True)
+            self._writer.write_string("\n")
         if track.isolated != "none":
-            self._writer.write_string(f"isolated {track.isolated}\n")
+            self._writer.write_string("isolated")
+            self._writer.write_string(track.isolated, is_enquotable=True)
+            self._writer.write_string("\n")
         if track.overhead != -1:
             self._writer.write_string("overhead")
             self._writer.write_int(track.overhead)
@@ -347,7 +361,7 @@ class SCNOutput:
     def _dump_node_traction(self, traction):
         self._node_dump_header(traction)
         self._writer.write_string("traction")
-        self._writer.write_string(traction.powersource_name)
+        self._writer.write_string(traction.powersource_name, is_enquotable=True)
         self._writer.write_float(traction.nominal_voltage)
         self._writer.write_float(traction.max_current)
         self._writer.write_float(traction.resistance)
@@ -371,7 +385,9 @@ class SCNOutput:
         self._writer.write_string("vis\n" if traction.is_visible else "unvis\n")
 
         if traction.parallel_name != "none":
-            self._writer.write_string(f"parallel {traction.parallel_name}\n")
+            self._writer.write_string("parallel")
+            self._writer.write_string(traction.parallel_name, is_enquotable=True)
+            self._writer.write_string("\n")
 
         self._writer.write_string("endtraction\n\n")
 
@@ -433,7 +449,7 @@ class SCNOutput:
 
     def _event_dump_header(self, event):
         self._writer.write_string("event")
-        self._writer.write_string(event.name)
+        self._writer.write_string(event.name, is_enquotable=True)
         self._writer.write_string(event.type.split(":")[1])
         self._writer.write_float(event.delay)
 
@@ -466,107 +482,107 @@ class SCNOutput:
             self._writer.write_string("condition")
 
             for entry in buffer:
-                self._writer.write_string(entry)
+                self._writer.write_string(entry, is_enquotable=True)
 
     def _dump_event_addvalues(self, addvalues):
         self._event_dump_header(addvalues)
-        self._writer.write_string(addvalues.memcell_name)
-        self._writer.write_strings(addvalues.values)
+        self._writer.write_string(addvalues.memcell_name, is_enquotable=True)
+        self._writer.write_strings(addvalues.values, is_enquotable=True)
         self._event_dump_conditions(addvalues)
         self._event_dump_ending(addvalues)
 
     def _dump_event_copyvalues(self, copyvalues):
         self._event_dump_header(copyvalues)
-        self._writer.write_string(copyvalues.target_memcell_name)
-        self._writer.write_string(copyvalues.source_memcell_name)
+        self._writer.write_string(copyvalues.target_memcell_name, is_enquotable=True)
+        self._writer.write_string(copyvalues.source_memcell_name, is_enquotable=True)
         if copyvalues.mask != 0:
             self._writer.write_int(copyvalues.mask)
         self._event_dump_ending(copyvalues)
 
     def _dump_event_getvalues(self, getvalues):
         self._event_dump_header(getvalues)
-        self._writer.write_string(getvalues.memcell_name)
+        self._writer.write_string(getvalues.memcell_name, is_enquotable=True)
         self._event_dump_ending(getvalues)
 
     def _dump_event_logvalues(self, logvalues):
         self._event_dump_header(logvalues)
-        self._writer.write_string(logvalues.memcell_name)
+        self._writer.write_string(logvalues.memcell_name, is_enquotable=True)
         self._event_dump_ending(logvalues)
 
     def _dump_event_putvalues(self, putvalues):
         self._event_dump_header(putvalues)
         self._writer.write_string("none")
         self._writer.write_floats(putvalues.location)
-        self._writer.write_strings(putvalues.values)
+        self._writer.write_strings(putvalues.values, is_enquotable=True)
         self._event_dump_ending(putvalues)
 
     def _dump_event_updatevalues(self, updatevalues):
         self._event_dump_header(updatevalues)
-        self._writer.write_string(updatevalues.memcell_name)
-        self._writer.write_strings(updatevalues.values)
+        self._writer.write_string(updatevalues.memcell_name, is_enquotable=True)
+        self._writer.write_strings(updatevalues.values, is_enquotable=True)
         self._event_dump_conditions(updatevalues)
         self._event_dump_ending(updatevalues)
 
     def _dump_event_animation(self, animation):
         self._event_dump_header(animation)
-        self._writer.write_string(animation.model_name)
+        self._writer.write_string(animation.model_name, is_enquotable=True)
         self._writer.write_string(animation.anim_type)
-        self._writer.write_string(animation.submodel_name)
+        self._writer.write_string(animation.submodel_name, is_enquotable=True)
         self._writer.write_floats(animation.vector)
         self._writer.write_float(animation.speed)
         self._event_dump_ending(animation)
 
     def _dump_event_lights(self, lights):
         self._event_dump_header(lights)
-        self._writer.write_string(lights.model_name)
+        self._writer.write_string(lights.model_name, is_enquotable=True)
         self._writer.write_ints(lights.light_states)
         self._event_dump_ending(lights)
 
     def _dump_event_trackvel(self, trackvel):
         self._event_dump_header(trackvel)
-        self._writer.write_string(trackvel.track_name)
+        self._writer.write_string(trackvel.track_name, is_enquotable=True)
         self._writer.write_float(trackvel.speed)
         self._event_dump_ending(trackvel)
 
     def _dump_event_visible(self, visible):
         self._event_dump_header(visible)
-        self._writer.write_string(visible.node_name)
+        self._writer.write_string(visible.node_name, is_enquotable=True)
         self._writer.write_int(visible.visibility)
         self._event_dump_ending(visible)
 
     def _dump_event_voltage(self, voltage):
         self._event_dump_header(voltage)
-        self._writer.write_string(voltage.powersource_name)
+        self._writer.write_string(voltage.powersource_name, is_enquotable=True)
         self._writer.write_float(voltage.voltage)
         self._event_dump_ending(voltage)
 
     def _dump_event_whois(self, whois):
         self._event_dump_header(whois)
-        self._writer.write_string(whois.memcell_name)
+        self._writer.write_string(whois.memcell_name, is_enquotable=True)
         self._writer.write_int(whois.mask)
         self._event_dump_ending(whois)
 
     def _dump_event_friction(self, friction):
         self._event_dump_header(friction)
-        self._writer.write_string(friction.track_name)
+        self._writer.write_string(friction.track_name, is_enquotable=True)
         self._writer.write_float(friction.friction)
         self._event_dump_ending(friction)
 
     def _dump_event_multiple(self, multiple):
         self._event_dump_header(multiple)
-        self._writer.write_string(multiple.memcell_name)
-        self._writer.write_strings(multiple.events_names)
+        self._writer.write_string(multiple.memcell_name, is_enquotable=True)
+        self._writer.write_strings(multiple.events_names, is_enquotable=True)
 
         if multiple.else_events_names:
             self._writer.write_string("else")
-            self._writer.write_strings(multiple.else_events_names)
+            self._writer.write_strings(multiple.else_events_names, is_enquotable=True)
 
         self._event_dump_conditions(multiple)
         self._event_dump_ending(multiple)
 
     def _dump_event_switch(self, switch):
         self._event_dump_header(switch)
-        self._writer.write_string(switch.switch_name)
+        self._writer.write_string(switch.switch_name, is_enquotable=True)
         self._writer.write_int(switch.state)
 
         if switch.move_rate != -1:
@@ -579,7 +595,7 @@ class SCNOutput:
 
     def _dump_event_sound(self, sound):
         self._event_dump_header(sound)
-        self._writer.write_string(sound.sound_name)
+        self._writer.write_string(sound.sound_name, is_enquotable=True)
         self._writer.write_int(sound.play_status)
 
         if sound.radio_channel > 0:

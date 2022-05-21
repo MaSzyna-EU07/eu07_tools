@@ -24,10 +24,13 @@ class TextWriter:
         for v in values:
             self.write_int(v)
 
-    def write_string(self, value):
+    def write_string(self, value, is_enquotable=False):
+        if is_enquotable and " " in value:
+            value = f"\"{value}\""
+
         separator = "" if value.endswith("\n") else self._separator 
         self._file.write(value + separator)
 
-    def write_strings(self, values):
+    def write_strings(self, values, is_enquotable=False):
         for v in values:
-            self.write_string(v)
+            self.write_string(v, is_enquotable)
