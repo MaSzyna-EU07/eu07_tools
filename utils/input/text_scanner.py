@@ -1,10 +1,15 @@
+DEFAULT_SEPARATORS = [" ", "\t", ";", ","]
+
 class TextScanner:
     @classmethod
-    def from_file(cls, file, parameters=None):
-        return cls(file, parameters)
+    def from_file(cls, file, separators=None):
+        return cls(file, separators)
 
-    def __init__(self, file, parameters=[]):
-        self._tokenizer = Tokenizer(parameters=parameters)
+    def __init__(self, file, separators=None):
+        if not separators:
+             separators = DEFAULT_SEPARATORS
+
+        self._tokenizer = Tokenizer(separators=separators)
         self._accessor = TokensAccessor(self._tokenizer.tokenize_file(file))
         self._back_tokens = []
 
@@ -90,7 +95,7 @@ def get_stream_size(stream: TextIOBase):
     return stream_size
 
 
-_DEFAULT_SEPARATORS = [" ", "\t", ";", ","]
+
 
 class Tokenizer:
 
@@ -103,7 +108,7 @@ class Tokenizer:
             self.return_ = return_
             self.keep_delimiters = keep_delimiters
 
-    def __init__(self, return_comments=False, separators=_DEFAULT_SEPARATORS, parameters=None):
+    def __init__(self, return_comments=False, separators=DEFAULT_SEPARATORS, parameters=None):
         self.line_no = 0
         self._parameters = parameters
 
