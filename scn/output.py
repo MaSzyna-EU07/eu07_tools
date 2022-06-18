@@ -1,5 +1,6 @@
 from eu07_tools.utils import TextWriter
 
+
 def dump(elements, file):
     SCNOutput(file).dump_from_iterable(elements)
 
@@ -22,7 +23,7 @@ class SCNOutput:
             "time": self._dump_time,
             "trainset": self._dump_trainset,
             "endtrainset": self._dump_endtrainset,
-            
+
             "node:dynamic": self._dump_node_dynamic,
             "node:eventlauncher": self._dump_node_eventlauncher,
             "node:lines": self._dump_node_lines,
@@ -33,7 +34,7 @@ class SCNOutput:
             "node:traction": self._dump_node_traction,
             "node:tractionpowersource": self._dump_node_tractionpowersource,
             "node:triangles": self._dump_node_triangles,
-            
+
             "event:addvalues": self._dump_event_addvalues,
             "event:copyvalues": self._dump_event_copyvalues,
             "event:getvalues": self._dump_event_getvalues,
@@ -58,6 +59,8 @@ class SCNOutput:
 
         self._is_trainset_opened = False
 
+        self._none_values = ("none", "")
+
     def dump_from_iterable(self, elements):
         for element in elements:
             self.dump_element(element)
@@ -75,7 +78,7 @@ class SCNOutput:
         self._writer.write_floats(atmo.sky_color)
         self._writer.write_float(atmo.fog_start)
         self._writer.write_float(atmo.fog_end)
-        
+
         if atmo.fog_end > 0:
             self._writer.write_floats(atmo.fog_color)
 
@@ -86,7 +89,7 @@ class SCNOutput:
         self._writer.write_string("camera")
         self._writer.write_floats(camera.location)
         self._writer.write_floats(camera.rotation)
-        
+
         if camera.index != -1:
             self._writer.write_int(camera.index)
 
@@ -174,7 +177,7 @@ class SCNOutput:
 
         if dynamic.load_count > 0:
             self._writer.write_string(dynamic.load_type)
-        
+
         self._writer.write_string("enddynamic\n")
 
     def _dump_node_eventlauncher(self, launcher):
@@ -210,7 +213,7 @@ class SCNOutput:
         for vertex_id, vertex in enumerate(lines.points):
             self._writer.write_floats(vertex)
 
-            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendline\n\n" 
+            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendline\n\n"
             self._writer.write_string(endtag)
 
     def _dump_node_memcell(self, memcell):
@@ -303,31 +306,31 @@ class SCNOutput:
             self._writer.write_float(track.radius2)
             self._writer.write_string("\n")
 
-        if track.event0 != "none":
+        if track.event0 not in self._none_values:
             self._writer.write_string("event0")
             self._writer.write_string(track.event0, is_enquotable=True)
             self._writer.write_string("\n")
-        if track.event1 != "none":
+        if track.event1 not in self._none_values:
             self._writer.write_string("event1")
             self._writer.write_string(track.event1, is_enquotable=True)
             self._writer.write_string("\n")
-        if track.event2 != "none":
+        if track.event2 not in self._none_values:
             self._writer.write_string("event2")
             self._writer.write_string(track.event2, is_enquotable=True)
             self._writer.write_string("\n")
-        if track.eventall0 != "none":
+        if track.eventall0 not in self._none_values:
             self._writer.write_string("eventall0")
             self._writer.write_string(track.eventall0, is_enquotable=True)
             self._writer.write_string("\n")
-        if track.eventall1 != "none":
+        if track.eventall1 not in self._none_values:
             self._writer.write_string("eventall1")
             self._writer.write_string(track.eventall1, is_enquotable=True)
             self._writer.write_string("\n")
-        if track.eventall2 != "none":
+        if track.eventall2 not in self._none_values:
             self._writer.write_string("eventall2")
             self._writer.write_string(track.eventall2, is_enquotable=True)
             self._writer.write_string("\n")
-        if track.isolated != "none":
+        if track.isolated not in self._none_values:
             self._writer.write_string("isolated")
             self._writer.write_string(track.isolated, is_enquotable=True)
             self._writer.write_string("\n")
@@ -343,19 +346,19 @@ class SCNOutput:
             self._writer.write_string("angle2")
             self._writer.write_float(track.angle2)
             self._writer.write_string("\n")
-        if track.fouling1 != "none":
+        if track.fouling1 not in self._none_values:
             self._writer.write_string(f"fouling1 {track.fouling1}\n")
-        if track.fouling2 != "none":
+        if track.fouling2 not in self._none_values:
             self._writer.write_string(f"fouling2 {track.fouling2}\n")
         if track.vradius != 0:
             self._writer.write_string("vradius")
             self._writer.write_float(track.vradius)
             self._writer.write_string("\n")
-        if track.trackbed != "none":
+        if track.trackbed not in self._none_values:
             self._writer.write_string(f"trackbed {track.trackbed}\n")
-        if track.railprofile != "none":
+        if track.railprofile not in self._none_values:
             self._writer.write_string(f"railprofile {track.railprofile}\n")
-        
+
         self._writer.write_string("endtrack\n\n")
 
     def _dump_node_traction(self, traction):
@@ -384,7 +387,7 @@ class SCNOutput:
 
         self._writer.write_string("vis\n" if traction.is_visible else "unvis\n")
 
-        if traction.parallel_name != "none":
+        if traction.parallel_name not in self._none_values:
             self._writer.write_string("parallel")
             self._writer.write_string(traction.parallel_name, is_enquotable=True)
             self._writer.write_string("\n")
@@ -436,16 +439,15 @@ class SCNOutput:
                 self._writer.write_string("specular:")
                 self._writer.write_floats(triangles.material.specular)
             self._writer.write_string("endmaterial")
-        
+
         self._writer.write_string(triangles.map + "\n")
 
         num_verts = len(triangles.vertices)
         for vertex_id, vertex in enumerate(triangles.vertices):
             self._writer.write_floats(vertex)
 
-            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendtri\n\n" 
+            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendtri\n\n"
             self._writer.write_string(endtag)
-
 
     def _event_dump_header(self, event):
         self._writer.write_string("event")
