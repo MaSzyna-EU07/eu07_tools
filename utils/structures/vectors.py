@@ -129,6 +129,10 @@ class VectorXYZ(BaseVector):
     def swizzled(self):
         return VectorXYZ((-self._values[0], self._values[2], self._values[1]))
 
+    def swizzle(self):
+        swizzled_vector = self.swizzled()
+        self._values = list(swizzled_vector)
+
     def cross(self, other):
         #TODO: Move up, make it possible to execute on 4 and 2dim vectors
         return self.__class__((
