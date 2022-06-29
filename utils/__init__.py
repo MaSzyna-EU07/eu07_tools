@@ -43,7 +43,11 @@ def find_asset_root(filepath):
 
 def shorten_asset_path(filepath):
     filepath = Path(filepath).resolve()
-    root = Path(find_asset_root(filepath))
+
+    try:
+        root = Path(find_asset_root(filepath))
+    except:
+        return str(filepath.stem)
 
     # TODO: Shorten model path, scenery path etc
     shortpath = filepath.relative_to(root).with_suffix("")
