@@ -2,42 +2,73 @@ from pathlib import Path
 
 class AssetSearcher:
     def __init__(self, root, basedir=""):
-        self.root = Path(root)
-        self.basedir = Path(basedir)
-
+        self._root = Path(root)
+        self._basedir = Path(basedir)
+        
         self.models = PathFinder(
-            [
-                Path(self.root),
-                Path(self.basedir),
-                Path(self.root, "models")
-            ],
+            [],
             [".e3d", ".t3d"]
         )
 
         self.textures = PathFinder(
-            [
-                Path(self.root),
-                Path(self.basedir),
-                Path(self.root, "textures"),
-                Path(str(self.basedir).replace("models", "textures"))
-            ],
+            [],
             [".mat", ".tga", ".dds", ".png", ".bmp", ".tex"]
         )
 
         self.scenes = PathFinder(
-            [
-                Path(self.root, "scenery"),
-                Path(self.basedir)
-            ],
+            [],
             []
         )
 
         self.sounds = PathFinder(
-            [
-                Path(self.root, "sounds")
-            ],
+            [],
             [".ogg", ".wav"]
         )
+
+        self.update_lookups()
+
+
+    @property
+    def root(self):
+        return self._root
+
+    @root.setter
+    def root(self, value):
+        self._root = Path(value)
+        self.update_lookups()
+
+    @property
+    def basedir(self):
+        return self._basedir
+
+    @basedir.setter
+    def basedir(self, value):
+        self._basedir = Path(value)
+        self.update_lookups()
+
+    def update_lookups(self):
+        self.models.lookups = [
+            Path(self._root),
+            Path(self._basedir),
+            Path(self._root, "models")
+        ]
+
+        self.textures.lookups = [
+            Path(self._root),
+            Path(self._basedir),
+            Path(self._root, "textures"),
+            Path(str(self._basedir).replace("models", "textures"))
+        ]
+
+        self.scenes.lookups = [
+            Path(self._root, "scenery"),
+            Path(self._basedir)
+        ]
+
+        self.sounds.lookups = [
+            Path(self._root, "sounds")
+        ]
+        
 
 
 class PathFinder:

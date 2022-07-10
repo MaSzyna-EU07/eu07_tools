@@ -82,7 +82,7 @@ class Geometry:
 
     def calc_smooth_groups_normals(self):
         if self.is_triangles:
-            raise ValueError("Can't calculate smooth groups normals for indexed or ordered geometry!")
+            raise ValueError("Can't calculate smooth groups normals for indexed or ordered mesh_data!")
 
         calc = SmoothGroupsNormalCalculator()
         calc.run(self)
