@@ -208,13 +208,14 @@ class SCNOutput:
         self._writer.write_string(type_)
         self._writer.write_floats(lines.color)
         self._writer.write_float(lines.thickness)
+        self._writer.write_string("\n")
 
         num_verts = len(lines.points)
         for vertex_id, vertex in enumerate(lines.points):
             self._writer.write_floats(vertex)
+            self._writer.write_string("\n")
 
-            endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendline\n\n"
-            self._writer.write_string(endtag)
+        self._writer.write_string("endline\n")
 
     def _dump_node_memcell(self, memcell):
         self._node_dump_header(memcell)
