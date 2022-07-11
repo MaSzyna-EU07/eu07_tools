@@ -215,7 +215,7 @@ class SCNOutput:
             self._writer.write_floats(vertex)
             self._writer.write_string("\n")
 
-        self._writer.write_string("endline\n")
+        self._writer.write_string("endline\n\n")
 
     def _dump_node_memcell(self, memcell):
         self._node_dump_header(memcell)
@@ -386,7 +386,7 @@ class SCNOutput:
         self._writer.write_int(traction.wires_type)
         self._writer.write_float(traction.wire_offset)
 
-        self._writer.write_string("vis\n" if traction.is_visible else "unvis\n")
+        self._writer.write_string("\nvis\n" if traction.is_visible else "\nunvis\n")
 
         if traction.parallel_name not in self._none_values:
             self._writer.write_string("parallel")
