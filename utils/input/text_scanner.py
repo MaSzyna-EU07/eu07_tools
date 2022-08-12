@@ -2,21 +2,20 @@ DEFAULT_SEPARATORS = [" ", "\t", ";", ","]
 
 class TextScanner:
     @classmethod
-    def from_file(cls, file, separators=None):
-        return cls(file, separators)
+    def from_file(cls, file, tokenizer=None):
+        return cls(file, tokenizer)
 
-    def __init__(self, file, separators=None):
-        if not separators:
-             separators = DEFAULT_SEPARATORS
-
-        self._tokenizer = Tokenizer(separators=separators)
-        self._accessor = TokensAccessor(self._tokenizer.tokenize_file(file))
+    def __init__(self, file, tokenizer=None):
+        self._tokenizer = tokenizer
+        if not self._tokenizer:
+            self._tokenizer = Tokenizer()
+        self._tokenizer.tokenize_file(file)
         self._back_tokens = []
 
     def read_string(self):
         if self._back_tokens:
             return self._back_tokens.pop(0)
-        return self._accessor.get_token()
+        return self._tokenizer.get_token()
 
     def read_float(self):
         return float(self.read_string())
@@ -72,29 +71,12 @@ from io import TextIOWrapper, BufferedReader, BytesIO, TextIOBase
 import re
 import math
 
-class TokensAccessor:
-    def __init__(self, tokens):
-        self._tokens_iterator = iter(tokens)
-
-    def get_token(self):
-        try:
-            return next(self._tokens_iterator)
-        except StopIteration:
-            return ""
-
-    def get_tokens(self, amount):
-        return (self.get_token() for _ in range(amount))
-    
-    def __iter__(self):
-        return self._tokens_iterator
 
 def get_stream_size(stream: TextIOBase):
     stream.seek(0, 2)
     stream_size = stream.tell()
     stream.seek(0)
     return stream_size
-
-
 
 
 class Tokenizer:
@@ -119,6 +101,8 @@ class Tokenizer:
         self._re_separators = re.compile(r"[" + sep_pat + r"]+")
         self._re_opening_delimiters = re.compile(r"//|/\*|\"")
 
+        self._tokens_iterator = None
+
         # TODO: Delimiters registration
         self._delimiters_map  = {
             "//": self.DelimitationData("//", "\n", return_=return_comments),
@@ -127,6 +111,18 @@ class Tokenizer:
         }
         
     # public:
+    def get_token(self):
+        try:
+            return next(self._tokens_iterator)
+        except StopIteration:
+            return ""
+
+    def get_tokens(self, amount):
+        return (self.get_token() for _ in range(amount))
+
+    def __iter__(self):
+        return self._tokens_iterator
+
     def tokenize_file(self, stream, ignore_comments=True):
         self.line_no = 1
         self._stream = stream
@@ -137,7 +133,7 @@ class Tokenizer:
         # In this case newline conversion is performed explicitly for each line with string.replace().
         self._stream.reconfigure(newline="")
 
-        return self._get_tokens_generator()
+        self._tokens_iterator = self._get_tokens_generator()
 
     def tokenize_string(self, string):
         return self.tokenize_file(TextIOWrapper(BufferedReader(BytesIO(string.encode()))))
