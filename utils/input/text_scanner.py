@@ -79,6 +79,10 @@ def get_stream_size(stream: TextIOBase):
     return stream_size
 
 
+def re_param_replacer(matchobj):
+    param_index = int(matchobj.group(1))
+    return param_array[param_index]
+
 class Tokenizer:
 
     class DelimitationData:
@@ -92,7 +96,7 @@ class Tokenizer:
 
     def __init__(self, return_comments=False, separators=DEFAULT_SEPARATORS, parameters=None):
         self.line_no = 0
-        self._parameters = parameters
+        self._parameters = parameters if parameters else []
 
         self._stream_size = 0
         self._readed_stream_size = 0
@@ -100,6 +104,7 @@ class Tokenizer:
         sep_pat = r"".join(re.escape(sep) for sep in separators)
         self._re_separators = re.compile(r"[" + sep_pat + r"]+")
         self._re_opening_delimiters = re.compile(r"//|/\*|\"")
+        self._re_param = re.compile(r"(\(p(.{1,2})\))")
 
         self._tokens_iterator = None
 
@@ -113,9 +118,19 @@ class Tokenizer:
     # public:
     def get_token(self):
         try:
-            return next(self._tokens_iterator)
+            token = next(self._tokens_iterator)
         except StopIteration:
             return ""
+        else:
+            if self._parameters:
+                param_founds = re.findall(self._re_param, token)
+                for param_string, param_n in param_founds:
+                    param_idx = int(param_n) - 1
+                    param_value = self._parameters[param_idx]
+
+                    token = token.replace(param_string, param_value)
+
+            return token
 
     def get_tokens(self, amount):
         return (self.get_token() for _ in range(amount))
@@ -152,6 +167,7 @@ class Tokenizer:
         for self.line_no, line in enumerate(self._stream, start=1):
             line_size = len(line)
             line = line.replace("\r\n", "\n").replace("\r", "\n")
+
             yield from self._tokenize_string(line)
             self._readed_stream_size += line_size
 
