@@ -443,8 +443,8 @@ class SCNOutput:
 
         self._writer.write_string(triangles.map + "\n")
 
-        num_verts = len(triangles.vertices)
-        for vertex_id, vertex in enumerate(triangles.vertices):
+        num_verts = len(triangles.geometry.vertices)
+        for vertex_id, vertex in enumerate(triangles.geometry.vertices):
             self._writer.write_floats(vertex)
 
             endtag = "end\n" if vertex_id < (num_verts - 1) else "\nendtri\n\n"

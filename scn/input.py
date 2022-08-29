@@ -534,7 +534,7 @@ class SCNInput(Iterator):
 
         vertex_endmark = ""
         while vertex_endmark != "endtri":
-            triangles.vertices.new(self._scanner.read_floats(8))
+            triangles.geometry.vertices.new(self._scanner.read_floats(8))
             vertex_endmark = self._scanner.read_string()
         
         return triangles
