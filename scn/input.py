@@ -4,12 +4,12 @@ import functools
 from eu07_tools.utils.input import TextScanner
 import eu07_tools.scn
 
-def load(file, parameters=None):
-    return SCNInput(file, parameters)
+def load(file, tokenizer=None):
+    return SCNInput(file, tokenizer)
 
 class SCNInput(Iterator):
-    def __init__(self, file, parameters=None):
-        self._scanner = TextScanner.from_file(file, parameters)
+    def __init__(self, file, tokenizer=None):
+        self._scanner = TextScanner.from_file(file, tokenizer)
         self._iterator = self._load()
         self._file = file
 
