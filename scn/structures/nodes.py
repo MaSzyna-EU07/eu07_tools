@@ -375,8 +375,7 @@ class NodeTriangles(Node):
         self.type = "node:triangles"
         self.subtype = "normal"
         self.vertices = FactorySequence(Vertex3D)
-        self.geometry = Geometry()
-        self.geometry.to_ordered()
+        self.geometry = Geometry(Geometry.Type.ORDERED)
         self.map = "none"
         self.material = _TrianglesMaterial()
 
