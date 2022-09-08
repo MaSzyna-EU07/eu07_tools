@@ -17,7 +17,7 @@ class AssetSearcher:
 
         self.scenes = PathFinder(
             [],
-            []
+            [".inc", ".scm", ".scn", ".ctr"]
         )
 
         self.sounds = PathFinder(
