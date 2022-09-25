@@ -25,6 +25,11 @@ class AssetSearcher:
             [".ogg", ".wav"]
         )
 
+        self.shaders = PathFinder(
+            [],
+            [".vert", ".frag"]
+        )
+
         self.update_lookups()
 
 
@@ -67,6 +72,10 @@ class AssetSearcher:
 
         self.sounds.lookups = [
             Path(self._root, "sounds")
+        ]
+
+        self.shaders.lookups = [
+            Path(self._root, "shaders")
         ]
         
 
