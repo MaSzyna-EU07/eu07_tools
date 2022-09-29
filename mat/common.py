@@ -4,13 +4,19 @@ NESTED_MAPPING_KEYS = {
 }
 
 NUMERIC_KEYS = {
-    "selfillum", "opacity"
+    "selfillum", "opacity", "shadow_rank"
 }
 
 STRING_KEYS = {
     "shader",
 }
 
+DEFAULT_VALUES = {
+    "selfillum": -1,
+    "opacity": 1,
+    "size": (-1, -1),
+    "shadow_rank": 3,
+}
 
 def get_texture_index_from_key(key):
     part2 = key.replace("texture", "")

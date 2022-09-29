@@ -1,49 +1,81 @@
-from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS
+from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS, DEFAULT_VALUES
+from eu07_tools.utils import TextWriter
+
 
 def dump(mapping, file):
-    MATOutput.dump_mapping(mapping, file)
+    MATOutput(file).dump_mapping(mapping)
 
 class MATOutput:
-    def __init__(self, mapping, file):
-        self._file = file
-        self._indent = -1
-        self._mapping = mapping
+    def __init__(self, file):
+        self._writer = TextWriter(file)
+        self._indent_level = 0
     
-    def dump_mapping():
-        self._write_if_exists("texture_diffuse")
-        self._write_if_exists("texture0")
-        self._write_if_exists("texture_normalmap")
-        self._write_if_exists("texture1")
+    def dump_mapping(self, mapping):
+        self._dump_mapping(mapping)
 
-        self._write_if_exists("shader")
-        self._write_shader_params()
+    def _dump_mapping(self, mapping):
+        self._write_value_if_exists(mapping, "shader")
+        self._write_shader_params(mapping)
 
-        self._write_if_exists("opacity")
-        self._write_if_exists("selfillum")
-        self._write_if_exists("size")
+        texture_keys = [key for key in mapping.keys() if key.startswith("texture")]
 
-        self._write_if_exists("spring")
-        self._write_if_exists("summer")
-        self._write_if_exists("autumn")
-        self._write_if_exists("winter")
+        for key in texture_keys:
+            self._write_value_if_exists(mapping, key)
 
-        self._write_if_exists("clear")
-        self._write_if_exists("cloudy")
-        self._write_if_exists("rain")
-        self._write_if_exists("snow")
+        self._write_value_if_exists(mapping, "shadow_rank")
+        self._write_value_if_exists(mapping, "opacity")
+        self._write_value_if_exists(mapping, "selfillum")
+        self._write_value_if_exists(mapping, "size")
 
-    def _write_if_exists(key):
+        self._indent_level += 1
+
+        for key in NESTED_MAPPING_KEYS:
+            self._write_submapping(key, mapping)
+
+        self._indent_level -= 1
+
+    def _write_value_if_exists(self, mapping, key):
         value = mapping.get(key)
 
-        if not value:
+        if value is None:
             return
 
-        if key in NESTED_MAPPING_KEYS:
-            _dump_mapping(value, file, indent+1)
+        default_value = DEFAULT_VALUES.get(key)
+        if default_value and default_value == value:
+            return
 
-    def _write_shader_params(mapping, file):
+        self._write_key(key)
+
+        if key in NUMERIC_KEYS:
+            self._writer.write_float(value)
+        else:
+            if key.startswith("texture"):
+                value = str(value)
+
+            self._writer.write_string(value)
+
+        self._writer.write_string("\n")
+
+    def _write_submapping(self, key, mapping):
+        submapping = mapping.get(key)
+
+        if submapping:
+            self._indent_level -= 1
+            self._write_key(key)
+            self._indent_level += 1
+            self._writer.write_string("{\n")
+
+            self._dump_mapping(submapping)
+
+            self._writer.write_string("}\n")
+
+    def _write_shader_params(self, mapping):
         for key in mapping:
             if key.startswith("param"):
-                _write_if_exists(mapping, key)
+                self._write_key(key)
+                self._writer.write_float(mapping[key])
 
+    def _write_key(self, key):
+        indent = "\t" * self._indent_level
+        self._writer.write_string(f"{indent}{key}:")
     
