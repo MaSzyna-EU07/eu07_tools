@@ -26,7 +26,13 @@ class Mapping(collections.abc.MutableMapping):
         if key == "size":
             self._items["size"] = VectorXY(value)
         elif "texture" in key:
-            self._items[key] = Texture(value)
+            tex_value = self._items[key] = MATTextureValue()
+            if isinstance(value, str):
+                tex_value.path = value
+                tex_value.use_set = False
+            else:
+                tex_value.set = list(value)
+                tex_value.use_set = True
         else:
             self._items[key] = value
 
@@ -39,32 +45,15 @@ class Mapping(collections.abc.MutableMapping):
     def __iter__(self):
         return iter(self._items)
 
-class Texture:
-    def __init__(self, value):
-        self.value = value
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self.value_type = (
-            "TEXTURE_SET" if isinstance(value, list)
-            else "TEXTURE_PATH"
-        )
-        self._value = value
-
-    def __repr__(self):
-        return (
-            f"<{self.__class__.__name__} "
-            f"type={self.value_type} "
-            f"value={self.value}>"
-        )
+class MATTextureValue:
+    def __init__(self):
+        self.path = ""
+        self.set = []
+        self.use_set = False
 
     def __str__(self):
-        if self.value_type == "TEXTURE_SET":
-            return "[ " + " ".join(self._value) + " ]"
+        if self.use_set:
+            return "[ " + " ".join(self.set) + " ]"
         else:
-            return self.value
+            return self.path
 

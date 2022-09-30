@@ -1,4 +1,4 @@
-from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS, DEFAULT_VALUES
+from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS, DEFAULT_VALUES, STRING_KEYS
 from eu07_tools.utils import TextWriter
 
 
@@ -48,11 +48,13 @@ class MATOutput:
 
         if key in NUMERIC_KEYS:
             self._writer.write_float(value)
-        else:
-            if key.startswith("texture"):
-                value = str(value)
-
+        elif key in STRING_KEYS:
             self._writer.write_string(value)
+        elif key.startswith("texture"):
+            self._writer.write_string(str(value))
+        else:
+            self._writer.write_floats(value)
+
 
         self._writer.write_string("\n")
 
@@ -73,7 +75,8 @@ class MATOutput:
         for key in mapping:
             if key.startswith("param"):
                 self._write_key(key)
-                self._writer.write_float(mapping[key])
+                self._writer.write_string(mapping[key])
+                self._writer.write_string("\n")
 
     def _write_key(self, key):
         indent = "\t" * self._indent_level
