@@ -75,7 +75,7 @@ class MATOutput:
         for key in mapping:
             if key.startswith("param"):
                 self._write_key(key)
-                self._writer.write_string(mapping[key])
+                self._writer.write_floats(mapping[key])
                 self._writer.write_string("\n")
 
     def _write_key(self, key):

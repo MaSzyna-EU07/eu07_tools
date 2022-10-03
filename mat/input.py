@@ -38,6 +38,19 @@ def _load_mapping(scanner):
             value = scanner.read_float()
         elif key == "size":
             value = [float(x) for x in scanner.read_floats(2)]
+        elif key.startswith("param"):
+            value = []
+            while 1:
+                token = scanner.read_string()
+                try:
+                    pv = float(token)
+                except ValueError:
+                    scanner.put_back(token)
+                    break
+                else:
+                    value.append(pv)
+
+
         else:
             value = scanner.read_string()
 
