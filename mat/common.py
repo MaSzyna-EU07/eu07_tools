@@ -2,7 +2,7 @@ from eu07_tools.utils import VectorXY
 
 NESTED_MAPPING_KEYS = {
     "spring", "summer", "autumn", "winter", 
-    "rain", "snow", "cloudy", "clear"
+    "clear", "scattered", "broken", "overcast", "rain", "snow"
 }
 
 NUMERIC_KEYS = {
