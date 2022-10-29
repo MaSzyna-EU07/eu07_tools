@@ -57,3 +57,5 @@ class MATTextureValue:
         else:
             return self.path
 
+
+

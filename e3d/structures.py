@@ -1,6 +1,7 @@
 from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
 from .common import TYPEID_TO_TYPENAME, ANIMID_TO_ANIMTYPENAME
 from eu07_tools.utils.geometry import Geometry
+from ..utils.structures import TexturePath
 
 
 def create_model():
@@ -93,11 +94,13 @@ class Submodel:
     @property
     def map(self):
         if self.material_id < 0:
-            return str(self.material_id)
+            value = str(self.material_id)
         elif self.material_id == 0:
-            return "none"
+            value = "none"
         else:
-            return self.owner.material_names[self.material_id]
+            value = self.owner.material_names[self.material_id]
+
+        return TexturePath(value)
 
     @property
     def transform(self):

@@ -34,7 +34,7 @@ class T3DOutput:
             self._write_property("Wire", submodel.wire)
             self._write_property("WireSize", submodel.wire_size)
             self._write_property("Opacity", submodel.opacity)
-            self._write_property("Map", submodel.map)
+            self._write_property("Map", submodel.map.path_with_traits)
             
         elif submodel.type == "FreeSpotLight":
             self._write_property("Diffuse", submodel.diffuse_color)
