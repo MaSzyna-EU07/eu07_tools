@@ -3,10 +3,10 @@ REPLACABLESKINS_VALUES = {"-1", "-2", "-3", "-4", "replacableskin"}
 class TexturePath:
     def __init__(self, path):
         self._path = "none"
-        self.path = path # Call property to set flags
         self.use_wrap_s = True
         self.use_wrap_t = True
         self.use_sharpen = False
+        self.path = path # Call property to provide proper initialization
 
     @property
     def path(self):
@@ -14,6 +14,8 @@ class TexturePath:
 
     @path.setter
     def path(self, path):
+        path = str(path) # in case if TexturePath object passed
+
         if path == "replacableskin":
             path = "-1"
 

@@ -18,4 +18,5 @@ DEFAULT_VALUES = {
     "opacity": 1,
     "size": VectorXY((-1, -1)),
     "shadow_rank": 3,
+    "shader": "",
 }
