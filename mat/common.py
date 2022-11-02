@@ -14,6 +14,7 @@ STRING_KEYS = {
 }
 
 DEFAULT_VALUES = {
+    "shader": "",
     "selfillum": -1,
     "opacity": 1,
     "size": VectorXY((-1, -1)),

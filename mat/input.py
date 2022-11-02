@@ -29,7 +29,7 @@ def _load_material(scanner):
                 paths = list(scanner.read_strings_before("]"))
                 mat.set_textureset(key, paths)
             else:
-                mat.set_texture_path(key, scanner.read_string())
+                mat.set_texture_path(key, token)
 
         elif key in NESTED_MAPPING_KEYS:
             mat_variant = _load_material(scanner)

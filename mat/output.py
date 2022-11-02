@@ -2,8 +2,8 @@ from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS, DEFAULT_VALUES, STRING_KE
 from eu07_tools.utils import TextWriter
 
 
-def dump(mapping, file):
-    MATOutput(file).dump_mapping(mapping)
+def dump(mat, file):
+    MATOutput(file).dump_material(mat)
 
 
 class MATOutput:
@@ -15,7 +15,8 @@ class MATOutput:
         self._dump_material(mat, None)
 
     def _dump_material(self, mat, parent_mat):
-        self._write_property("shader", mat.shader)
+        parent_shader = parent_mat.shader if parent_mat else None
+        self._write_property("shader", mat.shader, parent_shader)
 
         for param_key, param_array in mat.shader_params:
             self._write_key(param_key)
@@ -23,7 +24,7 @@ class MATOutput:
             self._writer.write_string("\n")
 
         for texture_key, pathlist in mat.iter_texture_lists():
-            self._write_property(texture_key, pathlist)
+            self._write_property(texture_key, [p.path_with_traits for p in pathlist])
 
         parent_opacity = parent_mat.opacity if parent_mat else None
         self._write_property("opacity", mat.opacity, parent_opacity)
@@ -49,7 +50,7 @@ class MATOutput:
             return
 
         default_value = DEFAULT_VALUES.get(key)
-        if default_value and default_value == value:
+        if (default_value is not None) and default_value == value:
             return
 
         self._write_key(key)

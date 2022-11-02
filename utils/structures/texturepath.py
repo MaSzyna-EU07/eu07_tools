@@ -3,8 +3,8 @@ REPLACABLESKINS_VALUES = {"-1", "-2", "-3", "-4", "replacableskin"}
 class TexturePath:
     def __init__(self, path):
         self._path = "none"
-        self.use_wrap_s = True
-        self.use_wrap_t = True
+        self.disable_wrap_s = False
+        self.disable_wrap_t = False
         self.use_sharpen = False
         self.path = path # Call property to provide proper initialization
 
@@ -24,8 +24,8 @@ class TexturePath:
         if len(parts) == 2:
             traits = parts[1]
 
-            self.use_wrap_s = "s" not in traits
-            self.use_wrap_t = "t" not in traits
+            self.disable_wrap_s = "s" in traits
+            self.disable_wrap_t = "t" in traits
             self.use_sharpen = "#" in traits
 
     @property
@@ -34,8 +34,8 @@ class TexturePath:
             return self._path
 
         traits_string = ""
-        traits_string += "s" if not self.use_wrap_s else ""
-        traits_string += "t" if not self.use_wrap_t else ""
+        traits_string += "s" if self.disable_wrap_s else ""
+        traits_string += "t" if self.disable_wrap_t else ""
         traits_string += "#" if self.use_sharpen else ""
 
         return f"{self._path}:{traits_string}" if traits_string else self._path
