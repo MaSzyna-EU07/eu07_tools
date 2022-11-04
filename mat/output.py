@@ -41,7 +41,7 @@ class MATOutput:
         self._indent_level += 1
 
         for variant_name, variant in mat.iter_variants():
-            self._write_variant(variant_name, variant)
+            self._write_variant(variant_name, variant, mat)
 
         self._indent_level -= 1
 
@@ -74,13 +74,13 @@ class MATOutput:
 
         self._writer.write_string("\n")
 
-    def _write_variant(self, key, variant):
+    def _write_variant(self, key, variant, parent_mat):
         self._indent_level -= 1
         self._write_key(key)
         self._indent_level += 1
         self._writer.write_string("{\n")
 
-        self._dump_material(variant)
+        self._dump_material(variant, parent_mat)
 
         self._writer.write_string("}\n")
 

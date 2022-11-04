@@ -33,12 +33,18 @@ class TexturePath:
         if self.is_replacableskin:
             return self._path
 
-        traits_string = ""
+        ts = self.traits_suffix
+
+        return f"{self._path}{ts}" if ts else self._path
+
+    @property
+    def traits_suffix(self):
+        traits_string = ":"
         traits_string += "s" if self.disable_wrap_s else ""
         traits_string += "t" if self.disable_wrap_t else ""
         traits_string += "#" if self.use_sharpen else ""
 
-        return f"{self._path}:{traits_string}" if traits_string else self._path
+        return traits_string if traits_string != ":" else ""
 
     @property
     def is_replacableskin(self):
