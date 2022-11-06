@@ -18,7 +18,7 @@ class MATOutput:
         parent_shader = parent_mat.shader if parent_mat else None
         self._write_property("shader", mat.shader, parent_shader)
 
-        for param_key, param_array in mat.shader_params:
+        for param_key, param_array in mat.shader_params.items():
             self._write_key(param_key)
             self._writer.write_floats(param_array)
             self._writer.write_string("\n")
