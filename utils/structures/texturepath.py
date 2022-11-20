@@ -1,12 +1,14 @@
 REPLACABLESKINS_VALUES = {"-1", "-2", "-3", "-4", "replacableskin"}
 
 class TexturePath:
-    def __init__(self, path):
-        self._path = "none"
+    def __init__(self, value):
         self.disable_wrap_s = False
         self.disable_wrap_t = False
         self.use_sharpen = False
-        self.path = path # Call property to provide proper initialization
+        self.path = value
+
+        if isinstance(value, TexturePath):
+            self.path = value.path_with_traits()
 
     @property
     def path(self):
@@ -14,8 +16,6 @@ class TexturePath:
 
     @path.setter
     def path(self, path):
-        path = str(path) # in case if TexturePath object passed
-
         if path == "replacableskin":
             path = "-1"
 

@@ -1,4 +1,4 @@
-from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS, DEFAULT_VALUES, STRING_KEYS
+from .common import NESTED_MAPPING_KEYS, FLOAT_KEYS, DEFAULT_VALUES, STRING_KEYS
 from eu07_tools.utils import TextWriter
 
 
@@ -46,16 +46,17 @@ class MATOutput:
         self._indent_level -= 1
 
     def _write_property(self, key, value, parent_value=None):
-        if (parent_value is not None) and value == parent_value:
-            return
-
-        default_value = DEFAULT_VALUES.get(key)
-        if (default_value is not None) and default_value == value:
-            return
+        if parent_value is not None:
+            if value == parent_value:
+                return
+        else:
+            default_value = DEFAULT_VALUES.get(key)
+            if (default_value is not None) and default_value == value:
+                return
 
         self._write_key(key)
 
-        if key in NUMERIC_KEYS:
+        if key in FLOAT_KEYS:
             self._writer.write_float(value)
         elif key in STRING_KEYS:
             self._writer.write_string(value)

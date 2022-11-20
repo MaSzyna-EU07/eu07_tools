@@ -1,5 +1,5 @@
-from .structures import create_material, Material
-from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS
+from .structures import create_material, MATMaterial
+from .common import NESTED_MAPPING_KEYS, FLOAT_KEYS, STRING_KEYS, INT_KEYS
 from eu07_tools.utils import TextScanner
 
 
@@ -9,7 +9,7 @@ def load(file):
 
 
 def _load_material(scanner):
-    mat = Material()
+    mat = MATMaterial()
 
     while True:
         token = scanner.read_string()
@@ -26,29 +26,28 @@ def _load_material(scanner):
             token = scanner.read_string()
 
             if token == "[":
-                paths = list(scanner.read_strings_before("]"))
-                mat.set_textureset(key, paths)
+                value = [
+                    mat.create_texture_path_object(p) for p in
+                    scanner.read_strings_before("]")
+                ]
+
             else:
-                mat.set_texture_path(key, token)
+                value = [mat.create_texture_path_object(token)]
 
         elif key in NESTED_MAPPING_KEYS:
-            mat_variant = _load_material(scanner)
-            mat.set_variant(key, mat_variant)
+            value = _load_material(scanner)
 
-        elif key == "shader":
-            mat.shader = scanner.read_string()
+        elif key in STRING_KEYS:
+            value = scanner.read_string()
 
-        elif key == "opacity":
-            mat.opacity = scanner.read_int()
+        elif key in FLOAT_KEYS:
+            value = scanner.read_float()
 
-        elif key == "selfillum":
-            mat.selfillum = scanner.read_float()
+        elif key in INT_KEYS:
+            value = scanner.read_int()
 
         elif key == "size":
-            mat.size = scanner.read_floats(2)
-
-        elif key == "shadow_rank":
-            mat.shadow_rank = scanner.read_int()
+            value = scanner.read_floats(2)
 
         elif key.startswith("param"):
             values = []
@@ -62,6 +61,8 @@ def _load_material(scanner):
                 else:
                     values.append(pv)
 
-            mat.shader_params[key] = values
+            value = values
+
+        mat[key] = value
 
     return mat

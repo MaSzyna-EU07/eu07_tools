@@ -1,68 +1,43 @@
 from eu07_tools.utils import VectorXY
 import collections.abc
 
-from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS, DEFAULT_VALUES
+from .common import NESTED_MAPPING_KEYS, FLOAT_KEYS, DEFAULT_VALUES
 from ..utils.structures import TexturePath
 
 
 def create_material():
-    return Material()
+    return MATMaterial()
 
-class Material:
+class MATMaterial:
     def __init__(self):
-        self.shader = ""
-        self.shader_params = {}
-        self.opacity = DEFAULT_VALUES["opacity"]
-        self.selfillum = DEFAULT_VALUES["selfillum"]
-        self.shadow_rank = DEFAULT_VALUES["shadow_rank"]
+        self._items = {}
 
-        self._texture_paths = {}
-        self._variants = {}
-        self._size = DEFAULT_VALUES["size"]
+    def __getitem__(self, key):
+        return self._items[key]
 
-    @property
-    def size(self):
-        return self._size
+    def __setitem__(self, key, value):
+        if key == "size":
+            value = VectorXY(value)
 
-    @size.setter
-    def size(self, size):
-        self._size = VectorXY(size)
+        self._items[key] = value
 
-    def set_variant(self, key, mat_variant):
-        self._variants[key] = mat_variant
+    def get(self, key, default=None):
+        return self._items.get(key, default)
 
-    def get_variant(self, key):
-        return self._variants.get(key)
+    def create_texture_path_object(self, path):
+        return TexturePath(path)
 
-    def create_variant(self, key):
-        mat_variant = Material()
-        self._variants[key] = mat_variant
+    def create_variant(self):
+        return MATMaterial()
 
-    def remove_variant(self, key):
-        del self._variants[key]
+    def items(self):
+        for key, value in self._items.items():
+            yield key, value
 
-    def iter_variants(self):
-        for key, variant in self._variants.items():
-            yield key, variant
+    def keys(self):
+        for k in self._items.keys():
+            yield k
 
-    def set_textureset(self, key, paths):
-        self._texture_paths[key] = [TexturePath(p) for p in paths]
-
-    def get_textureset(self, key):
-        return self._texture_paths.get(key)
-
-    def set_texture_path(self, key, path):
-        self._texture_paths[key] = [TexturePath(path)]
-
-    def get_texture_path(self, key):
-        paths = self._texture_paths.get(key)
-        if paths:
-            return paths[0]
-
-    def remove_texture(self, key):
-        del self._variants[key]
-
-    def iter_texture_lists(self):
-        for key, tex in self._texture_paths.items():
-            yield key, tex
-
+    def values(self):
+        for v in self._items.values():
+            yield v

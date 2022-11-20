@@ -2,6 +2,13 @@ class ShaderParser:
     def __init__(self, asset_searcher):
         self.asset_searcher = asset_searcher
 
+    def parse_from_shortpath(self, shortpath, shader_data=None):
+        self.asset_searcher.shaders.remove_extension(".vert")
+        abspath = self.asset_searcher.shaders.find(shortpath)
+        self.asset_searcher.shaders.add_extension(".vert")
+
+        return self.parse_from_abspath(abspath, shader_data)
+
     def parse_from_abspath(self, abspath, shader_data=None):
         data = ShaderInputs() if shader_data is None else shader_data
 
@@ -34,6 +41,13 @@ class ShaderInputs:
         self.textures = []
         self.params = []
 
+    def get_texture_alias_map(self):
+        d = {}
+        for texture in self.textures:
+            d[f"texture{texture.unit_index}"] = f"texture_{texture.name}"
+
+        return d
+
 
 class ShaderTextureInput:
     def __init__(self, name, location, components):
@@ -53,3 +67,7 @@ class ShaderParamInput:
         self.offset = offset
         self.size = size
         self.default = default
+
+    @property
+    def unit_index(self):
+        return self.location + 1

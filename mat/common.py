@@ -1,17 +1,21 @@
 from eu07_tools.utils import VectorXY
 
-NESTED_MAPPING_KEYS = {
+NESTED_MAPPING_KEYS = (
     "spring", "summer", "autumn", "winter", 
     "clear", "scattered", "broken", "overcast", "rain", "snow"
-}
+)
 
-NUMERIC_KEYS = {
-    "selfillum", "opacity", "shadow_rank"
-}
+FLOAT_KEYS = (
+    "selfillum", "opacity",
+)
 
-STRING_KEYS = {
+INT_KEYS = (
+    "shadow_rank",
+)
+
+STRING_KEYS = (
     "shader",
-}
+)
 
 DEFAULT_VALUES = {
     "shader": "",
