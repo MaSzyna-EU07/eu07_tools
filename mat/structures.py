@@ -1,7 +1,7 @@
 from eu07_tools.utils import VectorXY
 import collections.abc
 
-from .common import NESTED_MAPPING_KEYS, FLOAT_KEYS, DEFAULT_VALUES
+from .common import VARIANT_KEYS, FLOAT_KEYS, DEFAULT_VALUES
 from ..utils.structures import TexturePath
 
 

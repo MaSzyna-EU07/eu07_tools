@@ -1,4 +1,4 @@
-from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB, ColorRGBA, FactorySequence, OwnedFactorySequence
+from .structures import VectorUV, VectorXY, VectorXYZ, Vertex3D, ColorRGB, ColorRGBA, FactorySequence, OwnedFactorySequence, TexturePath
 from .asset_searcher import AssetSearcher
 from .input import TextScanner, BinaryScanner,Tokenizer
 from .output import BinaryWriter, TextWriter

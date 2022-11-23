@@ -1,6 +1,6 @@
 from eu07_tools.utils import VectorXY
 
-NESTED_MAPPING_KEYS = (
+VARIANT_KEYS = (
     "spring", "summer", "autumn", "winter", 
     "clear", "scattered", "broken", "overcast", "rain", "snow"
 )

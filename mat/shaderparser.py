@@ -22,7 +22,7 @@ class ShaderParser:
                         self.parse_from_abspath(abspath, data)
 
                 if line.startswith("#texture"):
-                    _, defstring = line.split("(")
+                    _, defstring = line[:-2].split("(")
                     name, location, components = [p.strip() for p in defstring.split(",")]
 
                     data.textures.append(ShaderTextureInput(name, int(location), components))

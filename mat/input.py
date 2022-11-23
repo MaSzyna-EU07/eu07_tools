@@ -1,5 +1,5 @@
 from .structures import create_material, MATMaterial
-from .common import NESTED_MAPPING_KEYS, FLOAT_KEYS, STRING_KEYS, INT_KEYS
+from .common import VARIANT_KEYS, FLOAT_KEYS, STRING_KEYS, INT_KEYS
 from eu07_tools.utils import TextScanner
 
 
@@ -34,7 +34,7 @@ def _load_material(scanner):
             else:
                 value = [mat.create_texture_path_object(token)]
 
-        elif key in NESTED_MAPPING_KEYS:
+        elif key in VARIANT_KEYS:
             value = _load_material(scanner)
 
         elif key in STRING_KEYS:
