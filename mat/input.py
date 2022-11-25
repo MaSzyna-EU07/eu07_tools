@@ -1,6 +1,6 @@
-from .structures import create_material, MATMaterial
+from .structures import create_material, MATMaterial, MATTextureValue
 from .common import VARIANT_KEYS, FLOAT_KEYS, STRING_KEYS, INT_KEYS
-from eu07_tools.utils import TextScanner
+from eu07_tools.utils import TextScanner, TexturePath
 
 
 def load(file):
@@ -26,13 +26,13 @@ def _load_material(scanner):
             token = scanner.read_string()
 
             if token == "[":
-                value = [
-                    mat.create_texture_path_object(p) for p in
+                value = MATTextureValue.from_list([
+                    TexturePath(p) for p in
                     scanner.read_strings_before("]")
-                ]
+                ])
 
             else:
-                value = [mat.create_texture_path_object(token)]
+                value = MATTextureValue.from_path(TexturePath(token))
 
         elif key in VARIANT_KEYS:
             value = _load_material(scanner)

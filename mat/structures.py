@@ -21,14 +21,12 @@ class MATMaterial:
 
         self._items[key] = value
 
+    def get_default_shader_name(self):
+        num_textures = len([k for k in self.keys() if k.startswith("texture")])
+        return f"default_{num_textures}"
+
     def get(self, key, default=None):
         return self._items.get(key, default)
-
-    def create_texture_path_object(self, path):
-        return TexturePath(path)
-
-    def create_variant(self):
-        return MATMaterial()
 
     def items(self):
         for key, value in self._items.items():
@@ -41,3 +39,28 @@ class MATMaterial:
     def values(self):
         for v in self._items.values():
             yield v
+
+
+class MATTextureValue:
+    def __init__(self, *paths):
+        self.paths = [p for p in paths]
+
+    @classmethod
+    def from_list(cls, pathlist):
+        return cls(*pathlist)
+
+    @classmethod
+    def from_path(cls, string):
+        return cls(string)
+
+    @property
+    def is_randomset(self):
+        return len(self.paths) > 1
+
+    @property
+    def is_path(self):
+        return len(self.paths) == 1
+
+    @property
+    def is_empty(self):
+        return len(self.paths) == 0

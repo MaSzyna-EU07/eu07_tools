@@ -18,9 +18,18 @@ class MATOutput:
         for key, value in mat.items():
             self._write_property(key, value, parent_mat)
 
-            # self._write_property(texture_key, [p.path_with_traits for p in pathlist])
-
     def _write_property(self, key, value, parent_mat=None):
+        # TODO:
+        # Jeśli w rodzicu zdefiniowana jest jakaś właściwość, a ta sama jest tutaj i mają one te same wartości
+        #      nie trzeba zapisać
+        # Jeśli mają one różne wartości
+        #      to trzeba zapisać
+        # Jeśli jakaś wartość jest równa wartości domyślnej a rodzic jej nie definiuje
+        #      nie trzeba zapisać
+        # Jeśli jakaś wartość jest równa wartości domyślnej i rodzicu zdefiniowana jest, a ta sama jest tutaj i mają one różne wartości
+        #       to trzeba zapisać
+        #
+        # parent_value = parent_mat.get(key)
         # if parent_value is not None:
         #     if value == parent_value:
         #         return
@@ -33,25 +42,28 @@ class MATOutput:
 
         if key in FLOAT_KEYS:
             self._writer.write_float(value)
+
         elif key in INT_KEYS:
             self._writer.write_int(value)
+
         elif key in STRING_KEYS:
             self._writer.write_string(value)
-        elif key.startswith("texture"):
-            is_randomset = (not isinstance(value, TexturePath))
 
-            if is_randomset:
+        elif key.startswith("texture"):
+
+            if value.is_randomset:
                 self._writer.write_string("[")
 
             self._writer.write_string(
-                ", ".join(tpo.path_with_traits) for tpo in value
+                ", ".join(tpo.path_with_traits for tpo in value.paths)
             )
 
-            if is_randomset:
+            if value.is_randomset:
                 self._writer.write_string("]")
 
         elif key.startswith("param"):
-            self._writer.write_floats(value)
+            if value:
+                self._writer.write_floats(value)
 
         elif key.startswith("size"):
             self._writer.write_floats(value)
@@ -62,15 +74,13 @@ class MATOutput:
         self._writer.write_string("\n")
 
     def _write_variant(self, key, variant, parent_mat):
-        self._write_key(key)
-
         self._writer.write_string("{\n")
 
         self._indent_level += 1
         self._dump_material(variant, parent_mat)
         self._indent_level -= 1
 
-        self._writer.write_string("}\n")
+        self._writer.write_string("}")
 
     def _write_key(self, key):
         indent = "\t" * self._indent_level
