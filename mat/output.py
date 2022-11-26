@@ -31,11 +31,11 @@ class MATOutput:
         #
         # parent_value = parent_mat.get(key)
         # if parent_value is not None:
-        #     if value == parent_value:
+        #     if param_list == parent_value:
         #         return
         # else:
         #     default_value = DEFAULT_VALUES.get(key)
-        #     if (default_value is not None) and default_value == value:
+        #     if (default_value is not None) and default_value == param_list:
         #         return
 
         self._write_key(key)

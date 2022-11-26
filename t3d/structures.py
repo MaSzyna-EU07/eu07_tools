@@ -71,7 +71,7 @@ class Include(Element):
 class Submodel(Element):
     """ Base class for submodels. Defines common attributes for subclasses.
 
-    :ivar type: Submodel type name - can be "Mesh", "FreeSpotLight", "Stars". This value is read-only.
+    :ivar type: Submodel type name - can be "Mesh", "FreeSpotLight", "Stars". This param_list is read-only.
     :type type: `str`
     :ivar name: Name of submodel
     :type name: `str`
@@ -81,7 +81,7 @@ class Submodel(Element):
     :type anim: `str`
     :ivar diffuse_color: RGB diffuse color, values in range <0;255>, defaults to (255, 255, 255)
     :type diffuse_color: :class:`utils.ColorRGB` 
-    :ivar selfillum: SelfIllum parameter, value in range <0;1.25>, defaults to 0
+    :ivar selfillum: SelfIllum parameter, param_list in range <0;1.25>, defaults to 0
     :type selfillum: `float`
     :ivar max_distance: Maximum rendering distance in meters, defaults to 1000
     :type max_distance: `float`
@@ -128,13 +128,13 @@ class MeshSubmodel(Submodel):
     :type wire: `bool`
     :ivar wire_size: Wire thickness in wireframe display mode, defaults to 1.0
     :type wire_size: `float`
-    :ivar opacity: Opacity level, value in range <0;1>, defaults to 1.0
+    :ivar opacity: Opacity level, param_list in range <0;1>, defaults to 1.0
     :type opacity: `float`
     :ivar map: Texture path or replacableskin id, defaults to "none"
     :type map: `str`
     :ivar triangles: Mutable collection of :class:`t3d.MeshTriangle` objects, by default it's empty
     :type triangles: :class:`utils.FactorySequence[t3d.MeshTriangle]`
-    :ivar num_verts: Number of vertices in all triangles, defaults to 0. This value is read-only.
+    :ivar num_verts: Number of vertices in all triangles, defaults to 0. This param_list is read-only.
     :type num_verts: `int`
     """
     def __init__(self, name):
@@ -211,7 +211,7 @@ class StarsSubmodel(Submodel):
 
     :ivar stars: Mutable collection of :class:`t3d.StarsLight` objects, by default it's empty
     :type stars: :class:`utils.FactorySequence[t3d.StarsLight]`
-    :ivar num_verts: Number of light points, defaults to 0. This value is read-only.
+    :ivar num_verts: Number of light points, defaults to 0. This param_list is read-only.
     :type num_verts: `int`
     """
     def __init__(self, name):
