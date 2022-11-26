@@ -27,12 +27,12 @@ def _load_material(scanner):
 
             if token == "[":
                 value = MATTextureValue.from_list([
-                    TexturePath(p) for p in
+                    TexturePath.from_string(p) for p in
                     scanner.read_strings_before("]")
                 ])
 
             else:
-                value = MATTextureValue.from_path(TexturePath(token))
+                value = MATTextureValue.from_path(TexturePath.from_string(token))
 
         elif key in VARIANT_KEYS:
             value = _load_material(scanner)

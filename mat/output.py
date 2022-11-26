@@ -55,7 +55,7 @@ class MATOutput:
                 self._writer.write_string("[")
 
             self._writer.write_string(
-                ", ".join(tpo.path_with_traits for tpo in value.paths)
+                ", ".join(tpo.as_string() for tpo in value.paths)
             )
 
             if value.is_randomset:
