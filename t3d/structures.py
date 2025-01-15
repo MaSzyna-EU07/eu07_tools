@@ -1,5 +1,6 @@
 import abc
 
+from eu07_tools.mat.structures import TextureReference
 from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
 from eu07_tools.utils.geometry import Geometry
 
@@ -144,7 +145,7 @@ class MeshSubmodel(Submodel):
         self.wire = False
         self.wire_size = 1.0
         self.opacity = 1.0
-        self.map = "none"
+        self.map = TextureReference("none")
 
         self.geometry = Geometry()
 
@@ -163,6 +164,14 @@ class MeshSubmodel(Submodel):
     @specular_color.setter
     def specular_color(self, specular_color):
         self._specular_color = ColorRGB(specular_color)
+
+    @property
+    def map(self):
+        return self._map
+
+    @map.setter
+    def map(self, map_):
+        self._map = TextureReference(map_)
 
 
 class FreeSpotLightSubmodel(Submodel):

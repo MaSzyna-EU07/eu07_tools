@@ -145,7 +145,7 @@ class Tokenizer:
         # HACK: In default, input file stream converts all crlf/cr to lf. 
         # It causes that the desirable result of len(line) (where line ends with crlf) is less by 1.
         # So we need to disable this behaviour to provide correct progress calculation.
-        # In this case newline conversion is performed explicitly for each line with string.replace().
+        # In this case newline conversion is performed explicitly for each line with data.replace().
         self._stream.reconfigure(newline="")
 
         self._tokens_iterator = self._get_tokens_generator()
