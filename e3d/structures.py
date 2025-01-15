@@ -1,6 +1,7 @@
 from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
 from .common import TYPEID_TO_TYPENAME, ANIMID_TO_ANIMTYPENAME
 from eu07_tools.utils.geometry import Geometry
+from ..mat.structures import TextureReference
 
 
 def create_model():
@@ -14,7 +15,7 @@ class Model:
         self.matrices = FactorySequence(list)
         self.vertices = FactorySequence(Vertex3D)
         self.indices = FactorySequence(int)
-        self.material_names = FactorySequence(str, initial_list=["none"])
+        self.material_names = FactorySequence(TextureReference, initial_list=[TextureReference("none")])
 
 
 
@@ -93,9 +94,7 @@ class Submodel:
     @property
     def map(self):
         if self.material_id < 0:
-            return str(self.material_id)
-        elif self.material_id == 0:
-            return "none"
+            return TextureReference(str(self.material_id))
         else:
             return self.owner.material_names[self.material_id]
 

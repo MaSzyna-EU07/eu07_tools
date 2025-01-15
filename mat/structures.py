@@ -135,7 +135,7 @@ class TextureReference:
                     key, value = ps.split("=")
                     self.generated_params[key] = value
 
-        elif data.startswith("-"):
+        elif data.startswith("-") or data == "replacableskin":
             self.type = TextureReference.Type.SKIN_INDEX
 
             self.skin_index = int(data)
@@ -178,7 +178,7 @@ class TextureReference:
 
     @property
     def is_skin(self):
-        return self._resource_path.startswith("-") or self._resource_path == "replacableskin"
+        return self.type == TextureReference.Type.SKIN_INDEX
 
 
 
