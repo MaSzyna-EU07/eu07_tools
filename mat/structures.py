@@ -27,7 +27,7 @@ class Mapping(collections.abc.MutableMapping):
         if key == "size":
             self._items["size"] = VectorXY(value)
         elif "texture" in key:
-            self._items[key] = Texture(value)
+            self._items[key] = TextureValue(value)
         else:
             self._items[key] = value
 
@@ -40,9 +40,25 @@ class Mapping(collections.abc.MutableMapping):
     def __iter__(self):
         return iter(self._items)
 
-class Texture:
+class TextureValue:
+    class Type(enum.Enum):
+        UNKNOWN = 0
+        REFERENCE = 1
+        SET = 2
+
+
     def __init__(self, value):
-        self.value = value
+        self._value = None
+        self.type = TextureValue.Type.UNKNOWN
+        self.feed(value)
+
+    def feed(self, value):
+        if isinstance(value, list):
+            self.type = TextureValue.Type.SET
+            self._value = [TextureReference(v) for v in value]
+        else:
+            self.type = TextureValue.Type.REFERENCE
+            self._value = TextureReference(value)
 
     @property
     def value(self):
@@ -50,24 +66,28 @@ class Texture:
 
     @value.setter
     def value(self, value):
-        self.value_type = (
-            "TEXTURE_SET" if isinstance(value, list)
-            else "TEXTURE_PATH"
-        )
-        self._value = value
+        self.feed(value)
 
     def __repr__(self):
         return (
             f"<{self.__class__.__name__} "
-            f"type={self.value_type} "
+            f"type={self.type} "
             f"value={self.value}>"
         )
 
     def __str__(self):
-        if self.value_type == "TEXTURE_SET":
+        if self.type == TextureValue.Type.SET:
             return "[ " + " ".join(self._value) + " ]"
         else:
             return self.value
+
+    @property
+    def is_set(self):
+        return self.type == TextureValue.Type.SET
+
+    @property
+    def is_reference(self):
+        return self.type == TextureValue.Type.REFERENCE
 
 
 class TextureReference:
