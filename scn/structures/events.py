@@ -1,5 +1,5 @@
 from .nodes import MemcellValues
-from eu07_tools.utils.structures import VectorXYZ
+from ...utils.structures import VectorXYZ
 
 
 class Event:

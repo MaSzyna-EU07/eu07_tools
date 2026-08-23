@@ -1,4 +1,4 @@
-from eu07_tools.utils import VectorXY
+from ..utils import VectorXY
 import collections.abc
 import enum
 
@@ -125,7 +125,7 @@ class TextureReference:
             return str(self.skin_index)
         elif self.type == TextureReference.Type.GENERATED:
             params_str = ""
-            for k, v in self.generated_params:
+            for k, v in self.generated_params.items():
                 params_str += f"{k}={v}&"
 
             params_str = params_str[:-1] if params_str else ""
@@ -145,7 +145,7 @@ class TextureReference:
         elif data.startswith("make:"):
             self.type = TextureReference.Type.GENERATED
 
-            data = data[6:]
+            data = data[len("make:"):]
 
             splitted = data.split("?")
             self._resource_path = splitted[0]
@@ -155,10 +155,14 @@ class TextureReference:
                     key, value = ps.split("=")
                     self.generated_params[key] = value
 
-        elif data.startswith("-") or data == "replacableskin":
+        elif data.startswith("-") or data.strip().lower() == "replacableskin":
             self.type = TextureReference.Type.SKIN_INDEX
 
-            self.skin_index = int(data)
+            try:
+                self.skin_index = int(data)
+            except ValueError:
+                # Bare "replacableskin" carries no index - it means skin #1.
+                self.skin_index = -1
         else:
             self.type = TextureReference.Type.PATH
 

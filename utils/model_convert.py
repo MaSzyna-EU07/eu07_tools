@@ -1,9 +1,9 @@
-import eu07_tools
-
 def e3d_to_t3d(e3d_model):
+    from ..t3d import create_submodel
+
     for e3d_sm in e3d_model.submodels:
         
-        t3d_sm = eu07_tools.t3d.create_submodel(e3d_sm.type, e3d_sm.name)
+        t3d_sm = create_submodel(e3d_sm.type, e3d_sm.name)
 
         t3d_sm.diffuse_color = [x * 255 for x in e3d_sm.diffuse_color[:3]]
         t3d_sm.anim = e3d_sm.anim

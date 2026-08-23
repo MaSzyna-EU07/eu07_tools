@@ -1,4 +1,4 @@
-from eu07_tools.utils import TextWriter
+from ..utils import TextWriter
 
 
 def dump(elements, file):

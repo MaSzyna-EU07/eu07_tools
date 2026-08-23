@@ -1,4 +1,4 @@
-from eu07_tools.utils import BinaryWriter
+from ..utils import BinaryWriter
 
 from .common import SUBMODEL_SIZE, VNT0_VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE
 

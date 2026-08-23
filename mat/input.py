@@ -1,6 +1,6 @@
 from .structures import create_mapping
 from .common import NESTED_MAPPING_KEYS, NUMERIC_KEYS
-from eu07_tools.utils import TextScanner
+from ..utils import TextScanner
 
 
 def load(file):

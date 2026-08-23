@@ -1,4 +1,4 @@
-from eu07_tools.utils.structures import VectorXYZ, ColorRGB, Vertex3D, FactorySequence
+from ...utils.structures import VectorXYZ, ColorRGB, Vertex3D, FactorySequence
 
 
 class Atmo:

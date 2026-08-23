@@ -1,8 +1,8 @@
 import abc
 
-from eu07_tools.mat.structures import TextureReference
-from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
-from eu07_tools.utils.geometry import Geometry
+from ..mat.structures import TextureReference
+from ..utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
+from ..utils.geometry import Geometry
 
 
 def create_submodel(type, name):

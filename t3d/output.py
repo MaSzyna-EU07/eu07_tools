@@ -1,6 +1,6 @@
 import math
 
-from eu07_tools.utils import TextWriter
+from ..utils import TextWriter
 
 def dump(elements, file):
     T3DOutput(file).dump_from_iterable(elements)

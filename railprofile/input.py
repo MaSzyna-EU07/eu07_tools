@@ -1,4 +1,4 @@
-from eu07_tools.utils import TextScanner
+from ..utils import TextScanner
 from .structures import RailProfile
 
 

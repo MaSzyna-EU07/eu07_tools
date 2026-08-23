@@ -1,6 +1,7 @@
 import struct
 
-import eu07_tools
+from ..utils import BinaryScanner
+from .structures import create_model
 from .common import (
     CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE,
     VNT1_VERTEX_SIZE, VNT2_VERTEX_SIZE, VNT0_VERTEX_SIZE, FLOAT_SIZE,
@@ -28,12 +29,12 @@ class E3DInput:
             "IDX4": self._read_IDX4,
         }
 
-        self._scanner = eu07_tools.utils.BinaryScanner(file)
+        self._scanner = BinaryScanner(file)
 
     def load(self):
         self._scanner.read_bytes(CHUNK_HEADER_SIZE)
 
-        self.model = eu07_tools.e3d.create_model()
+        self.model = create_model()
 
         while not self._scanner.is_empty:
             chunk_id, chunk_size = self._read_header()
