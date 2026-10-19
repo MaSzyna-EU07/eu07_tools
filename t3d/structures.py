@@ -192,6 +192,9 @@ class FreeSpotLightSubmodel(Submodel):
     :type falloff_angle: `float`
     :ivar hotspot_angle: Hotspot angle, defaults to 45.0
     :type hotspot_angle: `float`
+    :ivar hotspot_power: Light intensity in percent, defaults to None, which leaves the entry out (the simulator
+        takes 100 then)
+    :type hotspot_power: `float` or `None`
     """
     def __init__(self, name):
         super().__init__(name)
@@ -203,6 +206,7 @@ class FreeSpotLightSubmodel(Submodel):
         self.far_decay_radius = 45.0
         self.falloff_angle = 45.0
         self.hotspot_angle = 45.0
+        self.hotspot_power = None
 
 
 class StarsSubmodel(Submodel):

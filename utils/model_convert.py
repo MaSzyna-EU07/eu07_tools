@@ -36,6 +36,8 @@ def e3d_to_t3d(e3d_model):
             t3d_sm.use_near_atten = e3d_sm.use_near_atten
             t3d_sm.far_atten_decay_type = e3d_sm.far_atten_decay_type
             t3d_sm.far_decay_radius = e3d_sm.far_decay_radius
+            if e3d_sm.hotspot_power != 1.0:
+                t3d_sm.hotspot_power = e3d_sm.hotspot_power * 100
             # TODO: cos_falloff_angle, cos_hotspot_angle - how to translate to t3d?        
 
         elif e3d_sm.type == "Stars":

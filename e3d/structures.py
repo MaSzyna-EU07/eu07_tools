@@ -54,6 +54,8 @@ class Submodel:
         self.cos_falloff_angle = 0
         self.cos_hotspot_angle = 0
         self.cos_view_angle = 0
+        # light intensity of a FreeSpotLight, HotspotPower / 100
+        self.hotspot_power = 1.0
 
     @property
     def ambient_color(self):

@@ -65,7 +65,12 @@ class E3DOutput:
             self._writer.write_float(submodel.cos_falloff_angle)
             self._writer.write_float(submodel.cos_hotspot_angle)
             self._writer.write_float(submodel.cos_view_angle)
-            self._writer.write_bytes(b"\x00" * 100)
+            # index count and offset
+            self._writer.write_bytes(b"\x00" * 8)
+            # the former diffuse multiplier (1 leaves the colour as it is), then the light intensity
+            self._writer.write_float(1.0)
+            self._writer.write_float(submodel.hotspot_power)
+            self._writer.write_bytes(b"\x00" * 84)
 
     def _dump_VNT0(self):
         self._writer.write_string("VNT0")

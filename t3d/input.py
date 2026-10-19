@@ -58,6 +58,12 @@ class T3DInput:
             submodel.far_decay_radius = self._read_property()
             submodel.falloff_angle = self._read_property()
             submodel.hotspot_angle = self._read_property()
+            # optional, the simulator takes it only right after HotspotAngle
+            token = self._scanner.read_string()
+            if token.lower().rstrip(":") == "hotspotpower":
+                submodel.hotspot_power = self._scanner.read_float()
+            else:
+                self._scanner.put_back(token)
 
         elif submodel.type == "Stars":
             submodel.diffuse_color = self._read_property()

@@ -5,7 +5,7 @@ from .structures import create_model
 from .common import (
     CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE,
     VNT1_VERTEX_SIZE, VNT2_VERTEX_SIZE, VNT0_VERTEX_SIZE, FLOAT_SIZE,
-    IDX1_INDEX_SIZE, IDX2_INDEX_SIZE, IDX4_INDEX_SIZE
+    IDX1_INDEX_SIZE, IDX2_INDEX_SIZE, IDX4_INDEX_SIZE, TYPEID_TO_TYPENAME
 )
 
 
@@ -89,8 +89,18 @@ class E3DInput:
             submodel.num_indices = self._scanner.read_int()
             submodel.first_index_id = self._scanner.read_int()
 
+            # the former diffuse multiplier, then the light intensity (HotspotPower / 100)
+            diffuse_multiplier = self._scanner.read_float()
+            submodel.hotspot_power = self._scanner.read_float()
+            if submodel.hotspot_power <= 0:
+                # a file without the intensity of its own, where the diffuse colour holds it, or older than both,
+                # as the simulator takes it
+                submodel.hotspot_power = diffuse_multiplier if diffuse_multiplier > 0 else 1.0
+                if TYPEID_TO_TYPENAME.get(submodel.type_id) == "FreeSpotLight":
+                    submodel.diffuse_color = submodel.diffuse_color / submodel.hotspot_power
+
             # skip pad bytes
-            self._scanner.read_bytes(92)
+            self._scanner.read_bytes(84)
 
     def _read_IDX1(self, data_size):
         self._read_IDXx(data_size, IDX1_INDEX_SIZE)
