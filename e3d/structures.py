@@ -1,6 +1,6 @@
-from eu07_tools.utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
+from ..utils import FactorySequence, OwnedFactorySequence, Vertex3D, ColorRGBA
 from .common import TYPEID_TO_TYPENAME, ANIMID_TO_ANIMTYPENAME
-from eu07_tools.utils.geometry import Geometry
+from ..utils.geometry import Geometry
 from ..mat.structures import TextureReference
 
 
@@ -54,6 +54,8 @@ class Submodel:
         self.cos_falloff_angle = 0
         self.cos_hotspot_angle = 0
         self.cos_view_angle = 0
+        # light intensity of a FreeSpotLight, HotspotPower / 100
+        self.hotspot_power = 1.0
 
     @property
     def ambient_color(self):

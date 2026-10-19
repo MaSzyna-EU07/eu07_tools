@@ -1,5 +1,5 @@
-from eu07_tools.utils.geometry import Geometry
-from eu07_tools.utils.structures import VectorXYZ, ColorRGB, Vertex3D, FactorySequence
+from ...utils.geometry import Geometry
+from ...utils.structures import VectorXYZ, ColorRGB, Vertex3D, FactorySequence
 
 class Node:
     def __init__(self, name):

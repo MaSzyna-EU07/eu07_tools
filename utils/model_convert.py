@@ -1,9 +1,9 @@
-import eu07_tools
-
 def e3d_to_t3d(e3d_model):
+    from ..t3d import create_submodel
+
     for e3d_sm in e3d_model.submodels:
         
-        t3d_sm = eu07_tools.t3d.create_submodel(e3d_sm.type, e3d_sm.name)
+        t3d_sm = create_submodel(e3d_sm.type, e3d_sm.name)
 
         t3d_sm.diffuse_color = [x * 255 for x in e3d_sm.diffuse_color[:3]]
         t3d_sm.anim = e3d_sm.anim
@@ -36,6 +36,8 @@ def e3d_to_t3d(e3d_model):
             t3d_sm.use_near_atten = e3d_sm.use_near_atten
             t3d_sm.far_atten_decay_type = e3d_sm.far_atten_decay_type
             t3d_sm.far_decay_radius = e3d_sm.far_decay_radius
+            if e3d_sm.hotspot_power != 1.0:
+                t3d_sm.hotspot_power = e3d_sm.hotspot_power * 100
             # TODO: cos_falloff_angle, cos_hotspot_angle - how to translate to t3d?        
 
         elif e3d_sm.type == "Stars":

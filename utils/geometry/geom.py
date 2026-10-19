@@ -1,7 +1,7 @@
 import abc
 import enum
 
-from eu07_tools.utils import FactorySequence, Vertex3D
+from ...utils import FactorySequence, Vertex3D
 from .smooth_normals_calc import SmoothGroupsNormalCalculator
 
 

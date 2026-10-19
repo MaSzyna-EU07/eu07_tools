@@ -1,6 +1,6 @@
 import math
 
-from eu07_tools.utils import TextWriter
+from ..utils import TextWriter
 
 def dump(elements, file):
     T3DOutput(file).dump_from_iterable(elements)
@@ -46,6 +46,8 @@ class T3DOutput:
             self._write_property("FarDecayRadius", submodel.far_decay_radius)
             self._write_property("FalloffAngle", submodel.falloff_angle)
             self._write_property("HotspotAngle", submodel.hotspot_angle)
+            if submodel.hotspot_power is not None:
+                self._write_property("HotspotPower", submodel.hotspot_power)
 
         elif submodel.type == "Stars":
             self._write_property("Diffuse", submodel.diffuse_color)

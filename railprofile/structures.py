@@ -1,4 +1,4 @@
-from eu07_tools.utils import VectorXY, FactorySequence
+from ..utils import VectorXY, FactorySequence
 
 
 class RailProfile:

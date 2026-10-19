@@ -1,8 +1,8 @@
 import abc
 
-from eu07_tools.mat.structures import TextureReference
-from eu07_tools.utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
-from eu07_tools.utils.geometry import Geometry
+from ..mat.structures import TextureReference
+from ..utils.structures import ColorRGB, VectorXYZ, Vertex3D, FactorySequence
+from ..utils.geometry import Geometry
 
 
 def create_submodel(type, name):
@@ -192,6 +192,9 @@ class FreeSpotLightSubmodel(Submodel):
     :type falloff_angle: `float`
     :ivar hotspot_angle: Hotspot angle, defaults to 45.0
     :type hotspot_angle: `float`
+    :ivar hotspot_power: Light intensity in percent, defaults to None, which leaves the entry out (the simulator
+        takes 100 then)
+    :type hotspot_power: `float` or `None`
     """
     def __init__(self, name):
         super().__init__(name)
@@ -203,6 +206,7 @@ class FreeSpotLightSubmodel(Submodel):
         self.far_decay_radius = 45.0
         self.falloff_angle = 45.0
         self.hotspot_angle = 45.0
+        self.hotspot_power = None
 
 
 class StarsSubmodel(Submodel):

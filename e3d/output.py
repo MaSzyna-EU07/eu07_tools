@@ -1,4 +1,4 @@
-from eu07_tools.utils import BinaryWriter
+from ..utils import BinaryWriter
 
 from .common import SUBMODEL_SIZE, VNT0_VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE
 
@@ -65,7 +65,12 @@ class E3DOutput:
             self._writer.write_float(submodel.cos_falloff_angle)
             self._writer.write_float(submodel.cos_hotspot_angle)
             self._writer.write_float(submodel.cos_view_angle)
-            self._writer.write_bytes(b"\x00" * 100)
+            # index count and offset
+            self._writer.write_bytes(b"\x00" * 8)
+            # the former diffuse multiplier (1 leaves the colour as it is), then the light intensity
+            self._writer.write_float(1.0)
+            self._writer.write_float(submodel.hotspot_power)
+            self._writer.write_bytes(b"\x00" * 84)
 
     def _dump_VNT0(self):
         self._writer.write_string("VNT0")

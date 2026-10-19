@@ -1,8 +1,8 @@
 from collections.abc import Iterator
 import functools
 
-from eu07_tools.utils.input import TextScanner
-import eu07_tools.scn
+from ..utils.input import TextScanner
+from .structures import create_element
 
 def load(file, tokenizer=None):
     return SCNInput(file, tokenizer)
@@ -104,7 +104,7 @@ class SCNInput(Iterator):
 
 
     def _load_atmo(self):
-        atmo = eu07_tools.scn.create_element("atmo")
+        atmo = create_element("atmo")
         atmo.sky_color = self._scanner.read_floats(3)
         atmo.fog_start = self._scanner.read_float()
         atmo.fog_end = self._scanner.read_float()
@@ -122,7 +122,7 @@ class SCNInput(Iterator):
 
 
     def _load_camera(self):
-        camera = eu07_tools.scn.create_element("camera")
+        camera = create_element("camera")
         camera.location = self._scanner.read_floats(3)
         camera.rotation = self._scanner.read_floats(3)
 
@@ -135,55 +135,55 @@ class SCNInput(Iterator):
         return camera
 
     def _load_config(self):
-        config = eu07_tools.scn.create_element("config")
+        config = create_element("config")
         config.content = " ".join(self._scanner.read_strings_before("endconfig"))
         return config
 
     def _load_description(self):
-        description = eu07_tools.scn.create_element("description")
+        description = create_element("description")
         self._scanner.read_strings_before("enddescription")
         return None
 
     def _load_event(self):
-        event = eu07_tools.scn.create_element("event")
+        event = create_element("event")
         self._scanner.read_strings_before("endevent")
         return None
 
     def _load_firstinit(self):
-        return eu07_tools.scn.create_element("firstinit")
+        return create_element("firstinit")
 
     def _load_include(self):
-        include = eu07_tools.scn.create_element("include")
+        include = create_element("include")
         include.path, *parameters = self._scanner.read_strings_before("end")
         include.parameters = parameters
 
         return include
 
     def _load_light(self):
-        light = eu07_tools.scn.create_element("light")
+        light = create_element("light")
         self._scanner.read_strings_before("endlight")
         return None
 
     def _load_lua(self):
-        lua = eu07_tools.scn.create_element("lua")
+        lua = create_element("lua")
         lua.path = self._scanner.read_string()
         return lua
 
     def _load_origin(self):
-        origin = eu07_tools.scn.create_element("origin")
+        origin = create_element("origin")
         origin.vector = self._scanner.read_floats(3)
         return origin
 
     def _load_endorigin(self):
-        return eu07_tools.scn.create_element("endorigin")
+        return create_element("endorigin")
 
     def _load_rotate(self):
-        rotate = eu07_tools.scn.create_element("rotate")
+        rotate = create_element("rotate")
         rotate.vector = self._scanner.read_floats(3)
         return rotate
 
     def _load_sky(self):
-        sky = eu07_tools.scn.create_element("sky")
+        sky = create_element("sky")
         sky.model_path, __ = self._scanner.read_strings(2)
         return sky
 
@@ -192,13 +192,13 @@ class SCNInput(Iterator):
         return None
 
     def _load_time(self):
-        time = eu07_tools.scn.create_element("time")
+        time = create_element("time")
         time.inital_time, time.sunset_time, time.sunrise_time = self._scanner.read_strings(3)
         self._scanner.read_string() # endtag
         return time
 
     def _load_trainset(self):
-        trainset = eu07_tools.scn.create_element("trainset")
+        trainset = create_element("trainset")
 
         trainset.timetable_path, trainset.track_name = self._scanner.read_strings(2)
         trainset.offset, trainset.velocity = self._scanner.read_floats(2)
@@ -208,7 +208,7 @@ class SCNInput(Iterator):
 
     def _load_endtrainset(self):
         self._is_trainset_open = False
-        return eu07_tools.scn.create_element("endtrainset")
+        return create_element("endtrainset")
 
     def _load_node(self):
         max_distance = self._scanner.read_float()
@@ -226,7 +226,7 @@ class SCNInput(Iterator):
             return node
 
     def _load_node_dynamic(self, name):
-        dynamic = eu07_tools.scn.create_element("node:dynamic", name)
+        dynamic = create_element("node:dynamic", name)
         dynamic.base_path, dynamic.map, dynamic.mmd_path = self._scanner.read_strings(3)
 
         if not self._is_trainset_open:
@@ -258,7 +258,7 @@ class SCNInput(Iterator):
         return dynamic
 
     def _load_node_eventlauncher(self, name):
-        launcher = eu07_tools.scn.create_element("node:eventlauncher", name)
+        launcher = create_element("node:eventlauncher", name)
         *launcher.location, launcher.radius = self._scanner.read_floats(4)
         launcher.key = self._scanner.read_string()
         launcher.delta_time = self._scanner.read_float()
@@ -287,7 +287,7 @@ class SCNInput(Iterator):
         return lines
         
     def _generic_load_lines(self, name):
-        lines = eu07_tools.scn.create_element("node:lines", name)
+        lines = create_element("node:lines", name)
         *lines.color, lines.thickness = self._scanner.read_floats(4)
 
         while True:
@@ -302,7 +302,7 @@ class SCNInput(Iterator):
         return lines
 
     def _load_node_memcell(self, name):
-        memcell = eu07_tools.scn.create_element("node:memcell", name)
+        memcell = create_element("node:memcell", name)
         memcell.location = self._scanner.read_floats(3)
         memcell.values = self._scanner.read_strings(3)
         memcell.track_name = self._scanner.read_string()
@@ -311,7 +311,7 @@ class SCNInput(Iterator):
         return memcell
 
     def _load_node_model(self, name):
-        model = eu07_tools.scn.create_element("node:model", name)
+        model = create_element("node:model", name)
         *model.location, model.rotation.y = self._scanner.read_floats(4)
         model.path, model.map = self._scanner.read_strings(2)
 
@@ -362,7 +362,7 @@ class SCNInput(Iterator):
         return model
 
     def _load_node_sound(self, name):
-        sound = eu07_tools.scn.create_element("node:sound", name)
+        sound = create_element("node:sound", name)
         sound.location = self._scanner.read_floats(3)
         sound.path = self._scanner.read_string()
         self._scanner.read_string() # endtag
@@ -371,7 +371,7 @@ class SCNInput(Iterator):
 
 
     def _load_node_track(self, name):
-        track = eu07_tools.scn.create_element("node:track", name)
+        track = create_element("node:track", name)
         track.subtype = self._scanner.read_string().lower()
 
         track.length = self._scanner.read_float()
@@ -448,7 +448,7 @@ class SCNInput(Iterator):
         return track
 
     def _load_node_traction(self, name):
-        traction = eu07_tools.scn.create_element("node:traction", name)
+        traction = create_element("node:traction", name)
 
         traction.powersource_name = self._scanner.read_string()
         traction.nominal_voltage = self._scanner.read_float()
@@ -476,7 +476,7 @@ class SCNInput(Iterator):
         return traction
 
     def _load_node_tractionpowersource(self, name):
-        power_source = eu07_tools.scn.create_element("node:tractionpowersource", name)
+        power_source = create_element("node:tractionpowersource", name)
         power_source.location = self._scanner.read_floats(3)
         power_source.nominal_voltage = self._scanner.read_float()
         power_source.voltage_frequency = self._scanner.read_float()
@@ -509,7 +509,7 @@ class SCNInput(Iterator):
 
 
     def _generic_load_triangles(self, name):
-        triangles = eu07_tools.scn.create_element("node:triangles", name)
+        triangles = create_element("node:triangles", name)
         token = self._scanner.read_string()
         map_ = token
 
@@ -576,7 +576,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_addvalues(self, name):
-        addvalues = eu07_tools.scn.create_element("event:addvalues", name)
+        addvalues = create_element("event:addvalues", name)
 
         addvalues.memcell_name = self._scanner.read_string()
         addvalues.values = self._scanner.read_strings(3)
@@ -590,7 +590,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_copyvalues(self, name):
-        copyvalues = eu07_tools.scn.create_element("event:copyvalues", name)
+        copyvalues = create_element("event:copyvalues", name)
 
         copyvalues.target_memcell_name = self._scanner.read_string()
         copyvalues.source_memcell_name = self._scanner.read_string()
@@ -604,7 +604,7 @@ class SCNInput(Iterator):
 
     
     def _load_event_getvalues(self, name):
-        getvalues = eu07_tools.scn.create_element("event:getvalues", name)
+        getvalues = create_element("event:getvalues", name)
 
         getvalues.memcell_name = self._scanner.read_string()
 
@@ -612,7 +612,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_logvalues(self, name):
-        logvalues = eu07_tools.scn.create_element("event:logvalues", name)
+        logvalues = create_element("event:logvalues", name)
 
         logvalues.memcell_name = self._scanner.read_string()
 
@@ -620,7 +620,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_putvalues(self, name):
-        putvalues = eu07_tools.scn.create_element("event:putvalues", name)
+        putvalues = create_element("event:putvalues", name)
         self._scanner.read_string() # "none"
         putvalues.location = self._scanner.read_floats(3)
         putvalues.values = self._scanner.read_strings(3)
@@ -628,7 +628,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_updatevalues(self, name):
-        updatevalues = eu07_tools.scn.create_element("event:updatevalues", name)
+        updatevalues = create_element("event:updatevalues", name)
 
         updatevalues.memcell_name = self._scanner.read_string()
         updatevalues.values = self._scanner.read_strings(3)
@@ -644,7 +644,7 @@ class SCNInput(Iterator):
        
 
     def _load_event_animation(self, name):
-        animation = eu07_tools.scn.create_element("event:animation", name)
+        animation = create_element("event:animation", name)
 
         animation.model_name, animation.anim_type, animation.submodel_name = self._scanner.read_strings(3)
         *animation.vector, animation.delay = self._scanner.read_floats(4)
@@ -653,7 +653,7 @@ class SCNInput(Iterator):
     
 
     def _load_event_lights(self, name):
-        lights = eu07_tools.scn.create_element("event:lights", name)
+        lights = create_element("event:lights", name)
 
         lights.model_name = self._scanner.read_string()
         while True:
@@ -668,7 +668,7 @@ class SCNInput(Iterator):
 
     
     def _load_event_trackvel(self, name):
-        trackvel = eu07_tools.scn.create_element("event:trackvel", name)
+        trackvel = create_element("event:trackvel", name)
 
         trackvel.track_name = self._scanner.read_string()
         trackvel.velocity = self._scanner.read_float()
@@ -677,7 +677,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_visible(self, name):
-        visible = eu07_tools.scn.create_element("event:visible", name)
+        visible = create_element("event:visible", name)
 
         visible.node_name = self._scanner.read_string()
         visible.visibility = self._scanner.read_int() 
@@ -686,7 +686,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_voltage(self, name):
-        voltage = eu07_tools.scn.create_element("event:voltage", name)
+        voltage = create_element("event:voltage", name)
 
         voltage.powersource_name = self._scanner.read_string()
         voltage.voltage = self._scanner.read_float() 
@@ -695,7 +695,7 @@ class SCNInput(Iterator):
 
     
     def _load_event_whois(self, name):
-        whois = eu07_tools.scn.create_element("event:whois", name)
+        whois = create_element("event:whois", name)
 
         whois.memcell_name = self._scanner.read_string()
         whois.mask = self._scanner.read_int() 
@@ -704,7 +704,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_friction(self, name):
-        friction = eu07_tools.scn.create_element("event:friction", name)
+        friction = create_element("event:friction", name)
 
         friction.track_name = self._scanner.read_string()
         friction.friction = self._scanner.read_float() 
@@ -713,7 +713,7 @@ class SCNInput(Iterator):
 
 
     def _load_event_multiple(self, name):
-        multiple = eu07_tools.scn.create_element("event:multiple", name)
+        multiple = create_element("event:multiple", name)
 
         while True:
             token = self._scanner.read_string()
@@ -735,7 +735,7 @@ class SCNInput(Iterator):
 
     
     def _load_event_switch(self, name):
-        switch = eu07_tools.scn.create_element("event:switch", name)
+        switch = create_element("event:switch", name)
 
         switch.switch_name = self._scanner.read_string()
         switch.state = self._scanner.read_int()
@@ -756,7 +756,7 @@ class SCNInput(Iterator):
 
     
     def _load_event_sound(self, name):
-        sound = eu07_tools.scn.create_element("event:sound", name)
+        sound = create_element("event:sound", name)
 
         sound.sound_name = self._scanner.read_string()
         sound.play_status = self._scanner.read_string()
@@ -771,25 +771,25 @@ class SCNInput(Iterator):
 
 
     def _load_event_disable(self, name):
-        disable = eu07_tools.scn.create_element("event:disable", name)
+        disable = create_element("event:disable", name)
         self._scanner.read_string()
         return disable
 
 
     def _load_event_dynvel(self, name):
-        dynvel = eu07_tools.scn.create_element("event:dynvel", name)
+        dynvel = create_element("event:dynvel", name)
         self._scanner.read_string()
         return dynvel
 
 
     def _load_event_message(self, name):
-        message = eu07_tools.scn.create_element("event:message", name)
+        message = create_element("event:message", name)
         self._scanner.read_string()
         return message
 
 
     def _load_event_texture(self, name):
-        texture = eu07_tools.scn.create_element("event:texture", name)
+        texture = create_element("event:texture", name)
 
         texture.models_names = self._scanner.read_string().split("|")
         texture.replacableskin_index = self._scanner.read_int()

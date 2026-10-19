@@ -1,7 +1,7 @@
 from collections.abc import Iterator
-import eu07_tools.t3d
-from eu07_tools.utils import TextScanner
-from eu07_tools.utils.geometry import Geometry
+from .structures import create_include, create_submodel
+from ..utils import TextScanner
+from ..utils.geometry import Geometry
 
 
 
@@ -27,13 +27,13 @@ class T3DInput:
                     raise ValueError(f"Bad T3D syntax in line: {self._scanner.line_number}")
             elif token == "include":
                 path, *parameters = self._scanner.read_strings_before("end")
-                yield eu07_tools.t3d.create_include(path, parameters)
+                yield create_include(path, parameters)
 
     def _load_submodel(self, parent_name):
         type_ = self._read_property()
         name = self._read_property()
 
-        submodel = eu07_tools.t3d.create_submodel(type_, name)
+        submodel = create_submodel(type_, name)
 
         submodel.parent_name = parent_name
         submodel.anim = self._read_property()
@@ -58,6 +58,12 @@ class T3DInput:
             submodel.far_decay_radius = self._read_property()
             submodel.falloff_angle = self._read_property()
             submodel.hotspot_angle = self._read_property()
+            # optional, the simulator takes it only right after HotspotAngle
+            token = self._scanner.read_string()
+            if token.lower().rstrip(":") == "hotspotpower":
+                submodel.hotspot_power = self._scanner.read_float()
+            else:
+                self._scanner.put_back(token)
 
         elif submodel.type == "Stars":
             submodel.diffuse_color = self._read_property()
