@@ -5,6 +5,14 @@ from ..utils.geometry import Geometry
 
 
 
+# optional true/false entries of FreeSpotLight and the attributes of FreeSpotLightSubmodel they go to
+LIGHT_FLAGS = {
+    "shadeself": "shade_self",
+    "castshadows": "cast_shadows",
+    "softfalloff": "soft_falloff",
+}
+
+
 def load(file):
     return T3DInput(file).load()
 
@@ -58,12 +66,19 @@ class T3DInput:
             submodel.far_decay_radius = self._read_property()
             submodel.falloff_angle = self._read_property()
             submodel.hotspot_angle = self._read_property()
-            # optional, the simulator takes it only right after HotspotAngle
-            token = self._scanner.read_string()
-            if token.lower().rstrip(":") == "hotspotpower":
-                submodel.hotspot_power = self._scanner.read_float()
-            else:
-                self._scanner.put_back(token)
+            # optional entries in any order, which the simulator takes right after HotspotAngle
+            while True:
+                token = self._scanner.read_string()
+                key = token.lower().rstrip(":")
+                if key == "hotspotpower":
+                    submodel.hotspot_power = self._scanner.read_float()
+                elif key == "radius":
+                    submodel.radius = self._scanner.read_float()
+                elif key in LIGHT_FLAGS:
+                    setattr(submodel, LIGHT_FLAGS[key], self._scanner.read_string().lower() in ("true", "yes", "1"))
+                else:
+                    self._scanner.put_back(token)
+                    break
 
         elif submodel.type == "Stars":
             submodel.diffuse_color = self._read_property()

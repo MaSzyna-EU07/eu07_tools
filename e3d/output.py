@@ -1,6 +1,11 @@
+import struct
+
 from ..utils import BinaryWriter
 
-from .common import SUBMODEL_SIZE, VNT0_VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE
+from .common import (
+    SUBMODEL_SIZE, VNT0_VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE,
+    LIGHT_SHADESELF, LIGHT_NOSHADOWS, LIGHT_SOFTFALLOFF
+)
 
 def dump(model, file):
     E3DOutput(model, file).run()
@@ -70,7 +75,14 @@ class E3DOutput:
             # the former diffuse multiplier (1 leaves the colour as it is), then the light intensity
             self._writer.write_float(1.0)
             self._writer.write_float(submodel.hotspot_power)
-            self._writer.write_bytes(b"\x00" * 84)
+            # the optional parameters of a light point
+            self._writer.write_float(submodel.radius)
+            self._writer.write_bytes(struct.pack("I", (
+                (LIGHT_SHADESELF if submodel.shade_self else 0) |
+                (0 if submodel.cast_shadows else LIGHT_NOSHADOWS) |
+                (LIGHT_SOFTFALLOFF if submodel.soft_falloff else 0)
+            )))
+            self._writer.write_bytes(b"\x00" * 76)
 
     def _dump_VNT0(self):
         self._writer.write_string("VNT0")

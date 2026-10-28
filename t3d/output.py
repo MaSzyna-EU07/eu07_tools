@@ -48,6 +48,14 @@ class T3DOutput:
             self._write_property("HotspotAngle", submodel.hotspot_angle)
             if submodel.hotspot_power is not None:
                 self._write_property("HotspotPower", submodel.hotspot_power)
+            if submodel.radius is not None:
+                self._write_property("Radius", submodel.radius)
+            if submodel.shade_self is not None:
+                self._write_property("ShadeSelf", submodel.shade_self)
+            if submodel.cast_shadows is not None:
+                self._write_property("CastShadows", submodel.cast_shadows)
+            if submodel.soft_falloff is not None:
+                self._write_property("SoftFalloff", submodel.soft_falloff)
 
         elif submodel.type == "Stars":
             self._write_property("Diffuse", submodel.diffuse_color)
@@ -128,6 +136,9 @@ class T3DOutput:
             self._writer.write_string("\n")
 
         elif key_lower in "usenearatten wire":
+            self._writer.write_string("true" if value else "false")
+
+        elif key_lower in ("shadeself", "castshadows", "softfalloff"):
             self._writer.write_string("true" if value else "false")
 
         elif key_lower in "parent name":

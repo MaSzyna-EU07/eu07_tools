@@ -9,6 +9,11 @@ IDX2_INDEX_SIZE = 2
 IDX4_INDEX_SIZE = 4
 FLOAT_SIZE = 4
 
+# flags of the optional parameters of a light point in its submodel record, after its radius (as the simulator writes them)
+LIGHT_SHADESELF = 0x1
+LIGHT_NOSHADOWS = 0x2
+LIGHT_SOFTFALLOFF = 0x4
+
 TYPEID_TO_TYPENAME = {
     4: "Mesh",
     256: "Mesh",

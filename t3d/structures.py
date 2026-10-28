@@ -195,6 +195,16 @@ class FreeSpotLightSubmodel(Submodel):
     :ivar hotspot_power: Light intensity in percent, defaults to None, which leaves the entry out (the simulator
         takes 100 then)
     :type hotspot_power: `float` or `None`
+    :ivar radius: Radius of the sphere the light shines from, metres, defaults to None, which leaves the entry out (the
+        simulator takes a point then). A FalloffAngle of 360 makes the light a point light
+    :type radius: `float` or `None`
+    :ivar shade_self: Whether the model the light belongs to casts its shadows, defaults to None (the simulator takes false)
+    :type shade_self: `bool` or `None`
+    :ivar cast_shadows: Whether the light casts shadows, defaults to None (the simulator takes true)
+    :type cast_shadows: `bool` or `None`
+    :ivar soft_falloff: Whether the light falls off as 1 / (d^2 + r^2), as the Soft Falloff of Blender, instead of from the
+        surface of its sphere, defaults to None (the simulator takes false)
+    :type soft_falloff: `bool` or `None`
     """
     def __init__(self, name):
         super().__init__(name)
@@ -207,6 +217,10 @@ class FreeSpotLightSubmodel(Submodel):
         self.falloff_angle = 45.0
         self.hotspot_angle = 45.0
         self.hotspot_power = None
+        self.radius = None
+        self.shade_self = None
+        self.cast_shadows = None
+        self.soft_falloff = None
 
 
 class StarsSubmodel(Submodel):

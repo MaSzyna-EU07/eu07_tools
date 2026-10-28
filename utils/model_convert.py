@@ -38,6 +38,14 @@ def e3d_to_t3d(e3d_model):
             t3d_sm.far_decay_radius = e3d_sm.far_decay_radius
             if e3d_sm.hotspot_power != 1.0:
                 t3d_sm.hotspot_power = e3d_sm.hotspot_power * 100
+            if e3d_sm.radius > 0.0:
+                t3d_sm.radius = e3d_sm.radius
+            if e3d_sm.shade_self:
+                t3d_sm.shade_self = True
+            if not e3d_sm.cast_shadows:
+                t3d_sm.cast_shadows = False
+            if e3d_sm.soft_falloff:
+                t3d_sm.soft_falloff = True
             # TODO: cos_falloff_angle, cos_hotspot_angle - how to translate to t3d?        
 
         elif e3d_sm.type == "Stars":
