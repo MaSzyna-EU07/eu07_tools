@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from .structures import create_include, create_submodel
-from ..utils import TextScanner
+from ..utils import TextScanner, has_parameters, substitute_parameters
 from ..utils.geometry import Geometry
 
 
@@ -13,13 +13,16 @@ LIGHT_FLAGS = {
 }
 
 
-def load(file):
-    return T3DInput(file).load()
+def load(file, parameters=None):
+    """ Parameters: the values the include of the file gives its parameters (p1), (p2) ..., for the values of the transform
+    matrices which are parameters; the parameters stay in the names and in transform_params of the submodels """
+    return T3DInput(file, parameters).load()
 
 
 class T3DInput:
-    def __init__(self, file):
+    def __init__(self, file, parameters=None):
         self._scanner = TextScanner.from_file(file)
+        self._parameters = list(parameters) if parameters else []
         
     def load(self):
         while True:
@@ -86,7 +89,7 @@ class T3DInput:
 
         submodel.max_distance = self._read_property()
         submodel.min_distance = self._read_property()
-        submodel.transform = self._read_property()
+        self._read_transform(submodel)
 
         if submodel.type in "Stars Mesh":
             self._load_geometry(submodel)
@@ -139,6 +142,26 @@ class T3DInput:
                     for vertex in vertices:
                         submodel.stars.new(vertex[:3], vertex[3])
 
+
+    def _read_transform(self, submodel):
+        """ Transform matrix, whose elements may be parameters of an included file """
+        propname = self._scanner.read_string().lower().rstrip(":")
+        if propname != "transform":
+            raise ValueError(f"Expected Transform, got {propname}")
+        submodel.transform = []
+        submodel.transform_params = {}
+        for index in range(16):
+            token = self._scanner.read_string()
+            if has_parameters(token):
+                submodel.transform_params[index] = token
+                value = substitute_parameters(token, self._parameters)
+            else:
+                value = token
+            try:
+                submodel.transform.append(float(value))
+            except ValueError:
+                # a parameter without a value of a number: the matrix holds 0 in its place
+                submodel.transform.append(0.0)
 
     def _read_property(self):
         propname = self._scanner.read_string().lower().rstrip(":")

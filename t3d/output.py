@@ -15,7 +15,8 @@ class T3DOutput:
 
     def dump_element(self, element):
         if element.element_type == "include":
-            self._writer.write_string(f"include {element.path} end\n")
+            parameters = "".join(f"{parameter} " for parameter in element.parameters)
+            self._writer.write_string(f"include {element.path} {parameters}end\n")
         elif element.element_type == "submodel":
             self._dump_submodel(element)
 
@@ -63,7 +64,11 @@ class T3DOutput:
 
         self._write_property("MaxDistance", submodel.max_distance)
         self._write_property("MinDistance", submodel.min_distance)
-        self._write_property("Transform", submodel.transform)
+        # the elements which are parameters of an included file go as they are written in it
+        transform = list(submodel.transform)
+        for index, token in getattr(submodel, "transform_params", {}).items():
+            transform[index] = token
+        self._write_property("Transform", transform)
 
         self._dump_geometry(submodel)
 
@@ -125,14 +130,13 @@ class T3DOutput:
             self._writer.write_floats(value)
 
         elif key_lower in "transform":
-            self._writer.write_string("\n\t")
-            self._writer.write_floats(value[:4])
-            self._writer.write_string("\n\t")
-            self._writer.write_floats(value[4:8])
-            self._writer.write_string("\n\t")
-            self._writer.write_floats(value[8:12])
-            self._writer.write_string("\n\t")
-            self._writer.write_floats(value[12:])
+            for row in range(4):
+                self._writer.write_string("\n\t")
+                for element in value[row * 4:row * 4 + 4]:
+                    if isinstance(element, str):
+                        self._writer.write_string(element)
+                    else:
+                        self._writer.write_float(element)
             self._writer.write_string("\n")
 
         elif key_lower in "usenearatten wire":

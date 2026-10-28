@@ -89,6 +89,10 @@ class Submodel(Element):
     :type max_distance: `float`
     :ivar transform: Transform matrix as list of 16 floats, defaults to identity matrix.
     :type transform: `List[float]`
+    :ivar transform_params: Elements of the transform matrix which are parameters of an included file, as written in
+        the file (e.g. "(p2)"), by their index in transform; the value in transform is the one the parameters of the
+        include give, or 0 without them. Defaults to empty
+    :type transform_params: `Dict[int, str]`
     """
     def __init__(self, name):
         self.element_type = "submodel"
@@ -106,6 +110,7 @@ class Submodel(Element):
             0, 0, 1, 0,
             0, 0, 0, 1
         ]
+        self.transform_params = {}
 
     @property
     def diffuse_color(self):
