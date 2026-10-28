@@ -10,6 +10,7 @@ LIGHT_FLAGS = {
     "shadeself": "shade_self",
     "castshadows": "cast_shadows",
     "softfalloff": "soft_falloff",
+    "lightonly": "light_only",
 }
 
 

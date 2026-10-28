@@ -6,7 +6,7 @@ from .common import (
     CHUNK_HEADER_SIZE, MATRIX_SIZE, SUBMODEL_SIZE,
     VNT1_VERTEX_SIZE, VNT2_VERTEX_SIZE, VNT0_VERTEX_SIZE, FLOAT_SIZE,
     IDX1_INDEX_SIZE, IDX2_INDEX_SIZE, IDX4_INDEX_SIZE, TYPEID_TO_TYPENAME,
-    LIGHT_SHADESELF, LIGHT_NOSHADOWS, LIGHT_SOFTFALLOFF
+    LIGHT_SHADESELF, LIGHT_NOSHADOWS, LIGHT_SOFTFALLOFF, LIGHT_LIGHTONLY
 )
 
 
@@ -106,6 +106,7 @@ class E3DInput:
             submodel.shade_self = bool(light_flags & LIGHT_SHADESELF)
             submodel.cast_shadows = not (light_flags & LIGHT_NOSHADOWS)
             submodel.soft_falloff = bool(light_flags & LIGHT_SOFTFALLOFF)
+            submodel.light_only = bool(light_flags & LIGHT_LIGHTONLY)
 
             # skip pad bytes
             self._scanner.read_bytes(76)

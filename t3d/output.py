@@ -57,6 +57,8 @@ class T3DOutput:
                 self._write_property("CastShadows", submodel.cast_shadows)
             if submodel.soft_falloff is not None:
                 self._write_property("SoftFalloff", submodel.soft_falloff)
+            if submodel.light_only is not None:
+                self._write_property("LightOnly", submodel.light_only)
 
         elif submodel.type == "Stars":
             self._write_property("Diffuse", submodel.diffuse_color)
@@ -142,7 +144,7 @@ class T3DOutput:
         elif key_lower in "usenearatten wire":
             self._writer.write_string("true" if value else "false")
 
-        elif key_lower in ("shadeself", "castshadows", "softfalloff"):
+        elif key_lower in ("shadeself", "castshadows", "softfalloff", "lightonly"):
             self._writer.write_string("true" if value else "false")
 
         elif key_lower in "parent name":

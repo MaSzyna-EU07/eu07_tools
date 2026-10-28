@@ -46,6 +46,8 @@ def e3d_to_t3d(e3d_model):
                 t3d_sm.cast_shadows = False
             if e3d_sm.soft_falloff:
                 t3d_sm.soft_falloff = True
+            if e3d_sm.light_only:
+                t3d_sm.light_only = True
             # TODO: cos_falloff_angle, cos_hotspot_angle - how to translate to t3d?        
 
         elif e3d_sm.type == "Stars":

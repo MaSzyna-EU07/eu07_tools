@@ -210,6 +210,9 @@ class FreeSpotLightSubmodel(Submodel):
     :ivar soft_falloff: Whether the light falls off as 1 / (d^2 + r^2), as the Soft Falloff of Blender, instead of from the
         surface of its sphere, defaults to None (the simulator takes false)
     :type soft_falloff: `bool` or `None`
+    :ivar light_only: Whether the light only lights its surroundings, without the glowing point and the glare the simulator
+        draws for it, seen from afar, defaults to None (the simulator takes false)
+    :type light_only: `bool` or `None`
     """
     def __init__(self, name):
         super().__init__(name)
@@ -226,6 +229,7 @@ class FreeSpotLightSubmodel(Submodel):
         self.shade_self = None
         self.cast_shadows = None
         self.soft_falloff = None
+        self.light_only = None
 
 
 class StarsSubmodel(Submodel):

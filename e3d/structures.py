@@ -56,11 +56,12 @@ class Submodel:
         self.cos_view_angle = 0
         # light intensity of a FreeSpotLight, HotspotPower / 100
         self.hotspot_power = 1.0
-        # the optional parameters of a FreeSpotLight (Radius, ShadeSelf, CastShadows, SoftFalloff of the t3d)
+        # the optional parameters of a FreeSpotLight (Radius, ShadeSelf, CastShadows, SoftFalloff, LightOnly of the t3d)
         self.radius = 0.0
         self.shade_self = False
         self.cast_shadows = True
         self.soft_falloff = False
+        self.light_only = False
 
     @property
     def ambient_color(self):

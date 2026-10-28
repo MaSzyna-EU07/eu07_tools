@@ -4,7 +4,7 @@ from ..utils import BinaryWriter
 
 from .common import (
     SUBMODEL_SIZE, VNT0_VERTEX_SIZE, MATRIX_SIZE, CHUNK_HEADER_SIZE,
-    LIGHT_SHADESELF, LIGHT_NOSHADOWS, LIGHT_SOFTFALLOFF
+    LIGHT_SHADESELF, LIGHT_NOSHADOWS, LIGHT_SOFTFALLOFF, LIGHT_LIGHTONLY
 )
 
 def dump(model, file):
@@ -80,7 +80,8 @@ class E3DOutput:
             self._writer.write_bytes(struct.pack("I", (
                 (LIGHT_SHADESELF if submodel.shade_self else 0) |
                 (0 if submodel.cast_shadows else LIGHT_NOSHADOWS) |
-                (LIGHT_SOFTFALLOFF if submodel.soft_falloff else 0)
+                (LIGHT_SOFTFALLOFF if submodel.soft_falloff else 0) |
+                (LIGHT_LIGHTONLY if submodel.light_only else 0)
             )))
             self._writer.write_bytes(b"\x00" * 76)
 
