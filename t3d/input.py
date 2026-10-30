@@ -15,15 +15,22 @@ LIGHT_FLAGS = {
 
 
 def load(file, parameters=None):
-    """ Parameters: the values the include of the file gives its parameters (p1), (p2) ..., for the values of the transform
-    matrices which are parameters; the parameters stay in the names and in transform_params of the submodels """
+    """ Parameters: the values the include of the file gives its parameters (p1), (p2) ..., which are put in place of them
+    in every token as the simulator does. The names and the transform matrices keep what is written in the file as well:
+    name_template, parent_template and transform_params of the submodels, raw_parameters of the includes """
     return T3DInput(file, parameters).load()
 
 
 class T3DInput:
     def __init__(self, file, parameters=None):
-        self._scanner = TextScanner.from_file(file)
         self._parameters = list(parameters) if parameters else []
+        self._scanner = TextScanner.from_file(file, parameters=self._parameters)
+
+    def _substituted(self, raw):
+        return substitute_parameters(raw, self._parameters)
+
+    def _template(self, raw):
+        return raw if has_parameters(raw) else None
         
     def load(self):
         while True:
@@ -32,22 +39,37 @@ class T3DInput:
             if token == "":
                 return
             elif token == "parent":
-                parent_name = self._scanner.read_string()
+                raw_parent = self._scanner.read_raw_string()
                 try:
-                    yield self._load_submodel(parent_name)
+                    yield self._load_submodel(raw_parent)
                 except ValueError as e:
                     raise ValueError(f"Bad T3D syntax in line: {self._scanner.line_number}")
             elif token == "include":
-                path, *parameters = self._scanner.read_strings_before("end")
-                yield create_include(path, parameters)
+                raw = []
+                while True:
+                    item = self._scanner.read_raw_string()
+                    if item == "" or item == "end":
+                        break
+                    raw.append(item)
+                if raw:
+                    path, *parameters = [self._substituted(item) for item in raw]
+                    include = create_include(path, parameters)
+                    # as written in the file: parameters of this file passed on stay parameters
+                    include.raw_parameters = raw[1:]
+                    yield include
 
-    def _load_submodel(self, parent_name):
+    def _load_submodel(self, raw_parent):
         type_ = self._read_property()
-        name = self._read_property()
+        if self._scanner.read_string().lower().rstrip(":") != "name":
+            raise ValueError("Expected Name")
+        raw_name = self._scanner.read_raw_string()
 
-        submodel = create_submodel(type_, name)
+        submodel = create_submodel(type_, self._substituted(raw_name))
 
-        submodel.parent_name = parent_name
+        submodel.parent_name = self._substituted(raw_parent)
+        # the names as written in the file, when they hold parameters
+        submodel.name_template = self._template(raw_name)
+        submodel.parent_template = self._template(raw_parent)
         submodel.anim = self._read_property()
 
         if submodel.type == "Mesh":
@@ -152,7 +174,7 @@ class T3DInput:
         submodel.transform = []
         submodel.transform_params = {}
         for index in range(16):
-            token = self._scanner.read_string()
+            token = self._scanner.read_raw_string()
             if has_parameters(token):
                 submodel.transform_params[index] = token
                 value = substitute_parameters(token, self._parameters)

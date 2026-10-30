@@ -1,24 +1,39 @@
+from ..parameters import has_parameters, substitute_parameters
+
 DEFAULT_SEPARATORS = [" ", "\t", ";", ","]
 
 class TextScanner:
     @classmethod
-    def from_file(cls, file, tokenizer=None):
-        return cls(file, tokenizer)
+    def from_file(cls, file, tokenizer=None, parameters=None):
+        return cls(file, tokenizer, parameters)
 
-    def __init__(self, file, tokenizer=None):
+    def __init__(self, file, tokenizer=None, parameters=None):
         self._tokenizer = tokenizer
         if not self._tokenizer:
             self._tokenizer = Tokenizer()
         self._tokenizer.tokenize_file(file)
         self._back_tokens = []
+        # the values the include of the file gives its parameters (p1), (p2) ..., put in place of them in the tokens as the
+        # simulator does (read_raw_string() gives the tokens as they are written)
+        self.parameters = list(parameters) if parameters else []
 
-    def read_string(self):
+    def read_raw_string(self):
         if self._back_tokens:
             return self._back_tokens.pop(0)
         return self._tokenizer.get_token()
 
+    def read_string(self):
+        return substitute_parameters(self.read_raw_string(), self.parameters)
+
     def read_float(self):
-        return float(self.read_string())
+        token = self.read_string()
+        try:
+            return float(token)
+        except ValueError:
+            if has_parameters(token):
+                # a parameter of a file read without the values of its include
+                return 0.0
+            raise
 
     def read_int(self):
         return int(self.read_string())

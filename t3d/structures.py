@@ -66,6 +66,8 @@ class Include(Element):
         self.element_type = "include"
         self.path = path
         self.parameters = [] if parameters is None else list(parameters)
+        # the parameters as written in the file which includes, which may pass on its own parameters (p1), (p2) ...
+        self.raw_parameters = list(self.parameters)
 
 
 class Submodel(Element):
@@ -111,6 +113,10 @@ class Submodel(Element):
             0, 0, 0, 1
         ]
         self.transform_params = {}
+        # the name and the parent name as written in an included file, with its parameters (p1), (p2) ..., when they hold
+        # any; None otherwise
+        self.name_template = None
+        self.parent_template = None
 
     @property
     def diffuse_color(self):
